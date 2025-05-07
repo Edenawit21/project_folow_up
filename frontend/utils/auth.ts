@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // Base URL of your ASP.NET API
-const API_URL = "https://your-backend-url/api/auth";
+const API_URL = "http://localhost:5161/api/Auth";
 
 // Login function to handle user authentication
 export const login = async (email: string, password: string) => {
