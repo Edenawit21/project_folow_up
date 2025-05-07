@@ -31,16 +31,11 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    router.push("/manager");
-  };
+  
+  
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
-      {/* Top Navigation */}
-      <nav className="w-full bg-white px-6 py-4 shadow-md">
-        
-      </nav>
 
       <div className="flex flex-1">
         
@@ -66,6 +61,7 @@ const Login = () => {
                 <input
                   type="email"
                   id="email"
+                  placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -85,6 +81,7 @@ const Login = () => {
                 <input
                   type="password"
                   id="password"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
