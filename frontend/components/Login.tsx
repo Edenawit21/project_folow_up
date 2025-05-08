@@ -30,10 +30,7 @@ const Login = () => {
       setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
-
   
-  
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
 
