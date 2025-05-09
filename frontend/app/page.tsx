@@ -7,10 +7,10 @@ const Page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/login"); // Redirect to /login
+    router.replace("/login"); 
   }, [router]);
 
-  return null; // Or show a loading spinner
+  return null; 
 };
 
 export default Page;
