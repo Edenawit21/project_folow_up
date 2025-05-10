@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
-import { Add } from "@mui/icons-material";
+import React, { useState, useCallback } from "react";
 import { Project } from "@/types";
 import Sidebar from "@/components/Sidebar";
 import ProjectList from "@/components/ProjectList";
@@ -13,7 +12,7 @@ const teams = ["Team Alpha", "Team Beta", "Team Gamma"];
 
 const ProjectDashboard = () => {
   const [projects, setProjects] = useState(initialProjects);
-  const [activeSection, setActiveSection] = useState("Projects");
+  const [activeSection, setActiveSection] = useState("Charts"); // Default to "Charts"
   const [openDialog, setOpenDialog] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -71,11 +70,12 @@ const ProjectDashboard = () => {
       <Sidebar
         activeSection={activeSection}
         setActiveSection={setActiveSection}
+        handleOpenDialog={handleOpenDialog} // Pass the function to Sidebar
       />
       <main className="flex-1 p-8">
         {activeSection === "Projects" && (
           <>
-            {/* Header Section */}
+            {/* Filters and Search Section */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <input
                 type="text"
@@ -84,7 +84,6 @@ const ProjectDashboard = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-
               <div className="flex flex-wrap gap-2">
                 <select
                   value={filters.priority}
@@ -131,27 +130,6 @@ const ProjectDashboard = () => {
                   ))}
                 </select>
               </div>
-
-              <button
-                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap"
-                onClick={handleOpenDialog}
-              >
-                <Add className="text-white" />
-                New Project
-              </button>
-            </div>
-
-            {/* Charts Section */}
-            <div className="mb-10">
-              <h2 className="text-lg font-semibold mb-4">Project Analytics</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-4 rounded shadow">
-                  <PieChartComponent projects={projects} />
-                </div>
-                <div className="bg-white p-4 rounded shadow">
-                  <BarChartComponent projects={projects} />
-                </div>
-              </div>
             </div>
 
             {/* Project List */}
@@ -164,6 +142,20 @@ const ProjectDashboard = () => {
               handleDelete={handleDelete}
             />
           </>
+        )}
+
+        {activeSection === "Charts" && (
+          <div className="mb-10">
+            <h2 className="text-lg font-semibold mb-4">Project Analytics</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-4 rounded shadow">
+                <PieChartComponent projects={projects} />
+              </div>
+              <div className="bg-white p-4 rounded shadow">
+                <BarChartComponent projects={projects} />
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Project Dialog */}

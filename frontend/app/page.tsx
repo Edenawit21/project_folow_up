@@ -1,16 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+// import { useEffect } from "react";
+// import { useRouter } from "next/navigation";
 
 const Page = () => {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace("/login"); // Redirect to /login
-  }, [router]);
-
-  return null; // Or show a loading spinner
+  // const router = useRouter();
+  // useEffect(() => {
+  //   router.replace("/login");
+  // }, [router]);
+  // return null;
 };
 
 export default Page;
