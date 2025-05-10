@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import ThemeToggle from "@/components/ThemeToggle";
 
 export default function NavBar() {
   const [mounted, setMounted] = useState(false);
@@ -29,11 +28,6 @@ export default function NavBar() {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent transition-all duration-300">
               Protrack
             </h1>
-          </div>
-
-          {/* Right: Theme Toggle */}
-          <div>
-            <ThemeToggle />
           </div>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { Add } from "@mui/icons-material";
 interface SidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
-  handleOpenDialog: () => void; // Add the function to handle dialog opening
+  handleOpenDialog: () => void;
 }
 
 const Sidebar = ({
@@ -31,10 +31,15 @@ const Sidebar = ({
 
         {/* + New Project link */}
         <li
-          onClick={handleOpenDialog} // This will open the dialog
+          onClick={handleOpenDialog}
+          role="button"
+          tabIndex={0}
           className="cursor-pointer text-blue-600 hover:text-blue-800 flex items-center gap-2"
         >
-          <Add className="text-white bg-blue-500"  /> New Project
+          <span className="bg-blue-500 text-white rounded-full p-1">
+            <Add fontSize="small" />
+          </span>
+          New Project
         </li>
       </ul>
     </aside>
