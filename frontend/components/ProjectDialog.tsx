@@ -18,6 +18,16 @@ const ProjectDialog = ({
   editingProject,
   teams,
 }: ProjectDialogProps) => {
+  const formattedDate =
+    typeof formData.dueDate === "string"
+      ? formData.dueDate
+      : new Date(formData.dueDate).toISOString().split("T")[0];
+
+  const onFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSubmit();
+  };
+
   return (
     <div
       role="dialog"
@@ -27,7 +37,10 @@ const ProjectDialog = ({
         <h2 className="text-2xl font-bold mb-6">
           {editingProject ? "Edit Project" : "Create New Project"}
         </h2>
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form
+          onSubmit={onFormSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
           <div className="col-span-2">
             <input
               type="text"
@@ -37,8 +50,10 @@ const ProjectDialog = ({
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
+              required
             />
           </div>
+
           <div className="col-span-2">
             <textarea
               placeholder="Description"
@@ -48,29 +63,36 @@ const ProjectDialog = ({
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
+              required
             />
           </div>
+
           <div>
-            <label>Due Date</label>
+            <label className="block mb-1 text-sm">Due Date</label>
             <input
               type="date"
               className="w-full px-4 py-2 border rounded-lg"
-              value={new Date(formData.dueDate).toISOString().split("T")[0]}
+              value={formattedDate}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  dueDate: new Date(e.target.value),
+                  dueDate: e.target.value,
                 })
               }
+              required
             />
           </div>
+
           <div>
-            <label>Priority</label>
+            <label className="block mb-1 text-sm">Priority</label>
             <select
               className="w-full px-4 py-2 border rounded-lg"
               value={formData.priority}
               onChange={(e) =>
-                setFormData({ ...formData, priority: e.target.value as "High" | "Medium" | "Low" })
+                setFormData({
+                  ...formData,
+                  priority: e.target.value as "High" | "Medium" | "Low",
+                })
               }
             >
               {["High", "Medium", "Low"].map((option) => (
@@ -80,13 +102,21 @@ const ProjectDialog = ({
               ))}
             </select>
           </div>
+
           <div>
-            <label>Status</label>
+            <label className="block mb-1 text-sm">Status</label>
             <select
               className="w-full px-4 py-2 border rounded-lg"
               value={formData.status}
               onChange={(e) =>
-                setFormData({ ...formData, status: e.target.value as "Not Started" | "In Progress" | "Completed" | "On Hold" })
+                setFormData({
+                  ...formData,
+                  status: e.target.value as
+                    | "Not Started"
+                    | "In Progress"
+                    | "Completed"
+                    | "On Hold",
+                })
               }
             >
               {["Not Started", "In Progress", "Completed", "On Hold"].map(
@@ -98,8 +128,9 @@ const ProjectDialog = ({
               )}
             </select>
           </div>
+
           <div>
-            <label>Team</label>
+            <label className="block mb-1 text-sm">Team</label>
             <select
               className="w-full px-4 py-2 border rounded-lg"
               value={formData.team}
@@ -115,18 +146,18 @@ const ProjectDialog = ({
               ))}
             </select>
           </div>
-          <div className="col-span-2 flex justify-end gap-4">
+
+          <div className="col-span-2 flex justify-end gap-4 mt-4">
             <button
               type="button"
               onClick={handleCloseDialog}
-              className="px-5 py-2 rounded-lg bg-gray-200"
+              className="px-5 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
             >
               Cancel
             </button>
             <button
-              type="button"
-              onClick={handleSubmit}
-              className="px-5 py-2 rounded-lg bg-blue-600 text-white"
+              type="submit"
+              className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
             >
               {editingProject ? "Save Changes" : "Create Project"}
             </button>

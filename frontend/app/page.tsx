@@ -1,16 +1,11 @@
-"use client";
+import React from 'react'
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+const page = () => {
+  return (
+    <div>
+      
+    </div>
+  )
+}
 
-const Page = () => {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace("/login"); // Redirect to /login
-  }, [router]);
-
-  return null; // Or show a loading spinner
-};
-
-export default Page;
+export default page
