@@ -67,7 +67,7 @@ const ProjectList = ({
   return (
     <div className="p-4">
       {selectedProject ? (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 mb-6">
+        <div className="rounded-xl shadow-lg p-6 border border-gray-100 mb-6">
           <button
             onClick={handleBackToList}
             className="text-blue-600 hover:text-blue-800 mb-4 flex items-center gap-2"

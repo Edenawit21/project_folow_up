@@ -66,7 +66,7 @@ const ProjectDashboard = () => {
   }, [editingProject, formData, handleCloseDialog]);
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen ">
       <Sidebar
         activeSection={activeSection}
         setActiveSection={setActiveSection}

@@ -13,7 +13,7 @@ const Sidebar = ({
   handleOpenDialog,
 }: SidebarProps) => {
   return (
-    <aside className="w-60 bg-gray-100 p-6 shadow-md">
+    <aside className="w-60 p-6 shadow-md">
       <ul className="space-y-4">
         {["Charts", "Projects"].map((section) => (
           <li
