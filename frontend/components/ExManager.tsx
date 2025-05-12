@@ -1,131 +1,114 @@
 "use client";
-import { useEffect, useState } from "react";
-import {Bell,Search,Menu,X,FolderKanban,UserCircle2,BarChart2,PieChart,LineChart} from "lucide-react";
+import { useState } from "react";
+import {Bell,Search,Menu,X,FolderKanban,UserCircle2,BarChart2,PieChart,LineChart,} from "lucide-react";
 
 export default function ExecutiveDashboard() {
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await fetch("/api/notifications");
-        const data = await res.json();
-        setNotificationCount(data.count || 0);
-      } catch (error) {
-        console.error("Failed to fetch notifications", error);
-      }
-    };
+  const navItems = [
+    { icon: <FolderKanban size={18} />, label: "Projects", href: "#projects" },
+    { icon: <UserCircle2 size={18} />, label: "Project Manager", href: "#project-manager" },
+  ];
 
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  const chartItems = [
+    { icon: <BarChart2 size={18} />, label: "Bar Chart", href: "#bar-chart" },
+    { icon: <PieChart size={18} />, label: "Pie Chart", href: "#pie-chart" },
+    { icon: <LineChart size={18} />, label: "Line Chart", href: "#line-chart" },
+  ];
 
   return (
     <div className="flex min-h-screen bg-gray-200">
-      {sidebarOpen && (
-        <aside className="w-64 bg-gray-100 text-white px-4 py-6 relative">
-          <div className="flex items-center justify-between mb-6">
+      <aside
+        className={`${
+          sidebarCollapsed ? "w-16" : "w-64"
+        } transition-all duration-300 bg-white text-white px-4 py-6 relative`}
+      >
+        <div className="flex items-center justify-between mb-6">
+          {!sidebarCollapsed && (
             <h2 className="text-xl font-bold text-black">Dashboard</h2>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="text-gray-700 hover:text-blue-500"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          <div className="mb-6">
+          )}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="text-gray-700 hover:text-blue-500"
+          >
+            {sidebarCollapsed ? <Menu size={20} /> : <X size={20} />}
+          </button>
+        </div>
+        <div className="mb-6">
+          {!sidebarCollapsed && (
             <h3 className="text-black font-semibold mb-2">Data</h3>
-            <nav className="space-y-2 pl-2">
+          )}
+          <nav className="space-y-2 pl-1">
+            {navItems.map((item, idx) => (
               <a
-                href="#projects"
-                className="flex items-center gap-2 text-black hover:text-blue-500 font-medium"
+                key={idx}
+                href={item.href}
+                className="flex items-center gap-2 text-black hover:text-blue-500 font-medium overflow-hidden"
               >
-                <FolderKanban size={18} /> Projects
+                {item.icon}
+                {!sidebarCollapsed && (
+                  <span className="truncate max-w-[150px]">{item.label}</span>
+                )}
               </a>
-              <a
-                href="#project-manager"
-                className="flex items-center gap-2 text-black hover:text-blue-500 font-medium"
-              >
-                <UserCircle2 size={18} /> Project Manager
-              </a>
-            </nav>
-          </div>
-
-          <div>
+            ))}
+          </nav>
+        </div>
+        <div>
+          {!sidebarCollapsed && (
             <h3 className="text-black font-semibold mb-2">Charts</h3>
-            <nav className="space-y-2 pl-2">
+          )}
+          <nav className="space-y-2 pl-1">
+            {chartItems.map((item, idx) => (
               <a
-                href="#bar-chart"
-                className="flex items-center gap-2 text-black hover:text-blue-500 font-medium"
+                key={idx}
+                href={item.href}
+                className="flex items-center gap-2 text-black hover:text-blue-500 font-medium overflow-hidden"
               >
-                <BarChart2 size={18} /> Bar Chart
+                {item.icon}
+                {!sidebarCollapsed && (
+                  <span className="truncate max-w-[150px]">{item.label}</span>
+                )}
               </a>
-              <a
-                href="#pie-chart"
-                className="flex items-center gap-2 text-black hover:text-blue-500 font-medium"
-              >
-                <PieChart size={18} /> Pie Chart
-              </a>
-              <a
-                href="#line-chart"
-                className="flex items-center gap-2 text-black hover:text-blue-500 font-medium"
-              >
-                <LineChart size={18} /> Line Chart
-              </a>
-            </nav>
-          </div>
-        </aside>
-      )}
-
+            ))}
+          </nav>
+        </div>
+      </aside>
       <div className="flex-1 flex flex-col">
-        <header className="bg-gray-100 shadow p-4 flex justify-between items-center">
+        <header className="bg-white shadow p-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            {!sidebarOpen && (
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="text-gray-700 hover:text-blue-500"
-              >
-                <Menu size={24} />
-              </button>
-            )}
-
-            {/* Left-aligned Search Bar */}
             <div className="relative w-48">
               <input
                 type="text"
                 placeholder="Search"
                 className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
-              <Search className="absolute right-2 top-2.5 w-5 h-5 text-gray-400" />
+              <Search className="absolute right-2 top-2.5 w-5 h-4 text-gray-400" />
             </div>
           </div>
 
-          {/* Notification Bell */}
           <div className="relative">
-            <Bell className="w-4 h-4 text-gray-700 hover:text-blue-500 cursor-pointer" />
-            {notificationCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
-                {notificationCount}
-              </span>
-            )}
+            <Bell className="w-5 h-5 text-gray-700 hover:text-blue-500 cursor-pointer" />
           </div>
         </header>
 
-        <main className="p-4 bg-gray-200 flex-1">
+        <main className="p-4 bg-white flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-6">
             <div className="bg-white shadow rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-yellow-400">Total Projects</h2>
+              <h2 className="text-xl font-semibold text-yellow-400">
+                Total Projects
+              </h2>
               <p className="text-3xl font-bold">32</p>
             </div>
             <div className="bg-white shadow rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-blue-500">Active Projects</h2>
+              <h2 className="text-xl font-semibold text-blue-500">
+                Active Projects
+              </h2>
               <p className="text-3xl font-bold">18</p>
             </div>
             <div className="bg-white shadow rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-green-500">Completed Projects</h2>
+              <h2 className="text-xl font-semibold text-green-500">
+                Completed Projects
+              </h2>
               <p className="text-3xl font-bold">10</p>
             </div>
           </div>
