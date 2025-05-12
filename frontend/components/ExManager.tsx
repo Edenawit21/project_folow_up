@@ -1,13 +1,31 @@
 "use client";
 import { useState } from "react";
-import {Bell,Search,Menu,X,FolderKanban,UserCircle2,BarChart2,PieChart,LineChart,} from "lucide-react";
+import {
+  Bell,
+  Search,
+  Menu,
+  X,
+  FolderKanban,
+  UserCircle2,
+  BarChart2,
+  PieChart,
+  LineChart,
+  Home,
+  Clock,
+  Settings,
+  Users,
+} from "lucide-react";
 
 export default function ExecutiveDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const navItems = [
+    { icon: <Home size={18} />, label: "Home", href: "#home" },
     { icon: <FolderKanban size={18} />, label: "Projects", href: "#projects" },
+    { icon: <Clock size={18} />, label: "Timeline", href: "#timeline" },
     { icon: <UserCircle2 size={18} />, label: "Project Manager", href: "#project-manager" },
+    { icon: <Users size={18} />, label: "Users", href: "#users" },
+    { icon: <Settings size={18} />, label: "Settings", href: "#settings" },
   ];
 
   const chartItems = [
@@ -34,10 +52,8 @@ export default function ExecutiveDashboard() {
             {sidebarCollapsed ? <Menu size={20} /> : <X size={20} />}
           </button>
         </div>
+
         <div className="mb-6">
-          {!sidebarCollapsed && (
-            <h3 className="text-black font-semibold mb-2">Data</h3>
-          )}
           <nav className="space-y-2 pl-1">
             {navItems.map((item, idx) => (
               <a
@@ -53,6 +69,7 @@ export default function ExecutiveDashboard() {
             ))}
           </nav>
         </div>
+
         <div>
           {!sidebarCollapsed && (
             <h3 className="text-black font-semibold mb-2">Charts</h3>
@@ -73,6 +90,7 @@ export default function ExecutiveDashboard() {
           </nav>
         </div>
       </aside>
+
       <div className="flex-1 flex flex-col">
         <header className="bg-white shadow p-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
