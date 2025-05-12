@@ -10,7 +10,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Form state
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,7 +18,7 @@ const Signup = () => {
     confirmPassword: ""
   });
 
-  // Error state
+
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -26,7 +26,6 @@ const Signup = () => {
     confirmPassword: ""
   });
 
-  // Validation functions
   const validateName = (name: string): string => {
     if (!name) return "Full name required";
     const regex = /^[A-Za-z\s']+$/;
@@ -57,7 +56,6 @@ const Signup = () => {
       [name]: value
     }));
     
-    // Clear error when user types
     if (errors[name as keyof typeof errors]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
@@ -67,7 +65,6 @@ const Signup = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Validate all fields
     const nameError = validateName(formData.name);
     const emailError = validateEmail(formData.email);
     const passwordError = validatePassword(formData.password);
@@ -82,21 +79,19 @@ const Signup = () => {
       confirmPassword: confirmError
     });
 
-    // Check if any errors exist
     if (nameError || emailError || passwordError || confirmError) {
       setIsLoading(false);
       return;
     }
 
     try {
-      // Simulate API call
-      const emailTaken = false; // Replace with actual API check
+   
+      const emailTaken = false;
       if (emailTaken) {
         setErrors(prev => ({ ...prev, email: "The email is already taken" }));
         return;
       }
       
-      // On successful signup
       router.push("/manager");
     } catch (error) {
       console.error("Signup failed:", error);
@@ -106,7 +101,6 @@ const Signup = () => {
     }
   };
 
-  // Password strength indicator
   const getPasswordStrength = () => {
     if (!formData.password) return 0;
     let strength = 0;
@@ -131,7 +125,6 @@ const Signup = () => {
           <h2 className="text-3xl font-bold text-center mb-4">Setup your account!</h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Full Name
@@ -149,7 +142,6 @@ const Signup = () => {
               {errors.name && <p className="text-red-500 text-sm mt-2">{errors.name}</p>}
             </div>
 
-            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email
@@ -167,7 +159,6 @@ const Signup = () => {
               {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
             </div>
             
-            {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
@@ -193,7 +184,6 @@ const Signup = () => {
                 </button>
               </div>
               
-              {/* Password Strength Meter */}
               {formData.password && (
                 <div className="mt-2">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
@@ -211,7 +201,6 @@ const Signup = () => {
               {errors.password && <p className="text-red-500 text-sm mt-2">{errors.password}</p>}
             </div>
 
-            {/* Confirm Password Field */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
                 Confirm Password
