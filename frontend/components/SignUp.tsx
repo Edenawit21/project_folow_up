@@ -120,7 +120,7 @@ const Signup = () => {
     <div className="flex flex-col min-h-screen">
       
 
-      <div className="flex-grow flex items-center justify-center bg-gradient-to-b from-[#f9fafb] to-[#cce7ff] px-4 pt-16">
+      <div className="flex-grow flex items-center justify-center bg-gradient-to-b px-4 pt-16">
         <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
           <h2 className="text-3xl font-bold text-center mb-4">Setup your account!</h2>
 
@@ -133,7 +133,7 @@ const Signup = () => {
                 type="text"
                 id="name"
                 name="name"
-                placeholder="Smith John"
+                placeholder="Enter your name"
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -150,7 +150,7 @@ const Signup = () => {
                 type="email"
                 id="email"
                 name="email"
-                placeholder="example@site.com"
+                placeholder="Enter your email"
                 value={formData.email}
                 onChange={handleChange}
                 required

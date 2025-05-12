@@ -32,7 +32,7 @@ const Login = () => {
   };
   
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
+    <div className="min-h-screen flex flex-col  font-sans text-black dark:bg-gray-900 dark:text-white ">
 
       <div className="flex flex-1">
         
