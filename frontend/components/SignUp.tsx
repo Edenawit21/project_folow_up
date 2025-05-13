@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signup } from "@/utils/auth";
 
 const Signup = () => {
   const router = useRouter();
@@ -55,16 +54,7 @@ const Signup = () => {
     return "";
   };
 
-  const getPasswordStrength = () => {
-    if (!formData.password) return 0;
-    let strength = 0;
-    if (formData.password.length >= 8) strength++;
-    if (/[A-Z]/.test(formData.password)) strength++;
-    if (/[a-z]/.test(formData.password)) strength++;
-    if (/[0-9]/.test(formData.password)) strength++;
-    if (/[@$!%*?&]/.test(formData.password)) strength++;
-    return (strength / 5) * 100;
-  };
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
