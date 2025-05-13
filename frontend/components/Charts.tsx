@@ -17,7 +17,6 @@ import {
 } from "recharts";
 import { useTheme } from "next-themes";
 import { Project } from "@/types";
-// Use Heroicons v2 imports
 import {
   InformationCircleIcon,
   Bars3Icon,

@@ -11,6 +11,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // Form state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,6 +19,7 @@ const Signup = () => {
     confirmPassword: "",
   });
 
+  // Error state
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -25,11 +27,13 @@ const Signup = () => {
     confirmPassword: "",
   });
 
+  // Validation functions
   const validateName = (name: string): string => {
     if (!name) return "Full name required";
     const regex = /^[A-Za-z\s']+$/;
-    if (!regex.test(name))
+    if (!regex.test(name)) {
       return "Name can't include numbers or special characters (except apostrophes)";
+    }
     return "";
   };
 
@@ -51,13 +55,20 @@ const Signup = () => {
     return "";
   };
 
+  const getPasswordStrength = () => {
+    if (!formData.password) return 0;
+    let strength = 0;
+    if (formData.password.length >= 8) strength++;
+    if (/[A-Z]/.test(formData.password)) strength++;
+    if (/[a-z]/.test(formData.password)) strength++;
+    if (/[0-9]/.test(formData.password)) strength++;
+    if (/[@$!%*?&]/.test(formData.password)) strength++;
+    return (strength / 5) * 100;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -67,6 +78,7 @@ const Signup = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Validate all fields
     const nameError = validateName(formData.name);
     const emailError = validateEmail(formData.email);
     const passwordError = validatePassword(formData.password);
@@ -84,14 +96,22 @@ const Signup = () => {
       confirmPassword: confirmError,
     });
 
-    if (hasErrors) {
+    // Check if any errors exist
+    if (nameError || emailError || passwordError || confirmError) {
       setIsLoading(false);
       return;
     }
 
     try {
-      await signup(formData.name, formData.email, formData.password);
-      router.push("/dashboard");
+      // Simulate API call
+      const emailTaken = false; // Replace with actual API check
+      if (emailTaken) {
+        setErrors(prev => ({ ...prev, email: "The email is already taken" }));
+        return;
+      }
+      
+      // On successful signup
+      router.push("/manager");
     } catch (error) {
       const message =
         error instanceof Error
@@ -123,15 +143,15 @@ const Signup = () => {
       : "bg-green-500";
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="flex-grow flex items-center justify-center bg-gradient-to-b px-4 pt-16">
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <div className="flex-grow flex items-center justify-center px-4 py-16">
         <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
           <h2 className="text-3xl font-bold text-center mb-4">
             Setup your account!
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Name Field */}
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+            {/* Full Name */}
             <div>
               <label
                 htmlFor="name"
@@ -150,11 +170,13 @@ const Signup = () => {
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               />
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                <p className="text-red-500 text-sm mt-1" aria-live="assertive">
+                  {errors.name}
+                </p>
               )}
             </div>
 
-            {/* Email Field */}
+            {/* Email */}
             <div>
               <label
                 htmlFor="email"
@@ -173,10 +195,12 @@ const Signup = () => {
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               />
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                <p className="text-red-500 text-sm mt-1" aria-live="assertive">
+                  {errors.email}
+                </p>
               )}
             </div>
-
+            
             {/* Password Field */}
             <div>
               <label
@@ -225,11 +249,13 @@ const Signup = () => {
                 </div>
               )}
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                <p className="text-red-500 text-sm mt-1" aria-live="assertive">
+                  {errors.password}
+                </p>
               )}
             </div>
 
-            {/* Confirm Password Field */}
+            {/* Confirm Password */}
             <div>
               <label
                 htmlFor="confirmPassword"
@@ -260,7 +286,7 @@ const Signup = () => {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-1" aria-live="assertive">
                   {errors.confirmPassword}
                 </p>
               )}

@@ -30,6 +30,8 @@ const Login = () => {
       setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
+  
+  
 
   return (
     <div className="min-h-screen flex flex-col  font-sans text-black dark:bg-gray-900 dark:text-white ">
@@ -115,3 +117,4 @@ const Login = () => {
 };
 
 export default Login;
+
