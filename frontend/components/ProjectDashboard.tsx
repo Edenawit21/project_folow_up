@@ -7,6 +7,7 @@ import ProjectList from "@/components/ProjectList";
 import ProjectDialog from "@/components/ProjectDialog";
 import { PieChartComponent, BarChartComponent } from "@/components/Charts";
 import { initialProjects } from "@/constants";
+
 const teams = ["Team Alpha", "Team Beta", "Team Gamma"];
 
 const ProjectDashboard = () => {
@@ -16,8 +17,8 @@ const ProjectDashboard = () => {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
-    priority:"" ,
-    status:"" ,
+    priority: "",
+    status: "",
     team: "",
   });
 
@@ -111,9 +112,7 @@ const ProjectDashboard = () => {
                 >
                   <option value="">All Status</option>
                   <option value={Status.ToDo}>To Do</option>
-                  <option value={Status.WorkInProgress}>
-                    Work In Progress
-                  </option>
+                  <option value={Status.WorkInProgress}>Work In Progress</option>
                   <option value={Status.UnderReview}>Under Review</option>
                   <option value={Status.Completed}>Completed</option>
                 </select>
