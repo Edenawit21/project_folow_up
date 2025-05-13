@@ -25,7 +25,7 @@ const Login = () => {
 
     try {
       await login(email, password);
-      router.push("/manager");
+      router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     }
@@ -117,3 +117,4 @@ const Login = () => {
 };
 
 export default Login;
+
