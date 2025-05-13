@@ -31,11 +31,11 @@ const Login = () => {
     }
   };
   
+  
+
   return (
     <div className="min-h-screen flex flex-col  font-sans text-black dark:bg-gray-900 dark:text-white ">
-
       <div className="flex flex-1">
-        
         <main className="flex-1 flex items-center justify-center px-4">
           <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
             <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">
