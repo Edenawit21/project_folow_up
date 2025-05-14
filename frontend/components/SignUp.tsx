@@ -10,26 +10,29 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-
+  // Form state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
-
+  // Error state
   const [errors, setErrors] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
+  // Validation functions
   const validateName = (name: string): string => {
     if (!name) return "Full name required";
     const regex = /^[A-Za-z\s']+$/;
-    if (!regex.test(name)) return "Name can't include numbers or special characters (except apostrophes)";
+    if (!regex.test(name)) {
+      return "Name can't include numbers or special characters (except apostrophes)";
+    }
     return "";
   };
 
@@ -43,21 +46,21 @@ const Signup = () => {
   const validatePassword = (password: string): string => {
     if (!password) return "Password required!";
     if (!/[A-Z]/.test(password)) return "At least one capital letter required";
-    if (!/[a-z]/.test(password)) return "At least one lowercase letter required";
-    if (!/[0-9@$!%*?&]/.test(password)) return "Include a special character or number";
+    if (!/[a-z]/.test(password))
+      return "At least one lowercase letter required";
+    if (!/[0-9@$!%*?&]/.test(password))
+      return "Include a special character or number";
     if (password.length < 8) return "Password must be 8 characters or longer";
     return "";
   };
 
+  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name as keyof typeof errors]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -65,37 +68,46 @@ const Signup = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Validate all fields
     const nameError = validateName(formData.name);
     const emailError = validateEmail(formData.email);
     const passwordError = validatePassword(formData.password);
-    const confirmError = formData.confirmPassword !== formData.password 
-      ? "Passwords do not match" 
-      : "";
+    const confirmError =
+      formData.confirmPassword !== formData.password
+        ? "Passwords do not match"
+        : "";
+
+    const hasErrors = nameError || emailError || passwordError || confirmError;
 
     setErrors({
       name: nameError,
       email: emailError,
       password: passwordError,
-      confirmPassword: confirmError
+      confirmPassword: confirmError,
     });
 
+    // Check if any errors exist
     if (nameError || emailError || passwordError || confirmError) {
       setIsLoading(false);
       return;
     }
 
     try {
-   
-      const emailTaken = false;
+      // Simulate API call
+      const emailTaken = false; // Replace with actual API check
       if (emailTaken) {
         setErrors(prev => ({ ...prev, email: "The email is already taken" }));
         return;
       }
       
+      // On successful signup
       router.push("/manager");
     } catch (error) {
-      console.error("Signup failed:", error);
-      setErrors(prev => ({ ...prev, email: "Signup failed. Please try again." }));
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Signup failed. Please try again.";
+      setErrors((prev) => ({ ...prev, email: message }));
     } finally {
       setIsLoading(false);
     }
@@ -113,20 +125,28 @@ const Signup = () => {
   };
 
   const passwordStrength = getPasswordStrength();
-  const strengthColor = passwordStrength < 40 ? 'bg-red-500' : 
-                       passwordStrength < 70 ? 'bg-yellow-500' : 'bg-green-500';
+  const strengthColor =
+    passwordStrength < 40
+      ? "bg-red-500"
+      : passwordStrength < 70
+      ? "bg-yellow-500"
+      : "bg-green-500";
 
   return (
-    <div className="flex flex-col min-h-screen">
-      
-
-      <div className="flex-grow flex items-center justify-center bg-gradient-to-b px-4 pt-16">
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <div className="flex-grow flex items-center justify-center px-4 py-16">
         <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
-          <h2 className="text-3xl font-bold text-center mb-4">Setup your account!</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">
+            Setup your account!
+          </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+            {/* Full Name */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Full Name
               </label>
               <input
@@ -139,11 +159,19 @@ const Signup = () => {
                 required
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               />
-              {errors.name && <p className="text-red-500 text-sm mt-2">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1" aria-live="assertive">
+                  {errors.name}
+                </p>
+              )}
             </div>
 
+            {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email
               </label>
               <input
@@ -156,11 +184,19 @@ const Signup = () => {
                 required
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               />
-              {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1" aria-live="assertive">
+                  {errors.email}
+                </p>
+              )}
             </div>
             
+            {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="relative">
@@ -183,26 +219,38 @@ const Signup = () => {
                   {showPassword ? "🙈" : "👁️"}
                 </button>
               </div>
-              
+
               {formData.password && (
                 <div className="mt-2">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div 
-                      className={`h-1.5 rounded-full ${strengthColor}`} 
+                    <div
+                      className={`h-1.5 rounded-full transition-all duration-300 ${strengthColor}`}
                       style={{ width: `${passwordStrength}%` }}
                     ></div>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    Password strength: {passwordStrength < 40 ? 'Weak' : passwordStrength < 70 ? 'Medium' : 'Strong'}
+                    Password strength:{" "}
+                    {passwordStrength < 40
+                      ? "Weak"
+                      : passwordStrength < 70
+                      ? "Medium"
+                      : "Strong"}
                   </p>
                 </div>
               )}
-              
-              {errors.password && <p className="text-red-500 text-sm mt-2">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1" aria-live="assertive">
+                  {errors.password}
+                </p>
+              )}
             </div>
 
+            {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Confirm Password
               </label>
               <div className="relative">
@@ -220,35 +268,65 @@ const Signup = () => {
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute top-2 right-3 text-gray-500 hover:text-gray-700"
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  aria-label={
+                    showConfirmPassword ? "Hide password" : "Show password"
+                  }
                 >
                   {showConfirmPassword ? "🙈" : "👁️"}
                 </button>
               </div>
-              {errors.confirmPassword && <p className="text-red-500 text-sm mt-2">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm mt-1" aria-live="assertive">
+                  {errors.confirmPassword}
+                </p>
+              )}
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
               className={`w-full py-2 px-4 rounded-lg font-medium text-white transition ${
-                isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                isLoading
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
               }`}
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Creating Account...
                 </span>
-              ) : 'Sign Up'}
+              ) : (
+                "Sign Up"
+              )}
             </button>
 
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-gray-600 mt-2">
               Already have an account?{" "}
-              <Link href="/login" className="text-blue-600 hover:underline font-medium">
+              <Link
+                href="/login"
+                className="text-blue-600 hover:underline font-medium"
+              >
                 Log in
               </Link>
             </p>

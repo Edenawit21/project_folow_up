@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Project } from "@/types";
+import { Project, Priority, Status } from "@/types";
 import Sidebar from "@/components/Sidebar";
 import ProjectList from "@/components/ProjectList";
 import ProjectDialog from "@/components/ProjectDialog";
 import { PieChartComponent, BarChartComponent } from "@/components/Charts";
-import { projects as initialProjects } from "@/constants";
+import { initialProjects } from "@/constants";
 
 const teams = ["Team Alpha", "Team Beta", "Team Gamma"];
 
 const ProjectDashboard = () => {
-  const [projects, setProjects] = useState(initialProjects);
-  const [activeSection, setActiveSection] = useState("Charts"); 
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [activeSection, setActiveSection] = useState("Charts");
   const [openDialog, setOpenDialog] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,9 +25,8 @@ const ProjectDashboard = () => {
   const [formData, setFormData] = useState<Omit<Project, "id">>({
     name: "",
     description: "",
-    priority: "Medium",
-    status: "Not Started",
-    dueDate: new Date(),
+    priority: Priority.Medium,
+    status: Status.ToDo,
     team: "",
   });
 
@@ -39,9 +38,8 @@ const ProjectDashboard = () => {
     setFormData({
       name: "",
       description: "",
-      priority: "Medium",
-      status: "Not Started",
-      dueDate: new Date(),
+      priority: Priority.Medium,
+      status: Status.ToDo,
       team: "",
     });
   }, []);
@@ -66,11 +64,11 @@ const ProjectDashboard = () => {
   }, [editingProject, formData, handleCloseDialog]);
 
   return (
-    <div className="flex min-h-screen ">
+    <div className="flex min-h-screen dark:bg-gray-950 text-gray-900 dark:text-white">
       <Sidebar
         activeSection={activeSection}
         setActiveSection={setActiveSection}
-        handleOpenDialog={handleOpenDialog} 
+        handleOpenDialog={handleOpenDialog}
       />
       <main className="flex-1 p-8">
         {activeSection === "Projects" && (
@@ -79,7 +77,7 @@ const ProjectDashboard = () => {
               <input
                 type="text"
                 placeholder="Search Projects"
-                className="border border-gray-300 rounded px-3 py-2 w-full md:w-72"
+                className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded px-3 py-2 w-full md:w-72"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -89,37 +87,45 @@ const ProjectDashboard = () => {
                   onChange={(e) =>
                     setFilters((prev) => ({
                       ...prev,
-                      priority: e.target.value,
+                      priority: e.target.value as Priority,
                     }))
                   }
-                  className="border px-3 py-2 rounded bg-white"
+                  className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded"
                 >
                   <option value="">All Priorities</option>
-                  <option value="High">High</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Low">Low</option>
+                  <option value={Priority.Urgent}>Urgent</option>
+                  <option value={Priority.High}>High</option>
+                  <option value={Priority.Medium}>Medium</option>
+                  <option value={Priority.Low}>Low</option>
+                  <option value={Priority.Backlog}>Backlog</option>
                 </select>
 
                 <select
                   value={filters.status}
                   onChange={(e) =>
-                    setFilters((prev) => ({ ...prev, status: e.target.value }))
+                    setFilters((prev) => ({
+                      ...prev,
+                      status: e.target.value as Status,
+                    }))
                   }
-                  className="border px-3 py-2 rounded bg-white"
+                  className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded"
                 >
-                  <option value="">All Statuses</option>
-                  <option value="Not Started">Not Started</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                  <option value="On Hold">On Hold</option>
+                  <option value="">All Status</option>
+                  <option value={Status.ToDo}>To Do</option>
+                  <option value={Status.WorkInProgress}>Work In Progress</option>
+                  <option value={Status.UnderReview}>Under Review</option>
+                  <option value={Status.Completed}>Completed</option>
                 </select>
 
                 <select
                   value={filters.team}
                   onChange={(e) =>
-                    setFilters((prev) => ({ ...prev, team: e.target.value }))
+                    setFilters((prev) => ({
+                      ...prev,
+                      team: e.target.value,
+                    }))
                   }
-                  className="border px-3 py-2 rounded bg-white"
+                  className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded"
                 >
                   <option value="">All Teams</option>
                   {teams.map((team) => (
@@ -130,6 +136,7 @@ const ProjectDashboard = () => {
                 </select>
               </div>
             </div>
+
             <ProjectList
               projects={projects}
               searchTerm={searchTerm}
@@ -145,10 +152,10 @@ const ProjectDashboard = () => {
           <div className="mb-10">
             <h2 className="text-lg font-semibold mb-4">Project Analytics</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white p-4 rounded shadow">
+              <div className="bg-white dark:bg-gray-900 p-4 rounded shadow border dark:border-gray-700">
                 <PieChartComponent projects={projects} />
               </div>
-              <div className="bg-white p-4 rounded shadow">
+              <div className="bg-white dark:bg-gray-900 p-4 rounded shadow border dark:border-gray-700">
                 <BarChartComponent projects={projects} />
               </div>
             </div>

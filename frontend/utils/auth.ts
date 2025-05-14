@@ -20,22 +20,28 @@ export const login = async (email: string, password: string) => {
 export const signup = async (name: string, email: string, password: string) => {
   try {
     const response = await axios.post(`${API_URL}/register`, {
-      name,
+      displayName: name,
       email,
       password,
     });
+
+    console.log("Signup response:", response);
 
     if (response.data.token) {
       localStorage.setItem("token", response.data.token);
       return response.data.token;
     } else {
+      console.error("Signup API error:", response.data);
       throw new Error(response.data.message || "Signup failed.");
     }
-  } catch (error) {
-    console.error("Signup error:", error);
-    throw new Error("Failed to register. Please try again.");
+  } catch (error: any) {
+    console.error("Signup error:", error.response?.data || error.message);
+    throw new Error(
+      error.response?.data?.message || "Failed to register. Please try again."
+    );
   }
 };
+
 
 // Function to retrieve token
 export const getToken = (): string | null => {
