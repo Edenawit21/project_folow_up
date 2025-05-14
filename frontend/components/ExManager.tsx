@@ -1,44 +1,53 @@
 "use client";
-import { useState, useMemo } from "react";
-import { projects } from "@/constants"; 
-import {Bell,Search,Menu,X,FolderKanban,UserCircle2,BarChart2,PieChart,LineChart,Home,Clock,Settings,Users,
+import { useState } from "react";
+import { initialProjects } from "@/constants";
+import { Status } from "@/types";
+import {
+  Bell,
+  Search,
+  Menu,
+  X,
+  FolderKanban,
+  UserCircle2,
+  BarChart2,
+  PieChart,
+  LineChart,
+  Home,
+  Clock,
+  Settings,
+  Users,
 } from "lucide-react";
-import {PieChart as RePieChart,Pie,Cell,BarChart as ReBarChart,Bar,XAxis,YAxis,Tooltip,ResponsiveContainer,
-LineChart as ReLineChart,Line,CartesianGrid,Legend,
+
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  PieChart as RePieChart,
+  Pie,
+  Cell,
+  LineChart as ReLineChart,
+  Line,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
 } from "recharts";
 
 const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#00C49F"];
 
-const getStatusData = () => {
-  const statusCount: Record<string, number> = {};
-  projects.forEach((p) => {
-    statusCount[p.status] = (statusCount[p.status] || 0) + 1;
-  });
-  return Object.entries(statusCount).map(([status, count]) => ({
-    name: status,
-    value: count,
-  }));
-};
-
-const getPriorityData = () => {
-  const priorityCount: Record<string, number> = {};
-  projects.forEach((p) => {
-    priorityCount[p.priority] = (priorityCount[p.priority] || 0) + 1;
-  });
-  return Object.entries(priorityCount).map(([priority, count]) => ({
-    name: priority,
-    value: count,
-  }));
-};
-
 const getDueDateData = () => {
   const monthCount: Record<string, number> = {};
-  projects.forEach((p) => {
-    const date = new Date(p.dueDate);
+
+  initialProjects.forEach((p) => {
+    if (!p.endDate) return;
+
+    const date = new Date(p.endDate);
     const month = date.toLocaleString("default", {
       month: "short",
       year: "numeric",
     });
+
     monthCount[month] = (monthCount[month] || 0) + 1;
   });
 
@@ -47,30 +56,49 @@ const getDueDateData = () => {
       month,
       count,
     }))
-    .sort(
-      (a, b) =>
-        new Date(a.month).getTime() - new Date(b.month).getTime()
-    );
+    .sort((a, b) => {
+      const aDate = new Date(a.month + " 1");
+      const bDate = new Date(b.month + " 1");
+      return aDate.getTime() - bDate.getTime();
+    });
 };
 
 export default function ExecutiveDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeView, setActiveView] = useState("home");
+  const [selectedSection, setSelectedSection] = useState("Home");
 
   const navItems = [
-    { icon: <Home size={18} />, label: "Home", view: "home" },
-    { icon: <FolderKanban size={18} />, label: "Projects", view: "projects" },
-    { icon: <Clock size={18} />, label: "Timeline", view: "timeline" },
-    { icon: <UserCircle2 size={18} />, label: "Project Manager", view: "project-manager", },
-    { icon: <Users size={18} />, label: "Users", view: "users" },
-    { icon: <Settings size={18} />, label: "Settings", view: "settings" },
+    { icon: <Home size={18} />, label: "Home" },
+    { icon: <FolderKanban size={18} />, label: "Projects" },
+    { icon: <Clock size={18} />, label: "Timeline" },
+    { icon: <UserCircle2 size={18} />, label: "Project Manager" },
+    { icon: <Users size={18} />, label: "Users" },
+    { icon: <Settings size={18} />, label: "Settings" },
   ];
 
   const chartItems = [
-    { icon: <BarChart2 size={18} />, label: "Bar Chart", view: "bar" },
-    { icon: <PieChart size={18} />, label: "Pie Chart", view: "pie" },
-    { icon: <LineChart size={18} />, label: "Line Chart", view: "line" },
+    { icon: <BarChart2 size={18} />, label: "Bar Chart" },
+    { icon: <PieChart size={18} />, label: "Pie Chart" },
+    { icon: <LineChart size={18} />, label: "Line Chart" },
   ];
+
+  const statusCount = initialProjects.reduce((acc, project) => {
+    acc[project.status] = (acc[project.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const chartData = Object.entries(statusCount).map(([status, count]) => ({
+    name: status,
+    value: count,
+  }));
+
+  const totalProjects = initialProjects.length;
+  const activeProjects = initialProjects.filter(
+    (p) => p.status === Status.WorkInProgress
+  ).length;
+  const completedProjects = initialProjects.filter(
+    (p) => p.status === Status.Completed
+  ).length;
 
   return (
     <div className="flex min-h-screen bg-gray-200">
@@ -91,12 +119,12 @@ export default function ExecutiveDashboard() {
           </button>
         </div>
 
-        <nav className="space-y-2 pl-1">
+        <nav className="space-y-2 pl-1 mb-6">
           {navItems.map((item, idx) => (
             <button
               key={idx}
-              onClick={() => setActiveView(item.view)}
-              className="flex items-center gap-2 text-black hover:text-blue-500 font-medium w-full text-left"
+              onClick={() => setSelectedSection(item.label)}
+              className="flex items-center gap-2 text-black hover:text-blue-500 font-medium overflow-hidden w-full text-left"
             >
               {item.icon}
               {!sidebarCollapsed && (
@@ -106,25 +134,23 @@ export default function ExecutiveDashboard() {
           ))}
         </nav>
 
-        <div className="mt-6">
-          {!sidebarCollapsed && (
-            <h3 className="text-black font-semibold mb-2">Charts</h3>
-          )}
-          <nav className="space-y-2 pl-1">
-            {chartItems.map((item, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveView(item.view)}
-                className="flex items-center gap-2 text-black hover:text-blue-500 font-medium w-full text-left"
-              >
-                {item.icon}
-                {!sidebarCollapsed && (
-                  <span className="truncate max-w-[150px]">{item.label}</span>
-                )}
-              </button>
-            ))}
-          </nav>
-        </div>
+        {!sidebarCollapsed && (
+          <h3 className="text-black font-semibold mb-2">Charts</h3>
+        )}
+        <nav className="space-y-2 pl-1">
+          {chartItems.map((item, idx) => (
+            <button
+              key={idx}
+              onClick={() => setSelectedSection(item.label)}
+              className="flex items-center gap-2 text-black hover:text-blue-500 font-medium overflow-hidden w-full text-left"
+            >
+              {item.icon}
+              {!sidebarCollapsed && (
+                <span className="truncate max-w-[150px]">{item.label}</span>
+              )}
+            </button>
+          ))}
+        </nav>
       </aside>
 
       <div className="flex-1 flex flex-col">
@@ -140,55 +166,60 @@ export default function ExecutiveDashboard() {
           <Bell className="w-5 h-5 text-gray-700 hover:text-blue-500 cursor-pointer" />
         </header>
 
-        <main className="p-4 bg-white flex-1 space-y-6">
-          {activeView === "home" && (
+        <main className="p-4 bg-white flex-1">
+          {selectedSection === "Home" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-6">
               <div className="bg-white shadow rounded-xl p-6">
                 <h2 className="text-xl font-semibold text-yellow-400">
                   Total Projects
                 </h2>
-                <p className="text-3xl font-bold">{projects.length}</p>
+                <p className="text-3xl font-bold">{totalProjects}</p>
               </div>
               <div className="bg-white shadow rounded-xl p-6">
                 <h2 className="text-xl font-semibold text-blue-500">
                   Active Projects
                 </h2>
-                <p className="text-3xl font-bold">
-                  {projects.filter((p) => p.status === "In Progress").length}
-                </p>
+                <p className="text-3xl font-bold">{activeProjects}</p>
               </div>
               <div className="bg-white shadow rounded-xl p-6">
                 <h2 className="text-xl font-semibold text-green-500">
                   Completed Projects
                 </h2>
-                <p className="text-3xl font-bold">
-                  {projects.filter((p) => p.status === "Completed").length}
-                </p>
+                <p className="text-3xl font-bold">{completedProjects}</p>
               </div>
             </div>
           )}
 
-          {activeView === "pie" && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-center mb-4">
-                Project Status Overview
-              </h2>
-              <ResponsiveContainer width="100%" height={300}>
+          {selectedSection === "Bar Chart" && (
+            <div className="h-96">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {selectedSection === "Pie Chart" && (
+            <div className="h-96">
+              <ResponsiveContainer width="100%" height="100%">
                 <RePieChart>
                   <Pie
-                    data={getStatusData()}
+                    data={chartData}
+                    dataKey="value"
+                    nameKey="name"
                     cx="50%"
                     cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
-                    }
                     outerRadius={100}
-                    dataKey="value"
+                    label
                   >
-                    {getStatusData().map((_, index) => (
+                    {chartData.map((_, index) => (
                       <Cell
-                        key={`cell-${index}`}
+                        key={index}
                         fill={COLORS[index % COLORS.length]}
                       />
                     ))}
@@ -200,44 +231,24 @@ export default function ExecutiveDashboard() {
               <p className="text-gray-600 mt-4 text-sm text-center">
                 This chart provides a clear view of how your projects are
                 distributed across different statuses such as "In Progress",
-                "Completed", etc. This helps stakeholders monitor project health
-                at a glance.
+                "Completed", etc.
               </p>
             </div>
           )}
 
-          {activeView === "bar" && (
-            <div className="bg-white shadow rounded-xl p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                Project Priority Count
-              </h3>
-              <ResponsiveContainer width="100%" height={250}>
-                <ReBarChart data={getPriorityData()}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#82ca9d" />
-                </ReBarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-
-          {activeView === "line" && (
-            <div className="bg-white shadow rounded-xl p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                Projects Due Over Time
-              </h3>
-              <ResponsiveContainer width="100%" height={250}>
+          {selectedSection === "Line Chart" && (
+            <div className="h-96">
+              <ResponsiveContainer width="100%" height="100%">
                 <ReLineChart data={getDueDateData()}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip />
+                  <Legend />
                   <Line
                     type="monotone"
                     dataKey="count"
-                    stroke="#8884d8"
-                    strokeWidth={2}
+                    stroke="#82ca9d"
                   />
                 </ReLineChart>
               </ResponsiveContainer>
