@@ -6,6 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import ProjectList from "@/components/ProjectList";
 import ProjectDialog from "@/components/ProjectDialog";
 import { PieChartComponent, BarChartComponent } from "@/components/Charts";
+import ProjectFilters from "@/components/ProjectFilters"; // ✅ imported
 import { initialProjects } from "@/constants";
 
 const teams = ["Team Alpha", "Team Beta", "Team Gamma"];
@@ -73,6 +74,7 @@ const ProjectDashboard = () => {
       <main className="flex-1 p-8">
         {activeSection === "Projects" && (
           <>
+
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <input
                 type="text"
@@ -136,6 +138,7 @@ const ProjectDashboard = () => {
                 </select>
               </div>
             </div>
+
 
             <ProjectList
               projects={projects}
