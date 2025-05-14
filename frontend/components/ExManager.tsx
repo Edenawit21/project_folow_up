@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { projects } from "@/constants"; 
+
 import {Bell,Search,Menu,X,FolderKanban,UserCircle2,BarChart2,PieChart,LineChart,Home,Clock,Settings,Users,
 } from "lucide-react";
 import {PieChart as RePieChart,Pie,Cell,BarChart as ReBarChart,Bar,XAxis,YAxis,Tooltip,ResponsiveContainer,
@@ -61,11 +62,7 @@ export default function ExecutiveDashboard() {
     { icon: <Home size={18} />, label: "Home", view: "home" },
     { icon: <FolderKanban size={18} />, label: "Projects", view: "projects" },
     { icon: <Clock size={18} />, label: "Timeline", view: "timeline" },
-    {
-      icon: <UserCircle2 size={18} />,
-      label: "Project Manager",
-      view: "project-manager",
-    },
+    { icon: <UserCircle2 size={18} />, label: "Team Leader", view: "Team Leader",},
     { icon: <Users size={18} />, label: "Users", view: "users" },
     { icon: <Settings size={18} />, label: "Settings", view: "settings" },
   ];
