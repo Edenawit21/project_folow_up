@@ -61,11 +61,7 @@ export default function ExecutiveDashboard() {
     { icon: <Home size={18} />, label: "Home", view: "home" },
     { icon: <FolderKanban size={18} />, label: "Projects", view: "projects" },
     { icon: <Clock size={18} />, label: "Timeline", view: "timeline" },
-    {
-      icon: <UserCircle2 size={18} />,
-      label: "Project Manager",
-      view: "project-manager",
-    },
+    { icon: <UserCircle2 size={18} />, label: "Project Manager", view: "project-manager", },
     { icon: <Users size={18} />, label: "Users", view: "users" },
     { icon: <Settings size={18} />, label: "Settings", view: "settings" },
   ];
