@@ -17,7 +17,6 @@ export default function NavBar() {
     <nav className="sticky top-0 z-50 w-full bg-gradient-to-r from-gray-500 to-purple-500 dark:from-gray-800 dark:to-purple-700 transition-all duration-300 backdrop-blur-lg shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Left Side: Logo and Brand */}
           <div className="flex items-center space-x-3">
             <Image
               src="/log.png"

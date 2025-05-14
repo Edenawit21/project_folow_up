@@ -1,5 +1,8 @@
 "use client";
+
 import { useState } from "react";
+import { projects } from "@/constants"; // Make sure `projects` is exported from `constants/index.ts`
+
 import {
   Bell,
   Search,
@@ -15,6 +18,7 @@ import {
   Settings,
   Users,
 } from "lucide-react";
+
 import {
   BarChart,
   Bar,
@@ -30,10 +34,47 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+
 import { initialProjects } from "@/constants";
 import { Status } from "@/types";
 
-const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7f50", "#00bfff"];
+const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#00C49F"];
+
+const getStatusData = () => {
+  const statusCount: Record<string, number> = {};
+  projects.forEach((p) => {
+    statusCount[p.status] = (statusCount[p.status] || 0) + 1;
+  });
+  return Object.entries(statusCount).map(([status, value]) => ({
+    name: status,
+    value,
+  }));
+};
+
+const getPriorityData = () => {
+  const priorityCount: Record<string, number> = {};
+  projects.forEach((p) => {
+    priorityCount[p.priority] = (priorityCount[p.priority] || 0) + 1;
+  });
+  return Object.entries(priorityCount).map(([name, value]) => ({
+    name,
+    value,
+  }));
+};
+
+const getDueDateData = () => {
+  const monthCount: Record<string, number> = {};
+  projects.forEach((p) => {
+    const month = new Date(p.dueDate).toLocaleString("default", {
+      month: "short",
+      year: "numeric",
+    });
+    monthCount[month] = (monthCount[month] || 0) + 1;
+  });
+  return Object.entries(monthCount)
+    .map(([month, count]) => ({ month, count }))
+    .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
+};
 
 export default function ExecutiveDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -93,6 +134,7 @@ export default function ExecutiveDashboard() {
           </button>
         </div>
 
+        {/* Navigation */}
         <nav className="space-y-2 pl-1 mb-6">
           {navItems.map((item, idx) => (
             <button
@@ -108,6 +150,7 @@ export default function ExecutiveDashboard() {
           ))}
         </nav>
 
+        {/* Charts */}
         {!sidebarCollapsed && (
           <h3 className="text-black font-semibold mb-2">Charts</h3>
         )}
