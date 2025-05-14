@@ -1,6 +1,4 @@
 import { Project } from "@/types";
-
-// Explicitly type the projects array
 export const projects: Project[] = [
   {
     id: 1,

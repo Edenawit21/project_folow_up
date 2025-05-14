@@ -12,7 +12,7 @@ const teams = ["Team Alpha", "Team Beta", "Team Gamma"];
 
 const ProjectDashboard = () => {
   const [projects, setProjects] = useState(initialProjects);
-  const [activeSection, setActiveSection] = useState("Charts"); // Default to "Charts"
+  const [activeSection, setActiveSection] = useState("Charts"); 
   const [openDialog, setOpenDialog] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -70,12 +70,11 @@ const ProjectDashboard = () => {
       <Sidebar
         activeSection={activeSection}
         setActiveSection={setActiveSection}
-        handleOpenDialog={handleOpenDialog} // Pass the function to Sidebar
+        handleOpenDialog={handleOpenDialog} 
       />
       <main className="flex-1 p-8">
         {activeSection === "Projects" && (
           <>
-            {/* Filters and Search Section */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <input
                 type="text"
@@ -131,8 +130,6 @@ const ProjectDashboard = () => {
                 </select>
               </div>
             </div>
-
-            {/* Project List */}
             <ProjectList
               projects={projects}
               searchTerm={searchTerm}
@@ -158,7 +155,6 @@ const ProjectDashboard = () => {
           </div>
         )}
 
-        {/* Project Dialog */}
         {openDialog && (
           <ProjectDialog
             formData={formData}
