@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { FolderKanban, Key, Layers, User, Users, Crown } from "lucide-react";
 import Link from "next/link";
 import { Project } from "@/types";
@@ -50,7 +50,7 @@ export default function ProjectCard({ project }: { project: Project }) {
         <div className="flex flex-wrap gap-1">
           {project.admins.map((admin, index) => (
             <span
-              key={admin-${index}}
+              key={`admin-${index}`}
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-xs font-medium"
             >
               <Crown size={12} />
@@ -59,7 +59,7 @@ export default function ProjectCard({ project }: { project: Project }) {
           ))}
           {project.developers.map((dev, index) => (
             <span
-              key={dev-${index}}
+              key={`dev-${index}`}
               className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200 text-xs font-medium"
             >
               {dev.displayName}
@@ -70,7 +70,7 @@ export default function ProjectCard({ project }: { project: Project }) {
 
       <div className="text-right">
         <Link
-          href={/projects/${project.key.toUpperCase()}}
+          href={`/projects/${project.key.toUpperCase()}`}
           className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
         >
           → View details
