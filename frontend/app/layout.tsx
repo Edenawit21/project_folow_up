@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: "Project Management",
   description: "Manage IT projects efficiently",
   icons: {
-    icon: "/logo.png",
+    icon: "/favicon.png" 
   },
 };
 
