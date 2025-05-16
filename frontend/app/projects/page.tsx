@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchProjects } from "@/utils/jira";
+import { fetchProjects } from "@/utils/Jira";
 import { Project } from "@/types";
 import ProjectCard from "@/components/ProjectCard";
 

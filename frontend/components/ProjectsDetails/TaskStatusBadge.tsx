@@ -13,7 +13,7 @@ export default function TaskStatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${colorClass}}
+      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${colorClass}`}
     >
       {status}
     </span>
