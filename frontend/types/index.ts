@@ -1,29 +1,20 @@
 export interface Project {
-  id: number;
+  id: string;
+  key: string;
   name: string;
-  description?: string;
-  startDate?: string;
-  endDate?: string;
-  priority: Priority;
-  status: Status;
-  team: string;
+  projectTypeKey: string;
+  projectCategory: string;
+  leadDisplayName: string;
+  developers: TeamMember[];
+  admins: TeamMember[];
 }
-
-export enum Priority {
-  Urgent = "Urgent",
-  High = "High",
-  Medium = "Medium",
-  Low = "Low",
-  Backlog = "Backlog",
+// types/task.ts
+export interface Task {
+  status: string;
+  key: string;
+  summary: string;
 }
-
-export enum Status {
-  ToDo = "To Do",
-  WorkInProgress = "Work In Progress",
-  UnderReview = "Under Review",
-  Completed = "Completed",
-}
-
-export interface ChartProps {
-  projects: Project[];
+export interface TeamMember {
+  accountId: string | null;
+  displayName: string;
 }
