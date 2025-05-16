@@ -1,20 +1,8 @@
-"use client"; // This should be at the very top
+"use client"; 
 
 import React, { useMemo } from "react";
 import { ChartProps } from "@/types";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-} from "recharts";
+import {PieChart, Pie,Cell,Tooltip,Legend,BarChart,Bar,XAxis,YAxis,CartesianGrid,ResponsiveContainer } from "recharts";
 import { useTheme } from "next-themes";
 import { Project } from "@/types";
 import {
