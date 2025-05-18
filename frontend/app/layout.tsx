@@ -14,10 +14,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Project Management",
+  title: "ProjectManagement",
   description: "Manage IT projects efficiently",
   icons: {
-    icon: "/favicon.png" 
+    icon: "/favicon.png",
   },
 };
 

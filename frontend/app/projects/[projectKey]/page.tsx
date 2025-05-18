@@ -1,5 +1,5 @@
-import ProjectDetail from "@/components/projectsDetails";
-import { fetchProjectTasks, FetchSingleProject } from "@/utils/jira";
+import ProjectDetail from "@/components/ProjectsDetails";
+import { fetchProjectTasks, FetchSingleProject } from "@/utils/Jira";
 import { notFound } from "next/navigation";
 
 export default async function Page({
