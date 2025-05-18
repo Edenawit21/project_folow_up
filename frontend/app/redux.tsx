@@ -10,6 +10,7 @@ import {
 import globalReducer from "@/utils";
 import { api } from "@/utils/api";
 import { setupListeners } from "@reduxjs/toolkit/query";
+import userReducer from "@/utils/userSlice";
 
 import {
   persistStore,
@@ -47,10 +48,11 @@ const storage =
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["global"],
+  whitelist: ["global ", "user"],
 };
 const rootReducer = combineReducers({
   global: globalReducer,
+  user: userReducer,
   [api.reducerPath]: api.reducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
