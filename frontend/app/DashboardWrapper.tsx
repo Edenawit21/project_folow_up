@@ -22,13 +22,13 @@ function DashboardWLayout({ children }: { children: React.ReactNode }) {
   console.log("Dark Mode:", isDarkMode);
 
   return (
-    <div className="flex h-screen w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+    <div className="flex h-screen w-full dark:bg-gray-800 text-gray-900 dark:text-gray-100">
       {/* Overlay backdrop removed because no mobile logic */}
 
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 z-[60] h-full
-          bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800
+           dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800
           transition-width duration-300 ease-in-out
           ${isSidebarCollapsed ? "w-16" : "w-64"}
         `}
@@ -45,7 +45,7 @@ function DashboardWLayout({ children }: { children: React.ReactNode }) {
       >
         <header
           className={`fixed top-0 left-0 right-0 z-[70] h-16
-    bg-white/95 border-b border-gray-200 dark:bg-gray-900/95 dark:border-gray-800 backdrop-blur-sm
+     border-b border-gray-200 dark:bg-gray-900/95 dark:border-gray-800 backdrop-blur-sm
     transition-all duration-300
   `}
         >

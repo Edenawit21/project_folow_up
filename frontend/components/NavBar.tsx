@@ -24,34 +24,31 @@ const NavBar = () => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   return (
-    <nav className="flex items-center justify-between h-16 px-6 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-      {/* Left Section: Menu, Logo, Search */}
+    <nav className="flex items-center justify-between h-16 px-6 bg-[var(--background)] text-[var(--foreground)]">
+      {/* Left Section */}
       <div className="flex items-center gap-6 w-full max-w-xl">
-        {/* Menu toggle button */}
         <button
           type="button"
           aria-label="Toggle sidebar"
           onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
           className="rounded-lg p-2 hover:bg-gray-200 dark:hover:bg-gray-800"
         >
-          <Menu className="h-6 w-6 text-gray-900 dark:text-gray-300 cursor-pointer" />
+          <Menu className="h-6 w-6 cursor-pointer hover:text-white hover:bg-gray-600" />
         </button>
 
-        {/* Logo */}
         <Image
           src="/logo.png"
           alt="Logo"
           width={50}
           height={50}
-          className="rounded-full p-1 border dark:border-gray-600"
+          className="rounded-full p-1  border-gray-300 dark:border-gray-600"
         />
 
         {/* Search Bar */}
         <div className="relative hidden md:flex flex-grow ml-16 max-w-md">
           <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
-            <Search className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            <Search className="h-5 w-5 text-gray-500" />
           </div>
-
           <input
             type="search"
             placeholder="Search..."
@@ -60,9 +57,8 @@ const NavBar = () => {
         </div>
       </div>
 
-      {/* Right Section: Icons */}
+      {/* Right Section */}
       <div className="flex items-center gap-4">
-        {/* Dark mode toggle */}
         <button
           type="button"
           aria-label="Toggle dark mode"
@@ -72,45 +68,38 @@ const NavBar = () => {
           {isDarkMode ? (
             <Sun className="h-5 w-5 text-yellow-400 cursor-pointer" />
           ) : (
-            <Moon className="h-5 w-5 text-gray-900 dark:text-gray-300 cursor-pointer" />
+            <Moon className="h-5 w-5 text-gray-800 hover:text-white hover:bg-gray-600 cursor-pointer" />
           )}
         </button>
 
-        {/* Notifications */}
         <button
           type="button"
-          aria-label="Notifications"
           className="rounded-lg p-2 hover:bg-gray-200 dark:hover:bg-gray-800"
         >
-          <Bell className="h-5 w-5 text-gray-900 dark:text-gray-300 cursor-pointer" />
+          <Bell className="h-5 w-5 hover:text-white hover:bg-gray-600 cursor-pointer" />
         </button>
 
-        {/* Account */}
         <button
           type="button"
-          aria-label="Account"
           className="rounded-lg p-2 hover:bg-gray-200 dark:hover:bg-gray-800"
         >
-          <User className="h-5 w-5 text-gray-900 dark:text-gray-300 cursor-pointer" />
+          <User className="h-5 w-5 hover:text-white hover:bg-gray-600 cursor-pointer" />
         </button>
 
-        {/* Settings */}
         <Link
           href="/settings"
-          aria-label="Settings"
           className="rounded-lg p-2 hover:bg-gray-200 dark:hover:bg-gray-800"
         >
-          <Settings className="h-5 w-5 text-gray-900 dark:text-gray-300" />
+          <Settings className="h-5 w-5 hover:text-white hover:bg-gray-600 cursor-pointer" />
         </Link>
 
-        {/* Logout */}
         <button
           type="button"
           aria-label="Logout"
           onClick={() => console.log("Logging out...")}
           className="rounded-lg p-2 hover:bg-gray-200 dark:hover:bg-gray-800"
         >
-          <LogOut className="h-5 w-5 text-red-600 dark:text-red-400 cursor-pointer" />
+          <LogOut className="h-5 w-5 text-red-600 dark:text-red-400 hover:text-white hover:bg-red-600 cursor-pointer" />
         </button>
       </div>
     </nav>

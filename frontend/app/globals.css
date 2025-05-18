@@ -1,17 +1,22 @@
 @import "tailwindcss";
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+
+/* globals.css */
+
+
+
+:root {
+  --background: #ffffff; 
+  --foreground: #111111; 
+  --border-color: #e5e7eb
 }
 
-html,
-body,
-#root,
-.app {
-  height: 100%;
-  width: 100%;
-  @apply text-sm;
-  @apply bg-white;
-  @apply dark:bg-black;
+.dark {
+  --background: #1f2937; 
+  --foreground: #ffffff; 
+  --border-color: #4b5563}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.3s, color 0.3s;
 }
