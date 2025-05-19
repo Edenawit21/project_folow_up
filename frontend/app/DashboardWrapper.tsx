@@ -10,10 +10,8 @@ function DashboardWLayout({ children }: { children: React.ReactNode }) {
     (state) => state.global.isSidebarCollapsed
   );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
-
   useEffect(() => {
-    const root = document.documentElement;
-    root.classList.toggle("dark", isDarkMode);
+    document.documentElement.classList.toggle("dark", isDarkMode);
   }, [isDarkMode]);
 
   return (
