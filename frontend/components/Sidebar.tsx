@@ -151,9 +151,9 @@ const SidebarLink = ({
     <Link
       href={href}
       className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors
-        hover:bg-blue-200 dark:hover:bg-gray-800 ${
+        hover:bg-blue-200 dark:hover:bg-gray-800 hover:text-blue-500 ${
           active
-            ? "bg-blue-100 font-medium text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
+            ? "bg-blue-100 font-medium  dark:bg-blue-900/50 dark:text-blue-100 hover:text-blue-100"
             : ""
         }`}
       aria-current={active ? "page" : undefined}
@@ -161,13 +161,13 @@ const SidebarLink = ({
       <Icon
         className={`h-5 w-5 ${
           active
-            ? "text-blue-600 dark:text-blue-400"
+            ? "text-blue-700 dark:text-blue-400"
             : "group-hover:text-blue-700 dark:group-hover:text-gray-200"
         }`}
       />
       {!isCollapsed && <span>{label}</span>}
       {active && !isCollapsed && (
-        <div className="ml-auto h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400" />
+        <div className="ml-auto h-2 w-2 rounded-full bg-blue-100 dark:bg-blue-400 " />
       )}
     </Link>
   );
