@@ -36,11 +36,7 @@ const SideBar = () => {
         {[
           { href: "/", icon: Home, label: "Home" },
           { href: "/projects", icon: FolderKanban, label: "Projects" },
-          {
-            href: "/project-managers",
-            icon: UserCircle2,
-            label: "Project Managers",
-          },
+          { href: "/project-managers", icon: UserCircle2, label: "Project Managers" },
           { href: "/timeline", icon: Briefcase, label: "Timeline" },
           { href: "/search", icon: Search, label: "Search" },
           { href: "/settings", icon: Settings, label: "Settings" },

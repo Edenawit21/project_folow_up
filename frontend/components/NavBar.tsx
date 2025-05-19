@@ -99,7 +99,7 @@ const NavBar = () => {
           type="button"
           aria-label="Logout"
           onClick={() => console.log("Logging out...")}
-          className="rounded-lg p-2 hover:bg-gray-600"
+          className="rounded-lg p-2 hover:bg--600"
         >
           <LogOut className="h-5 w-5 text-red-600  cursor-pointer" />
         </button>
