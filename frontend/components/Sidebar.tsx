@@ -27,105 +27,59 @@ const SideBar = () => {
 
   return (
     <aside
-      className={`flex flex-col h-full bg-[var(--background)] text-[var(--foreground)] border-[var(--border-color)] shadow-xl transition-all duration-300 ${
+      className={`flex flex-col h-full bg-[var(--background)] text-[var(--text)] border-r border-[var(--border)] transition-all duration-300 shadow-lg ${
         isSidebarCollapsed ? "w-16" : "w-64"
       } top-0 left-0 z-50`}
       aria-label="Sidebar Navigation"
     >
       <nav className="flex-1 overflow-y-auto px-1 py-4 mt-15">
-        <SidebarLink
-          href="/"
-          icon={Home}
-          label="Home"
-          isCollapsed={isSidebarCollapsed}
-          active={pathname === "/"}
-        />
-        <SidebarLink
-          href="/projects"
-          icon={FolderKanban}
-          label="Projects"
-          isCollapsed={isSidebarCollapsed}
-          active={pathname === "/projects"}
-        />
-        <SidebarLink
-          href="/project-managers"
-          icon={UserCircle2}
-          label="Project Managers"
-          isCollapsed={isSidebarCollapsed}
-          active={pathname === "/project-managers"}
-        />
-        <SidebarLink
-          href="/timeline"
-          icon={Briefcase}
-          label="Timeline"
-          isCollapsed={isSidebarCollapsed}
-          active={pathname === "/timeline"}
-        />
-        <SidebarLink
-          href="/search"
-          icon={Search}
-          label="Search"
-          isCollapsed={isSidebarCollapsed}
-          active={pathname === "/search"}
-        />
-        <SidebarLink
-          href="/settings"
-          icon={Settings}
-          label="Settings"
-          isCollapsed={isSidebarCollapsed}
-          active={pathname === "/settings"}
-        />
-        <SidebarLink
-          href="/users"
-          icon={User}
-          label="Users"
-          isCollapsed={isSidebarCollapsed}
-          active={pathname === "/users"}
-        />
-        <SidebarLink
-          href="/teams"
-          icon={Users}
-          label="Teams"
-          isCollapsed={isSidebarCollapsed}
-          active={pathname === "/teams"}
-        />
-        <SidebarLink
-          href="/chat"
-          icon={MessageCircle}
-          label="Chat"
-          isCollapsed={isSidebarCollapsed}
-          active={pathname === "/chat"}
-        />
+        {[
+          { href: "/", icon: Home, label: "Home" },
+          { href: "/projects", icon: FolderKanban, label: "Projects" },
+          {
+            href: "/project-managers",
+            icon: UserCircle2,
+            label: "Project Managers",
+          },
+          { href: "/timeline", icon: Briefcase, label: "Timeline" },
+          { href: "/search", icon: Search, label: "Search" },
+          { href: "/settings", icon: Settings, label: "Settings" },
+          { href: "/users", icon: User, label: "Users" },
+          { href: "/teams", icon: Users, label: "Teams" },
+          { href: "/chat", icon: MessageCircle, label: "Chat" },
+        ].map((item) => (
+          <SidebarLink
+            key={item.href}
+            href={item.href}
+            icon={item.icon}
+            label={item.label}
+            isCollapsed={isSidebarCollapsed}
+            active={pathname === item.href}
+          />
+        ))}
 
-        <div className="mt-6  dark:border-gray-800 pt-4">
+        <div className="mt-6 pt-4 border-t border-[var(--border)]">
           <h3
-            className={`mb-3 px-4 text-xs font-semibold uppercase tracking-wide ${
+            className={`mb-3 px-4 text-xs font-semibold uppercase tracking-wide text-[var(--muted)] ${
               isSidebarCollapsed ? "sr-only" : ""
             }`}
           >
             Analytics
           </h3>
-          <SidebarLink
-            href="/charts/pie"
-            icon={PieChart}
-            label="Pie Chart"
-            isCollapsed={isSidebarCollapsed}
-            active={pathname === "/charts/pie"}
-          />
-          <SidebarLink
-            href="/charts/bar"
-            icon={BarChart3}
-            label="Bar Chart"
-            isCollapsed={isSidebarCollapsed}
-            active={pathname === "/charts/bar"}
-          />
-          <SidebarLink
-            href="/charts/line"
-            icon={LineChart}
-            label="Line Chart"
-            isCollapsed={isSidebarCollapsed}
-            active={pathname === "/charts/line"}
-          />
+          {[
+            { href: "/charts/pie", icon: PieChart, label: "Pie Chart" },
+            { href: "/charts/bar", icon: BarChart3, label: "Bar Chart" },
+            { href: "/charts/line", icon: LineChart, label: "Line Chart" },
+          ].map((item) => (
+            <SidebarLink
+              key={item.href}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              isCollapsed={isSidebarCollapsed}
+              active={pathname === item.href}
+            />
+          ))}
         </div>
       </nav>
     </aside>
@@ -151,23 +105,21 @@ const SidebarLink = ({
     <Link
       href={href}
       className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors
-        hover:bg-blue-200 dark:hover:bg-gray-800 hover:text-blue-500 ${
-          active
-            ? "bg-blue-100 font-medium  dark:bg-blue-900/50 dark:text-blue-100 hover:text-blue-100"
-            : ""
-        }`}
+        hover:bg-[var(--muted)] hover:text-blue-600
+        ${active ? "bg-blue-100 font-medium text-blue-700" : ""}
+      `}
       aria-current={active ? "page" : undefined}
     >
       <Icon
         className={`h-5 w-5 ${
           active
-            ? "text-blue-700 dark:text-blue-400"
-            : "group-hover:text-blue-700 dark:group-hover:text-gray-200"
+            ? "text-blue-700"
+            : "group-hover:text-blue-600 text-[var(--text)]"
         }`}
       />
       {!isCollapsed && <span>{label}</span>}
       {active && !isCollapsed && (
-        <div className="ml-auto h-2 w-2 rounded-full bg-blue-100 dark:bg-blue-400 " />
+        <div className="ml-auto h-2 w-2 rounded-full bg-blue-500" />
       )}
     </Link>
   );
