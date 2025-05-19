@@ -27,7 +27,7 @@ const SideBar = () => {
 
   return (
     <aside
-      className={`flex flex-col h-full bg-[var(--background)] text-[var(--foreground)] border-r border-[var(--border-color)] shadow-xl transition-all duration-300 ${
+      className={`flex flex-col h-full bg-[var(--background)] text-[var(--foreground)] border-[var(--border-color)] shadow-xl transition-all duration-300 ${
         isSidebarCollapsed ? "w-16" : "w-64"
       } top-0 left-0 z-50`}
       aria-label="Sidebar Navigation"
@@ -97,7 +97,7 @@ const SideBar = () => {
           active={pathname === "/chat"}
         />
 
-        <div className="mt-6 border-t border-gray-200 dark:border-gray-800 pt-4">
+        <div className="mt-6  dark:border-gray-800 pt-4">
           <h3
             className={`mb-3 px-4 text-xs font-semibold uppercase tracking-wide ${
               isSidebarCollapsed ? "sr-only" : ""
