@@ -24,9 +24,9 @@ const NavBar = () => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   return (
-    <nav className="flex items-center justify-between h-16 px-6 bg-[var(--background)] text-[var(--foreground)]">
+    <nav className="flex items-center justify-between h-16 px-6 bg-[var(--background)] text-[var(--foreground)] shadow-sm">
       {/* Left Section */}
-      <div className="flex items-center gap-6 w-full max-w-xl">
+      <div className="flex items-center gap-6 w-full max-w-xl ">
         <button
           type="button"
           aria-label="Toggle sidebar"
@@ -47,7 +47,7 @@ const NavBar = () => {
         {/* Search Bar */}
         <div className="relative hidden md:flex flex-grow ml-16 max-w-md">
           <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
-            <Search className="h-5 w-5 text-gray-500" />
+            <Search className="h-5 w-5 text-gray-800" />
           </div>
           <input
             type="search"
