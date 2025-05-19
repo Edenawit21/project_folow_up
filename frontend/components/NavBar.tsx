@@ -72,12 +72,14 @@ const NavBar = () => {
           )}
         </button>
 
-        <button
-          type="button"
-          className="rounded-lg p-2 hover:bg-gray-200 dark:hover:bg-gray-800"
-        >
-          <Bell className="h-5 w-5 hover:text-white hover:bg-gray-600 cursor-pointer" />
-        </button>
+        <Link href="/notifications" passHref>
+          <button
+            type="button"
+            className="rounded-lg p-2 hover:bg-gray-200 dark:hover:bg-gray-800"
+          >
+            <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gray-600 rounded cursor-pointer" />
+          </button>
+        </Link>
 
         <button
           type="button"
