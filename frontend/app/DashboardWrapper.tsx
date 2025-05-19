@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import NavBar from "@/components/NavBar";
 import SideBar from "@/components/Sidebar";
-import StoreProvider, { useAppSelector, useAppDispatch } from "./redux";
+import StoreProvider, { useAppSelector } from "./redux";
 
 function DashboardWLayout({ children }: { children: React.ReactNode }) {
   const isSidebarCollapsed = useAppSelector(
@@ -12,23 +12,16 @@ function DashboardWLayout({ children }: { children: React.ReactNode }) {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   useEffect(() => {
-    // Apply dark mode class to <html>
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    const root = document.documentElement;
+    root.classList.toggle("dark", isDarkMode);
   }, [isDarkMode]);
-  console.log("Dark Mode:", isDarkMode);
 
   return (
-    <div className="flex h-screen w-full dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-      {/* Overlay backdrop removed because no mobile logic */}
-
+    <div className="flex h-screen w-full bg-[var(--background)] text-[var(--text)]">
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 z-[60] h-full
-           dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800
+          bg-[var(--background)] border-r border-[var(--border)]
           transition-width duration-300 ease-in-out
           ${isSidebarCollapsed ? "w-16" : "w-64"}
         `}
@@ -45,9 +38,9 @@ function DashboardWLayout({ children }: { children: React.ReactNode }) {
       >
         <header
           className={`fixed top-0 left-0 right-0 z-[70] h-16
-     border-b border-gray-200 dark:bg-gray-900/95 dark:border-gray-800 backdrop-blur-sm
-    transition-all duration-300
-  `}
+            bg-[var(--background)] border-b border-[var(--border)]
+            backdrop-blur-sm transition-all duration-300
+          `}
         >
           <NavBar />
         </header>
