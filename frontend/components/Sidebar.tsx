@@ -11,9 +11,6 @@ import {
   User,
   Users,
   MessageCircle,
-  PieChart,
-  BarChart3,
-  LineChart,
 } from "lucide-react";
 import Link from "next/link";
 import { useAppSelector } from "@/app/redux";
@@ -36,7 +33,11 @@ const SideBar = () => {
         {[
           { href: "/", icon: Home, label: "Home" },
           { href: "/projects", icon: FolderKanban, label: "Projects" },
-          { href: "/project-managers", icon: UserCircle2, label: "Project Managers" },
+          {
+            href: "/project-managers",
+            icon: UserCircle2,
+            label: "Project Managers",
+          },
           { href: "/timeline", icon: Briefcase, label: "Timeline" },
           { href: "/search", icon: Search, label: "Search" },
           { href: "/settings", icon: Settings, label: "Settings" },
@@ -53,30 +54,6 @@ const SideBar = () => {
             active={pathname === item.href}
           />
         ))}
-
-        <div className="mt-6 pt-4 border-t border-[var(--border)]">
-          <h3
-            className={`mb-3 px-4 text-xs font-semibold uppercase tracking-wide text-[var(--text)] ${
-              isSidebarCollapsed ? "sr-only" : ""
-            }`}
-          >
-            Analytics
-          </h3>
-          {[
-            { href: "/charts/pie", icon: PieChart, label: "Pie Chart" },
-            { href: "/charts/bar", icon: BarChart3, label: "Bar Chart" },
-            { href: "/charts/line", icon: LineChart, label: "Line Chart" },
-          ].map((item) => (
-            <SidebarLink
-              key={item.href}
-              href={item.href}
-              icon={item.icon}
-              label={item.label}
-              isCollapsed={isSidebarCollapsed}
-              active={pathname === item.href}
-            />
-          ))}
-        </div>
       </nav>
     </aside>
   );
