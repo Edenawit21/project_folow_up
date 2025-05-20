@@ -2,26 +2,19 @@
 
 /* globals.css */
 body {
-  fotnt-familty: "Inter", sans-serif;
-}
-
-@theme {
-  --color-background: var(--background);
-  --color-border: var(--border);
-  --color-text: var(--text);
-  --color-muted: var(--muted);
+  font-family: "Inter", sans-serif;
 }
 
 :root {
-  --background: #f9fafb; /* gray-50 */
-  --text: #111827;       /* gray-900 */
-  --border: #e5e7eb;     /* gray-200 */
-  --muted: #6b7280;      /* gray-500 */
+  --background: #f9fafb; 
+  --text: #111827;       
+  --border: #e5e7eb;     
+  --muted: #6b7280;      
 }
 
 .dark {
-  --background: #111827; /* gray-900 */
-  --text: #f3f4f6;       /* gray-100 */
-  --border: #374151;     /* gray-700 */
-  --muted: #9ca3af;      /* gray-400 */
+  --background: #111827; 
+  --text: #f3f4f6;       
+  --border: #374151;     
+  --muted: #9ca3af;      
 }

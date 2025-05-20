@@ -1,4 +1,3 @@
-// components/ProjectFilter.tsx
 "use client";
 
 import React from "react";
@@ -24,16 +23,29 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
   teams,
   managers,
 }) => {
+  const baseSelectClasses = `
+    w-full
+    border
+    rounded-md
+    p-2
+    bg-[var(--background)]
+    border-[var(--border)]
+    text-[var(--text)]
+    focus:outline-none
+    focus:ring-2
+    focus:ring-blue-500
+  `;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       {/* Status */}
       <select
         value={filters.status}
         onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-        className="border rounded-md p-2"
+        className={baseSelectClasses}
       >
-        <option value="">All Statuses</option>
-        <option value="Open">Open</option>
+        <option value="">All</option>
+        <option value="Open">To Do</option>
         <option value="InProgress">In Progress</option>
         <option value="Completed">Completed</option>
       </select>
@@ -42,12 +54,13 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
       <select
         value={filters.priority}
         onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-        className="border rounded-md p-2"
+        className={baseSelectClasses}
       >
-        <option value="">All Priorities</option>
+        <option value="">All</option>
         <option value="Low">Low</option>
         <option value="Medium">Medium</option>
         <option value="High">High</option>
+        <option value="Urgent">Urgent</option>
       </select>
 
       {/* Assigned Developer */}
@@ -56,9 +69,9 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
         onChange={(e) =>
           setFilters({ ...filters, developerId: e.target.value })
         }
-        className="border rounded-md p-2"
+        className={baseSelectClasses}
       >
-        <option value="">All Developers</option>
+        <option value="">All</option>
         {developers.map((dev) => (
           <option key={dev.id} value={dev.id}>
             {dev.name}
@@ -70,9 +83,9 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
       <select
         value={filters.teamId}
         onChange={(e) => setFilters({ ...filters, teamId: e.target.value })}
-        className="border rounded-md p-2"
+        className={baseSelectClasses}
       >
-        <option value="">All Teams</option>
+        <option value="">All</option>
         {teams.map((team) => (
           <option key={team.id} value={team.id}>
             {team.name}
@@ -86,9 +99,9 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
         onChange={(e) =>
           setFilters({ ...filters, projectManagerId: e.target.value })
         }
-        className="border rounded-md p-2"
+        className={baseSelectClasses}
       >
-        <option value="">All Managers</option>
+        <option value="">All</option>
         {managers.map((pm) => (
           <option key={pm.id} value={pm.id}>
             {pm.name}
