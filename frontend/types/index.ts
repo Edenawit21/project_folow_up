@@ -19,3 +19,17 @@ export interface TeamMember {
   displayName: string;
 }
 
+// types/filters.ts
+
+export interface ProjectFilterState {
+  status: string;
+  priority: string;
+  developerId: string;
+  teamId: string;
+  projectManagerId: string;
+}
+
+export interface Entity {
+  id: string;
+  name: string;
+}
