@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Menu,
   Moon,
@@ -23,8 +23,24 @@ const NavBar = () => {
   );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <nav className="flex items-center justify-between h-16 px-6 bg-[var(--background)] text-[var(--text)] shadow-sm">
+    <nav className="flex items-center justify-between h-16 px-6 bg-[var(--background)] text-[var(--text)] shadow-sm border-b border-[var(--border)]">
       {/* Left Section */}
       <div className="flex items-center gap-6 w-full max-w-xl">
         <button
@@ -81,28 +97,39 @@ const NavBar = () => {
           </button>
         </Link>
 
-        <button
-          type="button"
-          className="rounded-lg p-2 hover:bg-[var(--muted)]"
-        >
-          <User className="h-5 w-5 text-[var(--text)] cursor-pointer" />
-        </button>
+        {/* Profile Dropdown */}
+        <div className="relative " ref={dropdownRef}>
+          <button
+            type="button"
+            onClick={() => setIsDropdownOpen((prev) => !prev)}
+            className="rounded-lg p-2 hover:bg-[var(--muted)]"
+          >
+            <User className="h-5 w-5 text-[var(--text)] cursor-pointer" />
+          </button>
 
-        <Link
-          href="/settings"
-          className="rounded-lg p-2 hover:bg-[var(--muted)]"
-        >
-          <Settings className="h-5 w-5 text-[var(--text)] cursor-pointer" />
-        </Link>
-
-        <button
-          type="button"
-          aria-label="Logout"
-          onClick={() => console.log("Logging out...")}
-          className="rounded-lg p-2 hover:bg--600"
-        >
-          <LogOut className="h-5 w-5 text-red-600  cursor-pointer" />
-        </button>
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-44  dark:bg-[var(--background)] border border-[var(--border)] rounded-lg shadow-lg z-50">
+              <Link
+                href="/profile"
+                className="block px-4 py-2 text-sm  dark:hover:bg-[var(--muted)] hover:bg-gray-400"
+              >
+                Profile
+              </Link>
+              <Link
+                href="/settings"
+                className="block px-4 py-2 text-sm dark:hover:bg-[var(--muted)] hover:bg-gray-400"
+              >
+                Settings
+              </Link>
+              <button
+                onClick={() => console.log("Logging out...")}
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-400 cursor-pointer"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );

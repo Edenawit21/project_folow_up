@@ -32,7 +32,7 @@ const SideBar = () => {
       } top-0 left-0 z-50`}
       aria-label="Sidebar Navigation"
     >
-      <nav className="flex-1 overflow-y-auto px-1 py-4 mt-15">
+      <nav className="flex-1 overflow-y-auto px-1 py-4 mt-15 ">
         {[
           { href: "/", icon: Home, label: "Home" },
           { href: "/projects", icon: FolderKanban, label: "Projects" },
@@ -56,7 +56,7 @@ const SideBar = () => {
 
         <div className="mt-6 pt-4 border-t border-[var(--border)]">
           <h3
-            className={`mb-3 px-4 text-xs font-semibold uppercase tracking-wide text-[var(--muted)] ${
+            className={`mb-3 px-4 text-xs font-semibold uppercase tracking-wide text-[var(--text)] ${
               isSidebarCollapsed ? "sr-only" : ""
             }`}
           >
