@@ -1,22 +1,27 @@
 @import "tailwindcss";
 
 /* globals.css */
+body {
+  fotnt-familty: "Inter", sans-serif;
+}
 
-
+@theme {
+  --color-background: var(--background);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+}
 
 :root {
-  --background: #ffffff; 
-  --foreground: #111111; 
-  --border-color: #e5e7eb
+  --background: #f9fafb; /* gray-50 */
+  --text: #111827;       /* gray-900 */
+  --border: #e5e7eb;     /* gray-200 */
+  --muted: #6b7280;      /* gray-500 */
 }
 
 .dark {
-  --background: #1f2937; 
-  --foreground: #ffffff; 
-  --border-color: #4b5563}
-
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  transition: background-color 0.3s, color 0.3s;
+  --background: #111827; /* gray-900 */
+  --text: #f3f4f6;       /* gray-100 */
+  --border: #374151;     /* gray-700 */
+  --muted: #9ca3af;      /* gray-400 */
 }

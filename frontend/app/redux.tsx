@@ -48,7 +48,7 @@ const storage =
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["global ", "user"],
+  whitelist: ["global", "user"],
 };
 const rootReducer = combineReducers({
   global: globalReducer,
