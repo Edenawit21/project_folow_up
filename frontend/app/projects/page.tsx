@@ -4,16 +4,15 @@ import { useEffect, useState } from "react";
 import { fetchProjects } from "@/utils/Jira";
 import { Project } from "@/types";
 import ProjectFilter from "@/components/ProjectFilter";
-import ProjectTable from "@/components/ProjectTable"; 
-
-type Entity = { id: string; name: string };
+import ProjectTable from "@/components/ProjectTable";
+import { ProjectFilterState, Entity } from "@/types";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<ProjectFilterState>({
     status: "",
     priority: "",
     developerId: "",
@@ -21,7 +20,7 @@ export default function ProjectsPage() {
     projectManagerId: "",
   });
 
-  // These need real data, not empty arrays
+  // Temporary placeholder entities (should come from an API ideally)
   const developers: Entity[] = [];
   const teams: Entity[] = [];
   const managers: Entity[] = [];
