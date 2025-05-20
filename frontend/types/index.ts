@@ -19,17 +19,3 @@ export interface TeamMember {
   displayName: string;
 }
 
-// export type UserRole = "manager" | "project_manager" | "team_leader";
-
-// export interface User {
-//   id: string;
-//   name: string;
-//   role: UserRole;
-// }
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  azureRole: string;
-  jiraRole: string;
-}
