@@ -78,8 +78,8 @@ const SidebarLink = ({
     <Link
       href={href}
       className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors
-        hover:bg-[var(--muted)] hover:text-blue-600
-        ${active ? "bg-blue-100 font-medium text-blue-700" : ""}
+        hover:bg-gray-300 hover:text-blue-600
+        ${active ? "font-medium text-blue-700" : ""}
       `}
       aria-current={active ? "page" : undefined}
     >
