@@ -1,18 +1,31 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import SideBar from "@/components/Sidebar";
 import StoreProvider, { useAppSelector } from "./redux";
 
 function DashboardWLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed
   );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDarkMode);
   }, [isDarkMode]);
+
+  // Pages where layout (NavBar + SideBar) should be hidden
+  const noLayoutPages = ["/login", "/signup"];
+
+  const shouldHideLayout = noLayoutPages.includes(pathname);
+
+  if (shouldHideLayout) {
+    // Just return the page content without NavBar and SideBar
+    return <div className="min-h-screen">{children}</div>;
+  }
 
   return (
     <div className="flex h-screen w-full bg-[var(--background)] text-[var(--text)]">
@@ -49,7 +62,6 @@ function DashboardWLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Redux Provider wrapper
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => (
   <StoreProvider>
     <DashboardWLayout>{children}</DashboardWLayout>
