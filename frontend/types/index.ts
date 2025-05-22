@@ -14,6 +14,8 @@ export interface Project {
   projectCategory?: string;
   leadDisplayName?: string;
   developers?: string[];
+  status?: string; 
+  priority?: string;
 }
 
 

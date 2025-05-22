@@ -1,101 +1,99 @@
 "use client";
 
-import React from "react";
+import { useAppDispatch, useAppSelector } from "@/app/redux";
+import { setIsSidebarCollapsed } from "@/utils";
 import {
-  Home,
-  FolderKanban,
-  UserCircle2,
   Briefcase,
+  Home,
+  LucideIcon,
+  Menu,
   Search,
   Settings,
   User,
   Users,
-  MessageCircle,
+  X,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { useAppSelector } from "@/app/redux";
 import { usePathname } from "next/navigation";
+import React from "react";
 
-const SideBar = () => {
+const Sidebar = () => {
+  const dispatch = useAppDispatch();
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed
   );
-  const pathname = usePathname();
+
+  const sidebarClassNames = `
+    fixed flex flex-col h-full justify-between z-40 overflow-y-auto shadow-xl
+    transition-all duration-300
+    bg-[var(--background)]
+    ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}
+  `;
 
   return (
-    <aside
-      className={`flex flex-col h-full bg-[var(--background)] text-[var(--text)] border-r border-[var(--border)] transition-all duration-300 shadow-lg ${
-        isSidebarCollapsed ? "w-16" : "w-64"
-      } top-0 left-0 z-50`}
-      aria-label="Sidebar Navigation"
-    >
-      <nav className="flex-1 overflow-y-auto px-1 py-4 mt-15 ">
-        {[
-          { href: "/", icon: Home, label: "Home" },
-          { href: "/projects", icon: FolderKanban, label: "Projects" },
-          {
-            href: "/project-managers",
-            icon: UserCircle2,
-            label: "Project Managers",
-          },
-          { href: "/timeline", icon: Briefcase, label: "Timeline" },
-          { href: "/search", icon: Search, label: "Search" },
-          { href: "/settings", icon: Settings, label: "Settings" },
-          { href: "/users", icon: User, label: "Users" },
-          { href: "/teams", icon: Users, label: "Teams" },
-          { href: "/chat", icon: MessageCircle, label: "Chat" },
-        ].map((item) => (
-          <SidebarLink
-            key={item.href}
-            href={item.href}
-            icon={item.icon}
-            label={item.label}
-            isCollapsed={isSidebarCollapsed}
-            active={pathname === item.href}
-          />
-        ))}
-      </nav>
-    </aside>
+    <div className={sidebarClassNames}>
+      <div className="flex flex-col h-full w-full justify-start">
+        {/* Logo Header */}
+        <div className="z-50 flex items-center min-h-[56px] justify-between px-6 py-4 border-b border-[var(--border)]">
+          <button
+            className="p-1 hover:opacity-70"
+            onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
+            aria-label="Collapse Sidebar"
+          >
+            <Menu className="h-6 w-6 text-[var(--text)] hover:text-gray-500 bg-[var(--background)] cursor-pointer" />
+          </button>
+        </div>
+
+        {/* Team Section */}
+        <div className="flex items-center gap-4 px-6 py-4 border-b border-[var(--border)] cursor-pointer">
+          <Image src="/logo.png" alt="Logo" width={36} height={36} />
+          
+         <h1>Project Tracker</h1>
+        </div>
+
+        {/* Navigation Links */}
+        <nav className="z-10 w-full">
+          <SidebarLink icon={Home} label="Home" href="/" />
+          <SidebarLink icon={Briefcase} label="projects" href="/projects" />
+          <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
+          <SidebarLink icon={Search} label="Search" href="/search" />
+          <SidebarLink icon={Settings} label="Settings" href="/settings" />
+          <SidebarLink icon={User} label="Users" href="/users" />
+          <SidebarLink icon={Users} label="Teams" href="/teams" />
+        </nav>
+      </div>
+    </div>
   );
 };
 
 interface SidebarLinkProps {
   href: string;
-  icon: React.ComponentType<any>;
+  icon: LucideIcon;
   label: string;
-  isCollapsed: boolean;
-  active: boolean;
 }
 
-const SidebarLink = ({
-  href,
-  icon: Icon,
-  label,
-  isCollapsed,
-  active,
-}: SidebarLinkProps) => {
+const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
+  const pathname = usePathname();
+  const isActive =
+    pathname === href || (pathname === "/" && href === "/dashboard");
+
   return (
-    <Link
-      href={href}
-      className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors
-        hover:bg-gray-300 hover:text-blue-600
-        ${active ? "font-medium text-blue-700" : ""}
-      `}
-      aria-current={active ? "page" : undefined}
-    >
-      <Icon
-        className={`h-5 w-5 ${
-          active
-            ? "text-blue-700"
-            : "group-hover:text-blue-600 text-[var(--text)]"
-        }`}
-      />
-      {!isCollapsed && <span>{label}</span>}
-      {active && !isCollapsed && (
-        <div className="ml-auto h-2 w-2 rounded-full bg-blue-500" />
-      )}
+    <Link href={href} className="w-full">
+      <div
+        className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 && {
+          isActive ? "bg-gray-100 text-white dark:bg-gray-600" : ""
+        } justify-start px-8 py-3`}
+      >
+        $
+        {isActive && (
+          <div className="absolute left-0 top-0 h-[100%] w-[5px] bg-blue-200" />
+        )}
+        <Icon className="h-6 w-6 text-[var(--text)]" />
+        <span className="text-[var(--text)] font-medium text-2xl">{label}</span>
+      </div>
     </Link>
   );
 };
 
-export default SideBar;
+export default Sidebar;
