@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Menu,
-  Moon,
-  Sun,
-  Search,
-  Settings,
-  Bell,
-  LogOut,
-  User,
-} from "lucide-react";
+import { Menu, Moon, Sun, Search, Bell, User } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
@@ -35,8 +26,20 @@ const NavBar = () => {
         setIsDropdownOpen(false);
       }
     };
+
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsDropdownOpen(false);
+      }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEsc);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEsc);
+    };
   }, []);
 
   return (
@@ -98,20 +101,22 @@ const NavBar = () => {
         </Link>
 
         {/* Profile Dropdown */}
-        <div className="relative " ref={dropdownRef}>
+        <div className="relative" ref={dropdownRef}>
           <button
             type="button"
             onClick={() => setIsDropdownOpen((prev) => !prev)}
+            aria-haspopup="true"
+            aria-expanded={isDropdownOpen}
             className="rounded-lg p-2 hover:bg-[var(--muted)]"
           >
             <User className="h-5 w-5 text-[var(--text)] cursor-pointer" />
           </button>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-44  dark:bg-[var(--background)] border border-[var(--border)] rounded-lg shadow-lg z-50">
+            <div className="absolute right-0 mt-2 w-44 dark:bg-[var(--background)] border border-[var(--border)] rounded-lg shadow-lg z-50">
               <Link
                 href="/profile"
-                className="block px-4 py-2 text-sm  dark:hover:bg-[var(--muted)] hover:bg-gray-400"
+                className="block px-4 py-2 text-sm dark:hover:bg-[var(--muted)] hover:bg-gray-400"
               >
                 Profile
               </Link>

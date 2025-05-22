@@ -90,9 +90,9 @@ const SidebarLink = ({
             : "group-hover:text-blue-600 text-[var(--text)]"
         }`}
       />
-      {!isCollapsed && <span>{label}</span>}
+      {!isCollapsed && <span className="text-2xl">{label}</span>}
       {active && !isCollapsed && (
-        <div className="ml-auto h-2 w-2 rounded-full bg-blue-500" />
+        <div className="ml-auto h-2 w-2 rounded-full bg-blue-500 " />
       )}
     </Link>
   );
