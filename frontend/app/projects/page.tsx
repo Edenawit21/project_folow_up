@@ -1,17 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { fetchProjects } from "@/utils/Jira";
-import { Project } from "@/types";
+import { useState, useMemo, useEffect } from "react";
+import { Project, ProjectFilterState, Entity } from "@/types";
 import ProjectFilter from "@/components/ProjectFilter";
-import ProjectTable from "@/components/ProjectTable";
-import { ProjectFilterState, Entity } from "@/types";
+import ProjectDashboard from "@/components/ProjectTable"; 
+import { initialProjects } from "@/constants";
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [filters, setFilters] = useState<ProjectFilterState>({
     status: "",
     priority: "",
@@ -20,36 +17,60 @@ export default function ProjectsPage() {
     projectManagerId: "",
   });
 
-  // Temporary placeholder entities (should come from an API ideally)
-  const developers: Entity[] = [];
-  const teams: Entity[] = [];
-  const managers: Entity[] = [];
-
-  useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const data = await fetchProjects();
-        setProjects(data);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load projects.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProjects();
+  // Extract unique developers from projects
+  const developers: Entity[] = useMemo(() => {
+    const devs = new Set<string>();
+    initialProjects.forEach((p) => p.developers?.forEach((d) => devs.add(d)));
+    return Array.from(devs).map((d) => ({ id: d, name: d }));
   }, []);
 
+  // Extract unique project managers
+  const managers: Entity[] = useMemo(() => {
+    const mgrs = new Set(initialProjects.map((p) => p.projectManager));
+    return Array.from(mgrs).map((m) => ({ id: m, name: m }));
+  }, []);
+
+  // Extract unique teams (project categories)
+  const teams: Entity[] = useMemo(() => {
+    const cats = new Set(
+      initialProjects
+        .map((p) => p.projectCategory)
+        .filter((c): c is string => typeof c === "string")
+    );
+    return Array.from(cats).map((c) => ({ id: c, name: c }));
+  }, []);
+  
+
+  // Filter projects whenever filters or allProjects change
+  useEffect(() => {
+    const filtered = allProjects.filter((project) => {
+      const matchManager =
+        !filters.projectManagerId ||
+        project.projectManager === filters.projectManagerId;
+      const matchDeveloper =
+        !filters.developerId ||
+        project.developers?.includes(filters.developerId);
+      const matchTeam =
+        !filters.teamId || project.projectCategory === filters.teamId;
+
+      // You may add status and priority filtering here if relevant fields exist
+
+      return matchManager && matchDeveloper && matchTeam;
+    });
+    setFilteredProjects(filtered);
+  }, [filters, allProjects]);
+
   return (
-    <div className="p-6 bg-[var(--background)] min-h-screen text-[var(--text)]">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-6 bg-[var(--background)] min-h-screen text-[var(--text)] space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-2xl font-bold">Projects</h1>
-        <div className="text-sm text-[var(--muted)]">
-          Showing {projects.length} project{projects.length !== 1 ? "s" : ""}
-        </div>
+        <span className="text-sm text-[var(--muted)]">
+          Showing {filteredProjects.length} project
+          {filteredProjects.length !== 1 ? "s" : ""}
+        </span>
       </div>
 
+      {/* Project filtering controls */}
       <ProjectFilter
         filters={filters}
         setFilters={setFilters}
@@ -58,20 +79,13 @@ export default function ProjectsPage() {
         managers={managers}
       />
 
-      {loading && (
-        <div className="mt-6 text-[var(--muted)]">Loading projects...</div>
-      )}
-
-      {error && <div className="mt-6 text-red-500 font-medium">{error}</div>}
-
-      {!loading && !error && projects.length === 0 && (
-        <div className="mt-6 text-[var(--muted)]">No projects found.</div>
-      )}
-
-      {!loading && !error && projects.length > 0 && (
-        <div className="mt-6">
-          <ProjectTable projects={projects} />
+      {/* Conditionally show dashboard or no projects message */}
+      {filteredProjects.length === 0 ? (
+        <div className="text-center text-[var(--muted)] mt-12">
+          🚫 No projects match your filters.
         </div>
+      ) : (
+        <ProjectDashboard projects={filteredProjects} />
       )}
     </div>
   );
