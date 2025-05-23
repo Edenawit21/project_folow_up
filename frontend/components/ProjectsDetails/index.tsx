@@ -41,7 +41,7 @@ export default function ProjectDetail({
             <FolderKanban className="text-blue-600" size={20} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">{project.name}</h1>
+            <h1 className="text-2xl font-bold">{project.projectName}</h1>
             <p className="text-gray-500">{project.key}</p>
           </div>
         </div>

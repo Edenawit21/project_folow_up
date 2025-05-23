@@ -27,8 +27,7 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
     "table"
   );
 
-  // --- Prepare fake timeline data (start & end dates) based on lastSyncedAt ---
-  // Just for demo: projects lastSyncedAt as end, start 30 days before
+  
   const timelineData = projects.map((p) => ({
     id: p.projectKey,
     group: p.projectManager,
