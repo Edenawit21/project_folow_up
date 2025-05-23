@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Project } from "@/types";
 import ProjectFilter from "@/components/ProjectFilter";
-// import ProjectTable from "@/components/ProjectTable";
 import { ProjectFilterState, Entity } from "@/types";
 import ProjectDashboard from "@/components/ProjectTable";
 import { initialProjects } from "@/constants";
