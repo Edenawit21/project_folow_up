@@ -1,13 +1,25 @@
 export interface Project {
-  id: string;
-  key: string;
-  name: string;
-  projectTypeKey: string;
-  projectCategory: string;
-  leadDisplayName: string;
-  developers: TeamMember[];
-  admins: TeamMember[];
+  projectKey: string;
+  projectName: string;
+  projectManager: string;
+  totalIssues: number;
+  issuesDone: number;
+  issuesInProgress: number;
+  totalStoryPoint: number;
+  storyPointsDone: number;
+  riskLevel: string;
+  lastSyncedAt: string;
+  id?: string;
+  key?: string;
+  projectCategory?: string;
+  leadDisplayName?: string;
+  developers?: string[];
+  status?: string; 
+  priority?: string;
 }
+
+
+
 // types/task.ts
 export interface Task {
   status: string;

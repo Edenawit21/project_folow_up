@@ -1,17 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { fetchProjects } from "@/utils/Jira";
+import { useState, useEffect } from "react";
 import { Project } from "@/types";
 import ProjectFilter from "@/components/ProjectFilter";
-import ProjectTable from "@/components/ProjectTable";
+// import ProjectTable from "@/components/ProjectTable";
 import { ProjectFilterState, Entity } from "@/types";
+import ProjectDashboard from "@/components/ProjectTable";
+import { initialProjects } from "@/constants";
+
+// Replace this with your actual constant or move to a separate file
+
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const [filters, setFilters] = useState<ProjectFilterState>({
     status: "",
     priority: "",
@@ -20,25 +21,12 @@ export default function ProjectsPage() {
     projectManagerId: "",
   });
 
-  // Temporary placeholder entities (should come from an API ideally)
-  const developers: Entity[] = [];
-  const teams: Entity[] = [];
-  const managers: Entity[] = [];
+  const developers: Entity[] = []; // Mock for now
+  const teams: Entity[] = []; // Mock for now
+  const managers: Entity[] = []; // Mock for now
 
   useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const data = await fetchProjects();
-        setProjects(data);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load projects.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProjects();
+    setProjects(initialProjects);
   }, []);
 
   return (
@@ -58,19 +46,11 @@ export default function ProjectsPage() {
         managers={managers}
       />
 
-      {loading && (
-        <div className="mt-6 text-[var(--muted)]">Loading projects...</div>
-      )}
-
-      {error && <div className="mt-6 text-red-500 font-medium">{error}</div>}
-
-      {!loading && !error && projects.length === 0 && (
+      {projects.length === 0 ? (
         <div className="mt-6 text-[var(--muted)]">No projects found.</div>
-      )}
-
-      {!loading && !error && projects.length > 0 && (
+      ) : (
         <div className="mt-6">
-          <ProjectTable projects={projects} />
+          <ProjectDashboard projects={projects} />
         </div>
       )}
     </div>
