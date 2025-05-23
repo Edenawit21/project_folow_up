@@ -3,14 +3,14 @@
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed } from "@/utils";
 import {
-  Briefcase,
-  Home,
-  LucideIcon,
-  Menu,
-  Search,
+  LayoutDashboard,
+  FolderKanban,
+  Building2,
+  UserCog,
+  Users2,
+  UserCircle2,
   Settings,
-  User,
-  Users,
+  Menu,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,53 +23,62 @@ const Sidebar = () => {
     (state) => state.global.isSidebarCollapsed
   );
 
-  const sidebarClassNames = `
-    fixed top-0 left-0 h-full z-40 flex flex-col justify-between overflow-y-auto
-    transition-all duration-300 ease-in-out shadow-xl
-    bg-[var(--background)]
-    ${isSidebarCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-64"}
-  `;
-
   return (
-    <aside className={sidebarClassNames}>
-      <div className="flex flex-col h-full w-full">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-          <button
-            className="p-1 hover:opacity-70"
-            onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
-            aria-label="Collapse Sidebar"
-          >
-            <Menu className="h-6 w-6 text-[var(--text)]" />
-          </button>
-        </div>
+    <aside
+      className={`fixed top-0 left-0 h-full z-40 flex flex-col bg-[var(--background)] shadow-xl
+        overflow-hidden transition-[width] duration-500 ease-in-out
+        ${isSidebarCollapsed ? "w-0" : "w-64"}
+      `}
+    >
+      {!isSidebarCollapsed && (
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+            <button
+              className="p-1 hover:opacity-70"
+              onClick={() => dispatch(setIsSidebarCollapsed(true))}
+              aria-label="Collapse Sidebar"
+            >
+              <Menu className="h-6 w-6 text-[var(--text)] cursor-pointer" />
+            </button>
+            <Image src="/logo.png" alt="Logo" width={40} height={50} />
+          </div>
 
-        {/* Logo & Title */}
-        <div className="flex items-center gap-4 px-6 py-4 border-b border-[var(--border)]">
-          <Image src="/logo.png" alt="Logo" width={36} height={36} />
-          <h1 className="text-xl font-semibold text-[var(--text)]">
-            Project Tracker
-          </h1>
+          {/* Navigation */}
+          <nav className="flex-1 px-2 py-4 space-y-1">
+            <SidebarLink icon={LayoutDashboard} label="Dashboard" href="/" />
+            <SidebarLink
+              icon={FolderKanban}
+              label="Projects"
+              href="/projects"
+            />
+            <SidebarLink
+              icon={UserCog}
+              label="Project Managers"
+              href="/project_manager"
+            />
+            <SidebarLink
+              icon={Users2}
+              label="Team Leaders"
+              href="/team_leaders"
+            />
+            <SidebarLink
+              icon={UserCircle2}
+              label="Project Owners"
+              href="/project_owner"
+            />
+            <SidebarLink icon={Building2} label="Teams" href="/teams" />
+            <SidebarLink icon={Settings} label="Settings" href="/settings" />
+          </nav>
         </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 px-2 py-4 space-y-1">
-          <SidebarLink icon={Home} label="Home" href="/" />
-          <SidebarLink icon={Briefcase} label="Projects" href="/projects" />
-          <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
-          <SidebarLink icon={Search} label="Search" href="/search" />
-          <SidebarLink icon={Settings} label="Settings" href="/settings" />
-          <SidebarLink icon={User} label="Users" href="/users" />
-          <SidebarLink icon={Users} label="Teams" href="/teams" />
-        </nav>
-      </div>
+      )}
     </aside>
   );
 };
 
 interface SidebarLinkProps {
   href: string;
-  icon: LucideIcon;
+  icon: React.ElementType;
   label: string;
 }
 
