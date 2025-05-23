@@ -35,21 +35,17 @@ const Sidebar = () => {
       <div className="flex flex-col h-full w-full">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+          {/* Collapse Button */}
           <button
             className="p-1 hover:opacity-70"
             onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
             aria-label="Collapse Sidebar"
           >
-            <Menu className="h-6 w-6 text-[var(--text)]" />
+            <Menu className="h-6 w-6 text-[var(--text)] cursor-pointer" />
           </button>
-        </div>
 
-        {/* Logo & Title */}
-        <div className="flex items-center gap-4 px-6 py-4 border-b border-[var(--border)]">
-          <Image src="/logo.png" alt="Logo" width={36} height={36} />
-          <h1 className="text-xl font-semibold text-[var(--text)]">
-            Project Tracker
-          </h1>
+          {/* Logo */}
+          <Image src="/logo.png" alt="Logo" width={40} height={50} />
         </div>
 
         {/* Navigation */}
