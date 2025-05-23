@@ -5,6 +5,7 @@ import { Menu, Moon, Search, Settings, Sun, User } from "lucide-react";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/utils";
+import Image from "next/image";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
@@ -14,64 +15,63 @@ const Navbar = () => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   return (
-    <header className="flex items-center justify-between  px-4 py-3  bg-[var(--background)]">
-      {/* Left Section: Sidebar Toggle & Search */}
-      <div className="flex items-center gap-8">
+    <header className="flex items-center justify-between px-4 py-3 bg-[var(--background)] shadow-sm border-b border-[var(--border)]">
+      {/* Left: Sidebar Toggle & Search */}
+      <div className="flex items-center gap-6 p">
         {isSidebarCollapsed && (
-          <button
-            onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
-          >
-            <Menu className="h-8 w-8 text-[var(--text)] cursor-pointer" />
-          </button>
+          <>
+            <button
+              aria-label="Open Sidebar"
+              onClick={() => dispatch(setIsSidebarCollapsed(false))}
+              className="p-1 hover:opacity-80"
+            >
+              <Menu className="h-6 w-6 text-[var(--text)] cursor-pointer" />
+            </button>
+
+            <Image src="/logo.png" alt="Logo" width={30} height={50} />
+          </>
         )}
 
-        {/* Search Input */}
-        <div className="relative w-[200px] flex h-min">
-          <Search className="absolute left-[4px] top-1/2 mr-2 h-5 w-5 -translate-y-1/2 transform cursor-pointer text-[var(--muted)]" />
+        <div className="relative w-50">
+          <Search className="absolute left-2 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--muted)]" />
           <input
             type="search"
             placeholder="Search..."
-            className="w-full rounded border-none bg-gray-100 p-2 pl-8 placeholder-gray-500 focus:border-transparent focus:outline-none text-[var(--text)]  focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-md  bg-[var(--background)] text-[var(--text)] pl-8 pr-2 py-2 placeholder-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
 
-      {/* Right Section: Actions */}
-      <div className="flex items-center">
+      {/* Right: Theme, Settings, User */}
+      <div className="flex items-center gap-4">
         {/* Theme Toggle */}
         <button
           onClick={() => dispatch(setIsDarkMode(!isDarkMode))}
-          className={
-            isDarkMode
-              ? `rounded p-2 dark:hover:bg-gray-700`
-              : `rounded p-2 hover:bg-gray-100`
-          }
+          aria-label="Toggle Theme"
+          className="rounded p-2 hover:bg-bg-[var(--background)] hover:bg-[var(--background)] transition-colors"
         >
           {isDarkMode ? (
-            <Sun className="h-6 w-6 cursor-pointer text-[var(--text)]" />
+            <Sun className="h-5 w-5 text-[var(--text)]" />
           ) : (
-            <Moon className="h-6 w-6 cursor-pointe text-[var(--text)]" />
+            <Moon className="h-5 w-5 text-[var(--text)]" />
           )}
         </button>
 
         {/* Settings */}
         <Link
           href="/settings"
-          className={
-            isDarkMode
-              ? `h-min w-min rounded p-2 hover:bg-[var(--background)]`
-              : `h-min w-min rounded p-2 hover:bg-gray-100`
-          }
+          aria-label="Settings"
+          className="rounded p-2 hover:bg-[var(--background)] dark:hover:bg-gray-700 transition-colors"
         >
-          <Settings className="h-5 w-5 cursor-pointer text-[var(--text)]" />
+          <Settings className="h-5 w-5 text-[var(--text)]" />
         </Link>
 
         {/* Divider */}
-        <div className="ml-2 mr-5 hidden min-h-[2em] w-[0.1rem] bg-[var(--background)] md:inline-block"></div>
+        <div className="hidden md:block h-6 w-px bg-[var(--border)] mx-2" />
 
-        {/* User Icon */}
-        <div className="hidden items-center justify-between md:flex">
-          <User className="h-6 w-6 cursor-pointer self-center rounded-full text-[var(--text)]" />
+        {/* User */}
+        <div className="hidden md:flex items-center justify-center">
+          <User className="h-6 w-6 text-[var(--text)] cursor-pointer" />
         </div>
       </div>
     </header>
