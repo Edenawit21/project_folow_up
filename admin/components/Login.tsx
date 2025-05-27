@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { login } from "@/utils/auth";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [form, setForm] = useState({ username: "", password: "" });
@@ -18,7 +19,7 @@ const Login = () => {
     e.preventDefault();
 
     if (!form.username || !form.password) {
-      alert("Please fill in both fields.");
+      toast("Please fill in both fields.");
       return;
     }
 
@@ -26,26 +27,27 @@ const Login = () => {
       const data = await login(form);
       const token = data.token;
 
-      if (token) {
+      if (!token) {
+        toast("Invalid login response.");
+        return;
+      }
+
+      const decoded: any = jwtDecode(token);
+      const roles =
+        decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+      const isAdmin =
+        (Array.isArray(roles) && roles.includes("Admin")) || roles === "Admin";
+
+      if (isAdmin) {
         localStorage.setItem("token", token);
-
-        const decoded: any = jwtDecode(token);
-        const roles =
-          decoded[
-            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-          ];
-
-        if (roles && roles.includes("Admin")) {
-          router.push("/admin/dashboard");
-        } else {
-          router.push("/user/dashboard");
-        }
+        router.push("/");
       } else {
-        alert("Invalid login response.");
+        toast("Access denied. Only Admins can log in.");
       }
     } catch (error) {
       console.error("Login failed:", error);
-      alert("Login failed. Check your credentials.");
+      toast("Login failed. Please check your credentials.");
     }
   };
 
