@@ -12,5 +12,5 @@ export default function UserListPage() {
 
   if (!token) return <div>Please login first.</div>;
 
-  return <UserList role="Director" token={token} />;
+  return <UserList Role="Director" token={token} />;
 }
