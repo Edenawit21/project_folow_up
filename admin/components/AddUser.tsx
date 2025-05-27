@@ -22,7 +22,6 @@ const AddUser = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!form.username || !form.email || !form.password || !form.role) {
       toast.warn("Please fill in all fields.");
       return;
@@ -40,7 +39,7 @@ const AddUser = () => {
         role: form.role,
       });
 
-      toast.success("User successfully registered and role assigned!");
+      toast.success("User registered and role assigned!");
       setForm({ username: "", email: "", password: "", role: "" });
     } catch (error) {
       console.error("Failed to add user:", error);
@@ -50,15 +49,15 @@ const AddUser = () => {
 
   return (
     <>
-      <div className="max-w-md mx-auto mt-10 p-6 rounded-2xl shadow-xl bg-[var(--background)] border border-[var(--border)]">
-        <h2 className="text-3xl font-semibold mb-6 text-[var(--foreground)] text-center">
-          Add User
+      <div className="w-full max-w-xl mx-auto mt-20 px-8 py-10 rounded-2xl shadow-2xl border bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+        <h2 className="text-center text-4xl font-bold mb-10 text-gray-900 dark:text-gray-100">
+          Create New User
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} autoComplete="off" className="space-y-6">
           {/* Username */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-[var(--foreground)]">
+            <label className="block mb-1 font-semibold text-sm text-gray-700 dark:text-gray-300">
               Username
             </label>
             <input
@@ -66,14 +65,15 @@ const AddUser = () => {
               name="username"
               value={form.username}
               onChange={handleChange}
-              placeholder="Enter username"
-              className="w-full px-4 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoComplete="off"
+              placeholder="e.g. johndoe"
+              className="w-full px-5 py-3 rounded-xl border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-[var(--foreground)]">
+            <label className="block mb-1 font-semibold text-sm text-gray-700 dark:text-gray-300">
               Email
             </label>
             <input
@@ -81,14 +81,15 @@ const AddUser = () => {
               name="email"
               value={form.email}
               onChange={handleChange}
+              autoComplete="new-email"
               placeholder="user@example.com"
-              className="w-full px-4 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-5 py-3 rounded-xl border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-[var(--foreground)]">
+            <label className="block mb-1 font-semibold text-sm text-gray-700 dark:text-gray-300">
               Password
             </label>
             <input
@@ -96,21 +97,22 @@ const AddUser = () => {
               name="password"
               value={form.password}
               onChange={handleChange}
+              autoComplete="new-password"
               placeholder="••••••••"
-              className="w-full px-4 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-5 py-3 rounded-xl border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Role */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-[var(--foreground)]">
+            <label className="block mb-1 font-semibold text-sm text-gray-700 dark:text-gray-300">
               Role
             </label>
             <select
               name="role"
               value={form.role}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-5 py-3 rounded-xl border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="" disabled>
                 Select a role
@@ -126,14 +128,13 @@ const AddUser = () => {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition cursor-pointer"
+            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg transition-colors"
           >
-            Add User
+            Register User
           </button>
         </form>
       </div>
 
-      {/* Toast Container */}
       <ToastContainer position="top-right" autoClose={3000} />
     </>
   );

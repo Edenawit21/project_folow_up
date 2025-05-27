@@ -16,22 +16,23 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-full z-40 bg-[var(--background)] shadow-lg 
-        overflow-hidden transition-[width] duration-500 ease-in-out
+      className={`fixed top-0 left-0 h-full z-40 shadow-lg transition-[width] duration-500 ease-in-out
+        bg-white text-gray-900 border-r border-gray-200
+        dark:bg-gray-900 dark:text-white dark:border-gray-700
         ${isSidebarCollapsed ? "w-0" : "w-64"}
       `}
     >
       {!isSidebarCollapsed && (
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
             <Image src="/logo.png" alt="Logo" width={40} height={50} />
             <button
               onClick={() => dispatch(setIsSidebarCollapsed(true))}
               aria-label="Collapse Sidebar"
               className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
             >
-              <Menu className="w-5 h-5 text-[var(--foreground)]" />
+              <Menu className="w-5 h-5" />
             </button>
           </div>
 
@@ -62,8 +63,8 @@ const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
         className={`relative flex items-center gap-3 px-5 py-2 rounded-lg transition-all
           ${
             isActive
-              ? "bg-blue-100 dark:bg-gray-700 text-blue-700"
-              : "hover:bg-gray-100 dark:hover:bg-gray-800 text-[var(--foreground)]"
+              ? "bg-blue-100 text-blue-700 dark:bg-gray-700"
+              : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
           }`}
       >
         {isActive && (

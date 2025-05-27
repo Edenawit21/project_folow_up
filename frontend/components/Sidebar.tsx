@@ -34,6 +34,8 @@ const Sidebar = () => {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+            <Image src="/logo.png" alt="Logo" width={40} height={50} />
+
             <button
               className="p-1 hover:opacity-70"
               onClick={() => dispatch(setIsSidebarCollapsed(true))}
@@ -41,7 +43,6 @@ const Sidebar = () => {
             >
               <Menu className="h-6 w-6 text-[var(--text)] cursor-pointer" />
             </button>
-            <Image src="/logo.png" alt="Logo" width={40} height={50} />
           </div>
 
           {/* Navigation */}
