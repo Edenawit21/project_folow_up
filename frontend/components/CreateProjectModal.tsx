@@ -10,11 +10,13 @@ interface Props {
 }
 
 const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate, project }) => {
+  const isEdit = !!project;
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    priority: "High",
-    status: "todo",
+    priority: "Select priority",
+    status: "Select status",
     developersInput: "",
     manager: "",
     owner: "",
@@ -28,8 +30,8 @@ const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate, project }) => 
       setFormData({
         title: project.title || "",
         description: project.description || "",
-        priority: project.priority || "High",
-        status: project.status || "todo",
+        priority: project.priority || "Select priority",
+        status: project.status || "Select status",
         developersInput: Array.isArray(project.developers)
           ? project.developers.join(", ")
           : "",
@@ -49,7 +51,6 @@ const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate, project }) => 
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
-
     if (!formData.title.trim()) newErrors.title = "Title is required";
     if (!formData.manager.trim()) newErrors.manager = "Manager is required";
     if (!formData.owner.trim()) newErrors.owner = "Owner is required";
@@ -71,7 +72,7 @@ const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate, project }) => 
       manager: formData.manager,
       owner: formData.owner,
       teamLeader: formData.teamLeader,
-      developers: formData.developersInput.trim(), // <-- This must be a string as per FormProject
+      developers: formData.developersInput.trim(),
     };
 
     onCreate(transformed);
@@ -79,10 +80,10 @@ const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate, project }) => 
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex justify-center items-center p-4">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-lg">
+    <div className="absolute inset-0 z-50 flex justify-center items-center px-4 py-8 overflow-auto">
+      <div className="bg-white border border-gray-300 rounded-lg shadow-lg w-full max-w-2xl p-6">
         <h2 className="text-xl font-semibold mb-4">
-          {project ? "Edit Project" : "Create Project"}
+          {isEdit ? "Edit Project" : "Create Project"}
         </h2>
 
         <div className="grid gap-4">
@@ -175,7 +176,7 @@ const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate, project }) => 
             onClick={handleSubmit}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
           >
-            {project ? "Update" : "Create"}
+            {isEdit ? "Update" : "Create"}
           </button>
         </div>
       </div>

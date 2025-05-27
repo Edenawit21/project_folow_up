@@ -41,12 +41,12 @@ export default function ProjectDashboard({
     end_time: moment(p.lastSyncedAt).valueOf(),
   }));
 
-  // --- Board grouping by risk level ---
+  // Board groups by risk level
   const boardGroups = Array.from(
     new Set(projects.map((p) => p.riskLevel || "Unknown"))
   );
 
-  // --- Data for graph: Issue status summary ---
+  // Graph data for issue status
   const graphData = projects.map((p) => ({
     name: p.projectName,
     issuesDone: p.issuesDone,
@@ -54,7 +54,7 @@ export default function ProjectDashboard({
     issuesRemaining: p.totalIssues - p.issuesDone - p.issuesInProgress,
   }));
 
-  // --- Pie chart data for risk level distribution ---
+  // Pie chart data for risk levels
   const riskCount = boardGroups.map((risk) => ({
     name: risk,
     value: projects.filter((p) => p.riskLevel === risk).length,
@@ -84,30 +84,13 @@ export default function ProjectDashboard({
         <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-2">Key</th>
-              <th className="border border-gray-300 p-2">Name</th>
-              <th className="border border-gray-300 p-2">Manager</th>
-              <th className="border border-gray-300 p-2">Risk</th>
-              <th className="border border-gray-300 p-2">Issues Done</th>
-              <th className="border border-gray-300 p-2">In Progress</th>
-              <th className="border border-gray-300 p-2">Total Issues</th>
-              <th className="border border-gray-300 p-2">Story Points Done</th>
-              <th className="border border-gray-300 p-2">Last Synced</th>
-              <th className="border border-gray-300 p-2">Actions</th> {/* NEW */}
+              <th className="border border-gray-300 p-2">Key</th><th className="border border-gray-300 p-2">Name</th><th className="border border-gray-300 p-2">Manager</th><th className="border border-gray-300 p-2">Risk</th><th className="border border-gray-300 p-2">Issues Done</th><th className="border border-gray-300 p-2">In Progress</th><th className="border border-gray-300 p-2">Total Issues</th><th className="border border-gray-300 p-2">Story Points Done</th><th className="border border-gray-300 p-2">Last Synced</th><th className="border border-gray-300 p-2">Actions</th>
             </tr>
           </thead>
           <tbody>
             {projects.map((p) => (
               <tr key={p.projectKey} className="hover:bg-gray-50">
-                <td className="border border-gray-300 p-2">{p.projectKey}</td>
-                <td className="border border-gray-300 p-2">{p.projectName}</td>
-                <td className="border border-gray-300 p-2">{p.projectManager}</td>
-                <td className="border border-gray-300 p-2">{p.riskLevel}</td>
-                <td className="border border-gray-300 p-2">{p.issuesDone}</td>
-                <td className="border border-gray-300 p-2">{p.issuesInProgress}</td>
-                <td className="border border-gray-300 p-2">{p.totalIssues}</td>
-                <td className="border border-gray-300 p-2">{p.storyPointsDone}</td>
-                <td className="border border-gray-300 p-2">{p.lastSyncedAt}</td>
+                <td className="border border-gray-300 p-2">{p.projectKey}</td><td className="border border-gray-300 p-2">{p.projectName}</td><td className="border border-gray-300 p-2">{p.projectManager}</td><td className="border border-gray-300 p-2">{p.riskLevel}</td><td className="border border-gray-300 p-2">{p.issuesDone}</td><td className="border border-gray-300 p-2">{p.issuesInProgress}</td><td className="border border-gray-300 p-2">{p.totalIssues}</td><td className="border border-gray-300 p-2">{p.storyPointsDone}</td><td className="border border-gray-300 p-2">{p.lastSyncedAt}</td>
                 <td className="border border-gray-300 p-2 text-center relative">
                   <ActionMenu
                     onEdit={() => onEdit(p)}
@@ -176,34 +159,19 @@ export default function ProjectDashboard({
             </h3>
             <ResponsiveContainer>
               <BarChart data={graphData} margin={{ top: 5, bottom: 30 }}>
-                <XAxis
-                  dataKey="name"
-                  angle={-45}
-                  textAnchor="end"
-                  interval={0}
-                />
+                <XAxis dataKey="name" angle={-45} textAnchor="end" interval={0} />
                 <YAxis />
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="issuesDone" fill="#82ca9d" name="Done" />
-                <Bar
-                  dataKey="issuesInProgress"
-                  fill="#8884d8"
-                  name="In Progress"
-                />
-                <Bar
-                  dataKey="issuesRemaining"
-                  fill="#ffc658"
-                  name="Remaining"
-                />
+                <Bar dataKey="issuesInProgress" fill="#8884d8" name="In Progress" />
+                <Bar dataKey="issuesRemaining" fill="#ffc658" name="Remaining" />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
           <div style={{ width: "100%", height: 300 }}>
-            <h3 className="mb-3 font-semibold text-lg">
-              Risk Level Distribution
-            </h3>
+            <h3 className="mb-3 font-semibold text-lg">Risk Level Distribution</h3>
             <ResponsiveContainer>
               <PieChart>
                 <Pie
