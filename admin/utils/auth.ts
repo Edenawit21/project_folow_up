@@ -13,12 +13,22 @@ export interface LoginResponse {
 }
 
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
-  const response = await axios.post<LoginResponse>(`${API_URL}/login`, data, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return response.data;
+  try {
+    const response = await axios.post<LoginResponse>(`${API_URL}/login`, data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 401) {
+        throw new Error("Invalid username or password.");
+      }
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+    throw error;
+  }
 };
 
 // --- Register types ---
@@ -29,11 +39,19 @@ export interface RegisterRequest {
 }
 
 export const registerUser = async (data: RegisterRequest) => {
-  return axios.post(`${API_URL}/register`, data, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  try {
+    const response = await axios.post(`${API_URL}/register`, data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || "Registration failed.");
+    }
+    throw error;
+  }
 };
 
 // --- Assign Role types ---
@@ -43,9 +61,17 @@ export interface AssignRoleRequest {
 }
 
 export const assignRole = async (data: AssignRoleRequest) => {
-  return axios.post(`${API_URL}/assign-role`, data, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  try {
+    const response = await axios.post(`${API_URL}/assign-role`, data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || "Assign role failed.");
+    }
+    throw error;
+  }
 };
