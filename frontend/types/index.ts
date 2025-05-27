@@ -19,8 +19,6 @@ export interface Project {
 }
 
 
-
-// types/task.ts
 export interface Task {
   status: string;
   key: string;
