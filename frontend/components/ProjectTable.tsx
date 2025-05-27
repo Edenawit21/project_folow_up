@@ -18,16 +18,21 @@ import {
 
 interface ProjectDashboardProps {
   projects: Project[];
+  onEdit: (project: Project) => void;
+  onDelete: (projectKey: string) => void;
 }
 
 const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
+export default function ProjectDashboard({
+  projects,
+  onEdit,
+  onDelete,
+}: ProjectDashboardProps) {
   const [view, setView] = useState<"table" | "board" | "timeline" | "graph">(
     "table"
   );
 
-  
   const timelineData = projects.map((p) => ({
     id: p.projectKey,
     group: p.projectManager,
@@ -88,6 +93,7 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
               <th className="border border-gray-300 p-2">Total Issues</th>
               <th className="border border-gray-300 p-2">Story Points Done</th>
               <th className="border border-gray-300 p-2">Last Synced</th>
+              <th className="border border-gray-300 p-2">Actions</th> {/* NEW */}
             </tr>
           </thead>
           <tbody>
@@ -95,19 +101,19 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
               <tr key={p.projectKey} className="hover:bg-gray-50">
                 <td className="border border-gray-300 p-2">{p.projectKey}</td>
                 <td className="border border-gray-300 p-2">{p.projectName}</td>
-                <td className="border border-gray-300 p-2">
-                  {p.projectManager}
-                </td>
+                <td className="border border-gray-300 p-2">{p.projectManager}</td>
                 <td className="border border-gray-300 p-2">{p.riskLevel}</td>
                 <td className="border border-gray-300 p-2">{p.issuesDone}</td>
-                <td className="border border-gray-300 p-2">
-                  {p.issuesInProgress}
-                </td>
+                <td className="border border-gray-300 p-2">{p.issuesInProgress}</td>
                 <td className="border border-gray-300 p-2">{p.totalIssues}</td>
-                <td className="border border-gray-300 p-2">
-                  {p.storyPointsDone}
-                </td>
+                <td className="border border-gray-300 p-2">{p.storyPointsDone}</td>
                 <td className="border border-gray-300 p-2">{p.lastSyncedAt}</td>
+                <td className="border border-gray-300 p-2 text-center relative">
+                  <ActionMenu
+                    onEdit={() => onEdit(p)}
+                    onDelete={() => onDelete(p.projectKey)}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -220,6 +226,59 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
               </PieChart>
             </ResponsiveContainer>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ActionMenu({
+  onEdit,
+  onDelete,
+}: {
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="relative inline-block text-left">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="p-1 rounded hover:bg-gray-200 focus:outline-none"
+        aria-label="Actions menu"
+      >
+        {/* Three vertical dots */}
+        <svg
+          className="w-5 h-5"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          aria-hidden="true"
+        >
+          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4z" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+          <button
+            onClick={() => {
+              onEdit();
+              setOpen(false);
+            }}
+            className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => {
+              onDelete();
+              setOpen(false);
+            }}
+            className="block w-full px-4 py-2 text-left hover:bg-gray-100 text-red-600"
+          >
+            Delete
+          </button>
         </div>
       )}
     </div>
