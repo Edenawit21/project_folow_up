@@ -38,7 +38,7 @@ const Sidebar = () => {
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2">
             <SidebarLink icon={UserPlus} label="Add User" href="/add_user" />
-            <SidebarLink icon={Users} label="User List" href="/user-list" />
+            <SidebarLink icon={Users} label="User List" href="/user_list" />
           </nav>
         </div>
       )}
