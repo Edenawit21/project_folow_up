@@ -49,8 +49,8 @@ const AddUser = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white px-4">
-      <div className="w-full max-w-xl mx-auto mt-20 px-8 py-10 rounded-2xl shadow-2xl border bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700">
-        <h2 className="text-center text-4xl font-bold mb-10 text-gray-900 dark:text-gray-100">
+      <div className="w-full max-w-xl mx-auto mt-5 px-8 py-5 rounded-sm shadow-sm border bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+        <h2 className="text-center text-xl font-bold mb-5 text-gray-900 dark:text-gray-100">
           Create New User
         </h2>
 
@@ -67,7 +67,7 @@ const AddUser = () => {
               onChange={handleChange}
               autoComplete="off"
               placeholder="e.g. johndoe"
-              className="w-full px-5 py-3 rounded-xl border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-5 py-3 rounded-sm border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -83,7 +83,7 @@ const AddUser = () => {
               onChange={handleChange}
               autoComplete="new-email"
               placeholder="user@example.com"
-              className="w-full px-5 py-3 rounded-xl border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-5 py-3 rounded-sm border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -99,7 +99,7 @@ const AddUser = () => {
               onChange={handleChange}
               autoComplete="new-password"
               placeholder="••••••••"
-              className="w-full px-5 py-3 rounded-xl border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-5 py-3 rounded-sm border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -112,7 +112,7 @@ const AddUser = () => {
               name="role"
               value={form.role}
               onChange={handleChange}
-              className="w-full px-5 py-3 rounded-xl border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-5 py-3 rounded-sm border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="" disabled>
                 Select a role
@@ -128,7 +128,7 @@ const AddUser = () => {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg transition-colors"
+            className="w-full py-3 rounded-sm bg-green-700 hover:bg-green-700 text-white font-bold text-lg transition-colors hover:border-gray-600 hover:border-[1px]"
           >
             Register User
           </button>

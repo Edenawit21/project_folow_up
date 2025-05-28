@@ -1,32 +1,57 @@
-// app/page.tsx (or app/home/page.tsx if it's nested)
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode"; // fixed import
 
-export default function Home() {
+const Page = () => {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [checking, setChecking] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      router.push("/login"); // Redirect if no token
-    } else {
-      setIsAuthenticated(true);
-      setChecking(false); // Stop loading once checked
+      router.replace("/login");
+      return;
+    }
+
+    try {
+      const decoded: any = jwtDecode(token);
+
+      const rolesClaim =
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
+      const roles = decoded[rolesClaim];
+
+      const normalizedRoles = Array.isArray(roles)
+        ? roles.map((r) => r.toLowerCase())
+        : [String(roles).toLowerCase()];
+
+      if (!normalizedRoles.includes("admin")) {
+        router.push("/login");
+        return;
+      }
+
+      setLoading(false);
+    } catch (err) {
+      console.error("Invalid token:", err);
+      router.push("/login");
     }
   }, [router]);
 
-  if (checking) return <div>Checking authentication...</div>;
-
-  if (!isAuthenticated) return null;
+  if (loading) {
+    return (
+      <div className="p-4 text-lg text-gray-900 dark:text-gray-100">
+        Loading...
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h1>Welcome to the Home Page</h1>
+    <div className="p-4 text-xl text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 min-h-screen">
+      <h1>Welcome to the Admin Page</h1>
     </div>
   );
-}
+};
+
+export default Page;

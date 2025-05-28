@@ -27,8 +27,6 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
     "table"
   );
 
-  // --- Prepare fake timeline data (start & end dates) based on lastSyncedAt ---
-  // Just for demo: projects lastSyncedAt as end, start 30 days before
   const timelineData = projects.map((p) => ({
     id: p.projectKey,
     group: p.projectManager,
@@ -37,12 +35,10 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
     end_time: moment(p.lastSyncedAt).valueOf(),
   }));
 
-  // --- Board grouping by risk level ---
   const boardGroups = Array.from(
     new Set(projects.map((p) => p.riskLevel || "Unknown"))
   );
 
-  // --- Data for graph: Issue status summary ---
   const graphData = projects.map((p) => ({
     name: p.projectName,
     issuesDone: p.issuesDone,
@@ -50,24 +46,29 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
     issuesRemaining: p.totalIssues - p.issuesDone - p.issuesInProgress,
   }));
 
-  // --- Pie chart data for risk level distribution ---
   const riskCount = boardGroups.map((risk) => ({
     name: risk,
     value: projects.filter((p) => p.riskLevel === risk).length,
   }));
 
   return (
-    <div>
+    <div
+      className="p-4"
+      style={{
+        backgroundColor: "var(--background)",
+        color: "var(--text)",
+      }}
+    >
       {/* View buttons */}
       <div className="mb-4 flex gap-3">
         {["table", "board", "timeline", "graph"].map((v) => (
           <button
             key={v}
             onClick={() => setView(v as any)}
-            className={`px-4 py-2 rounded ${
+            className={`px-4 py-2 rounded font-semibold transition-colors duration-200 ${
               view === v
                 ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                : "bg-[var(--border)] text-[var(--text)] hover:bg-[var(--muted)]"
             }`}
           >
             {v.charAt(0).toUpperCase() + v.slice(1)}
@@ -77,38 +78,96 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
 
       {/* --- TABLE VIEW --- */}
       {view === "table" && (
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-2">Key</th>
-              <th className="border border-gray-300 p-2">Name</th>
-              <th className="border border-gray-300 p-2">Manager</th>
-              <th className="border border-gray-300 p-2">Risk</th>
-              <th className="border border-gray-300 p-2">Issues Done</th>
-              <th className="border border-gray-300 p-2">In Progress</th>
-              <th className="border border-gray-300 p-2">Total Issues</th>
-              <th className="border border-gray-300 p-2">Story Points Done</th>
-              <th className="border border-gray-300 p-2">Last Synced</th>
+        <table
+          className="w-full border-collapse"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <thead
+            style={{ backgroundColor: "var(--border)" }}
+            className="select-none"
+          >
+            <tr>
+              {[
+                "Key",
+                "Name",
+                "Manager",
+                "Risk",
+                "Issues Done",
+                "In Progress",
+                "Total Issues",
+                "Story Points Done",
+                "Last Synced",
+              ].map((header) => (
+                <th
+                  key={header}
+                  className="border p-2 font-medium"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  {header}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {projects.map((p) => (
-              <tr key={p.projectKey} className="hover:bg-gray-50">
-                <td className="border border-gray-300 p-2">{p.projectKey}</td>
-                <td className="border border-gray-300 p-2">{p.projectName}</td>
-                <td className="border border-gray-300 p-2">
+              <tr
+                key={p.projectKey}
+                className="hover:bg-[var(--border)] transition-colors duration-150"
+              >
+                <td
+                  className="border p-2"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  {p.projectKey}
+                </td>
+                <td
+                  className="border p-2"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  {p.projectName}
+                </td>
+                <td
+                  className="border p-2"
+                  style={{ borderColor: "var(--border)" }}
+                >
                   {p.projectManager}
                 </td>
-                <td className="border border-gray-300 p-2">{p.riskLevel}</td>
-                <td className="border border-gray-300 p-2">{p.issuesDone}</td>
-                <td className="border border-gray-300 p-2">
+                <td
+                  className="border p-2"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  {p.riskLevel || "Unknown"}
+                </td>
+                <td
+                  className="border p-2"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  {p.issuesDone}
+                </td>
+                <td
+                  className="border p-2"
+                  style={{ borderColor: "var(--border)" }}
+                >
                   {p.issuesInProgress}
                 </td>
-                <td className="border border-gray-300 p-2">{p.totalIssues}</td>
-                <td className="border border-gray-300 p-2">
+                <td
+                  className="border p-2"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  {p.totalIssues}
+                </td>
+                <td
+                  className="border p-2"
+                  style={{ borderColor: "var(--border)" }}
+                >
                   {p.storyPointsDone}
                 </td>
-                <td className="border border-gray-300 p-2">{p.lastSyncedAt}</td>
+                <td
+                  className="border p-2"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  {moment(p.lastSyncedAt).format("YYYY-MM-DD")}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -119,14 +178,27 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
       {view === "board" && (
         <div className="flex gap-6">
           {boardGroups.map((risk) => (
-            <div key={risk} className="flex-1 bg-gray-100 rounded p-4">
-              <h3 className="font-semibold mb-3">{risk.toUpperCase()}</h3>
+            <div
+              key={risk}
+              className="flex-1 rounded p-4"
+              style={{ backgroundColor: "var(--border)" }}
+            >
+              <h3
+                className="font-semibold mb-3"
+                style={{ color: "var(--text)" }}
+              >
+                {risk.toUpperCase()}
+              </h3>
               {projects
                 .filter((p) => p.riskLevel === risk)
                 .map((p) => (
                   <div
                     key={p.projectKey}
-                    className="bg-white p-3 mb-3 rounded shadow-sm"
+                    className="rounded shadow-sm p-3 mb-3"
+                    style={{
+                      backgroundColor: "var(--background)",
+                      color: "var(--text)",
+                    }}
                   >
                     <strong>{p.projectName}</strong>
                     <div>Manager: {p.projectManager}</div>
@@ -146,13 +218,17 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
       {/* --- TIMELINE VIEW --- */}
       {view === "timeline" && (
         <div>
-          <p>
+          <p style={{ color: "var(--muted)" }}>
             * Timeline view demo. For a full timeline, use a timeline library
             like react-calendar-timeline or similar.
           </p>
           <ul className="mt-3 space-y-2">
             {timelineData.map((item) => (
-              <li key={item.id} className="border p-2 rounded">
+              <li
+                key={item.id}
+                className="border rounded p-2"
+                style={{ borderColor: "var(--border)", color: "var(--text)" }}
+              >
                 <strong>{item.title}</strong> - Manager: {item.group} <br />
                 Start: {moment(item.start_time).format("YYYY-MM-DD")} | End:{" "}
                 {moment(item.end_time).format("YYYY-MM-DD")}
@@ -166,7 +242,10 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
       {view === "graph" && (
         <div className="space-y-10">
           <div style={{ width: "100%", height: 300 }}>
-            <h3 className="mb-3 font-semibold text-lg">
+            <h3
+              className="mb-3 font-semibold text-lg"
+              style={{ color: "var(--text)" }}
+            >
               Issues Status Bar Chart
             </h3>
             <ResponsiveContainer>
@@ -176,10 +255,16 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
                   angle={-45}
                   textAnchor="end"
                   interval={0}
+                  stroke="var(--text)"
                 />
-                <YAxis />
-                <Tooltip />
-                <Legend />
+                <YAxis stroke="var(--text)" />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--background)",
+                    color: "var(--text)",
+                  }}
+                />
+                <Legend wrapperStyle={{ color: "var(--text)" }} />
                 <Bar dataKey="issuesDone" fill="#82ca9d" name="Done" />
                 <Bar
                   dataKey="issuesInProgress"
@@ -196,7 +281,10 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
           </div>
 
           <div style={{ width: "100%", height: 300 }}>
-            <h3 className="mb-3 font-semibold text-lg">
+            <h3
+              className="mb-3 font-semibold text-lg"
+              style={{ color: "var(--text)" }}
+            >
               Risk Level Distribution
             </h3>
             <ResponsiveContainer>
@@ -217,7 +305,12 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
                     />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--background)",
+                    color: "var(--text)",
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
