@@ -45,10 +45,10 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
   `;
 
   return (
-    <div className="space-y-4 p-4 rounded-lg bg-[var(--background)]">
-      <div className="flex items-center gap-2 mb-4">
-        <Sliders className="w-5 h-5 text-[var(--text)]" />
-        <h2 className="text-lg font-semibold text-[var(--text)]">
+    <div className="space-y-4 p-2 rounded-lg bg-[var(--background)]">
+      <div className="flex items-center gap-2 mb-2">
+        <Sliders className="w-4 h-4 text-[var(--text)]" />
+        <h2 className="text-medium font-semibold text-[var(--text)]">
           Filter Projects
         </h2>
       </div>

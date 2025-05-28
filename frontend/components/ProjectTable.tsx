@@ -18,7 +18,7 @@ import {
 
 interface ProjectDashboardProps {
   projects: Project[];
-  onEdit: (project: Project) => void;
+  onEdit: (updatedProject: Project) => void;
   onDelete: (projectKey: string) => void;
 }
 
@@ -32,6 +32,28 @@ export default function ProjectDashboard({
   const [view, setView] = useState<"table" | "board" | "timeline" | "graph">(
     "table"
   );
+  const [editingProjectKey, setEditingProjectKey] = useState<string | null>(null);
+  const [editingForm, setEditingForm] = useState<Partial<Project>>({});
+
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setEditingForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFormSubmit = () => {
+    if (!editingProjectKey) return;
+
+    const updated = {
+      ...projects.find((p) => p.projectKey === editingProjectKey)!,
+      ...editingForm,
+    };
+
+    onEdit(updated);
+    setEditingProjectKey(null);
+    setEditingForm({});
+  };
 
   const timelineData = projects.map((p) => ({
     id: p.projectKey,
@@ -41,12 +63,10 @@ export default function ProjectDashboard({
     end_time: moment(p.lastSyncedAt).valueOf(),
   }));
 
-  // Board groups by risk level
   const boardGroups = Array.from(
     new Set(projects.map((p) => p.riskLevel || "Unknown"))
   );
 
-  // Graph data for issue status
   const graphData = projects.map((p) => ({
     name: p.projectName,
     issuesDone: p.issuesDone,
@@ -54,7 +74,6 @@ export default function ProjectDashboard({
     issuesRemaining: p.totalIssues - p.issuesDone - p.issuesInProgress,
   }));
 
-  // Pie chart data for risk levels
   const riskCount = boardGroups.map((risk) => ({
     name: risk,
     value: projects.filter((p) => p.riskLevel === risk).length,
@@ -84,20 +103,93 @@ export default function ProjectDashboard({
         <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-2">Key</th><th className="border border-gray-300 p-2">Name</th><th className="border border-gray-300 p-2">Manager</th><th className="border border-gray-300 p-2">Risk</th><th className="border border-gray-300 p-2">Issues Done</th><th className="border border-gray-300 p-2">In Progress</th><th className="border border-gray-300 p-2">Total Issues</th><th className="border border-gray-300 p-2">Story Points Done</th><th className="border border-gray-300 p-2">Last Synced</th><th className="border border-gray-300 p-2">Actions</th>
+              <th className="p-2 border">Key</th>
+              <th className="p-2 border">Name</th>
+              <th className="p-2 border">Manager</th>
+              <th className="p-2 border">Risk</th>
+              <th className="p-2 border">Issues Done</th>
+              <th className="p-2 border">In Progress</th>
+              <th className="p-2 border">Total Issues</th>
+              <th className="p-2 border">Story Points</th>
+              <th className="p-2 border">Last Synced</th>
+              <th className="p-2 border">Actions</th>
             </tr>
           </thead>
           <tbody>
             {projects.map((p) => (
-              <tr key={p.projectKey} className="hover:bg-gray-50">
-                <td className="border border-gray-300 p-2">{p.projectKey}</td><td className="border border-gray-300 p-2">{p.projectName}</td><td className="border border-gray-300 p-2">{p.projectManager}</td><td className="border border-gray-300 p-2">{p.riskLevel}</td><td className="border border-gray-300 p-2">{p.issuesDone}</td><td className="border border-gray-300 p-2">{p.issuesInProgress}</td><td className="border border-gray-300 p-2">{p.totalIssues}</td><td className="border border-gray-300 p-2">{p.storyPointsDone}</td><td className="border border-gray-300 p-2">{p.lastSyncedAt}</td>
-                <td className="border border-gray-300 p-2 text-center relative">
-                  <ActionMenu
-                    onEdit={() => onEdit(p)}
-                    onDelete={() => onDelete(p.projectKey)}
-                  />
-                </td>
-              </tr>
+              <React.Fragment key={p.projectKey}>
+                <tr className="hover:bg-gray-50">
+                  <td className="p-2 border">{p.projectKey}</td>
+                  <td className="p-2 border">{p.projectName}</td>
+                  <td className="p-2 border">{p.projectManager}</td>
+                  <td className="p-2 border">{p.riskLevel}</td>
+                  <td className="p-2 border">{p.issuesDone}</td>
+                  <td className="p-2 border">{p.issuesInProgress}</td>
+                  <td className="p-2 border">{p.totalIssues}</td>
+                  <td className="p-2 border">{p.storyPointsDone}</td>
+                  <td className="p-2 border">{p.lastSyncedAt}</td>
+                  <td className="p-2 border text-center relative">
+                    <ActionMenu
+                      onEdit={() => {
+                        setEditingProjectKey(p.projectKey);
+                        setEditingForm(p);
+                      }}
+                      onDelete={() => onDelete(p.projectKey)}
+                    />
+                  </td>
+                </tr>
+
+                {editingProjectKey === p.projectKey && (
+                  <tr>
+                    <td colSpan={10} className="p-4 bg-gray-100">
+                      <div className="grid grid-cols-2 gap-4">
+                        <input
+                          name="projectName"
+                          placeholder="Project Name"
+                          value={editingForm.projectName || ""}
+                          onChange={handleFormChange}
+                          className="border p-2 rounded"
+                        />
+                        <input
+                          name="projectManager"
+                          placeholder="Manager"
+                          value={editingForm.projectManager || ""}
+                          onChange={handleFormChange}
+                          className="border p-2 rounded"
+                        />
+                        <select
+                          name="riskLevel"
+                          value={editingForm.riskLevel || ""}
+                          onChange={handleFormChange}
+                          className="border p-2 rounded"
+                        >
+                          <option value="">Select Risk</option>
+                          <option value="High">High</option>
+                          <option value="Medium">Medium</option>
+                          <option value="Low">Low</option>
+                        </select>
+                        <div className="flex gap-2 col-span-2 justify-end">
+                          <button
+                            onClick={() => {
+                              setEditingProjectKey(null);
+                              setEditingForm({});
+                            }}
+                            className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={handleFormSubmit}
+                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                          >
+                            Save
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
@@ -133,21 +225,16 @@ export default function ProjectDashboard({
 
       {/* --- TIMELINE VIEW --- */}
       {view === "timeline" && (
-        <div>
-          <p>
-            * Timeline view demo. For a full timeline, use a timeline library
-            like react-calendar-timeline or similar.
-          </p>
-          <ul className="mt-3 space-y-2">
-            {timelineData.map((item) => (
-              <li key={item.id} className="border p-2 rounded">
-                <strong>{item.title}</strong> - Manager: {item.group} <br />
-                Start: {moment(item.start_time).format("YYYY-MM-DD")} | End:{" "}
-                {moment(item.end_time).format("YYYY-MM-DD")}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul className="mt-3 space-y-2">
+          {timelineData.map((item) => (
+            <li key={item.id} className="border p-2 rounded">
+              <strong>{item.title}</strong> - Manager: {item.group}
+              <br />
+              Start: {moment(item.start_time).format("YYYY-MM-DD")} | End:{" "}
+              {moment(item.end_time).format("YYYY-MM-DD")}
+            </li>
+          ))}
+        </ul>
       )}
 
       {/* --- GRAPH VIEW --- */}
@@ -213,22 +300,16 @@ function ActionMenu({
     <div className="relative inline-block text-left">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="p-1 rounded hover:bg-gray-200 focus:outline-none"
+        className="p-1 rounded hover:bg-gray-200"
         aria-label="Actions menu"
       >
-        {/* Three vertical dots */}
-        <svg
-          className="w-5 h-5"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          aria-hidden="true"
-        >
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4z" />
         </svg>
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+        <div className="absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-white ring-1 ring-white ring-opacity-5 z-10">
           <button
             onClick={() => {
               onEdit();
