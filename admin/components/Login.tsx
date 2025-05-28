@@ -89,8 +89,8 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen flex items-start justify-center pt-10 bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white px-4">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-sm shadow-sm p-4">
         <h2 className="text-2xl font-bold mb-6 text-center">Admin Login</h2>
         <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
           <div>
@@ -107,7 +107,7 @@ const Login = () => {
               value={form.username}
               onChange={handleChange}
               placeholder="admin"
-              className={`w-full px-4 py-2 border rounded-md bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 ${
+              className={`w-full px-4 py-2 border rounded-sm bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 ${
                 errors.username
                   ? "border-red-500 focus:ring-red-500"
                   : "border-gray-300 dark:border-gray-600 focus:ring-blue-500"
@@ -132,7 +132,7 @@ const Login = () => {
               value={form.password}
               onChange={handleChange}
               placeholder="••••••••"
-              className={`w-full px-4 py-2 border rounded-md bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 ${
+              className={`w-full px-4 py-2 border rounded-sm bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 ${
                 errors.password
                   ? "border-red-500 focus:ring-red-500"
                   : "border-gray-300 dark:border-gray-600 focus:ring-blue-500"
@@ -145,7 +145,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200"
+            className="w-full py-2 rounded-md bg-green-700 hover:bg-green-700 text-white font-semibold transition-colors duration-200"
           >
             Login
           </button>
