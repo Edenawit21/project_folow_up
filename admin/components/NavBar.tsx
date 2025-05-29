@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Menu, Moon, Search, Settings, Sun, User } from "lucide-react";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
@@ -13,6 +13,23 @@ const Navbar = () => {
     (state) => state.global.isSidebarCollapsed
   );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        accountRef.current &&
+        !accountRef.current.contains(event.target as Node)
+      ) {
+        setIsAccountMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="flex items-center justify-between px-4 py-3 shadow-sm border-b bg-white text-gray-900 border-gray-200 dark:bg-gray-900 dark:text-white dark:border-gray-700">
@@ -43,7 +60,7 @@ const Navbar = () => {
       </div>
 
       {/* Right: Theme, Settings, User */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 relative">
         {/* Theme Toggle */}
         <button
           onClick={() => dispatch(setIsDarkMode(!isDarkMode))}
@@ -69,9 +86,38 @@ const Navbar = () => {
         {/* Divider */}
         <div className="hidden md:block h-6 w-px mx-2 bg-gray-300 dark:bg-gray-600" />
 
-        {/* User */}
-        <div className="hidden md:flex items-center justify-center">
-          <User className="h-6 w-6 cursor-pointer" />
+        {/* User Dropdown */}
+        <div
+          ref={accountRef}
+          className="relative hidden md:flex items-center justify-center"
+        >
+          <button
+            onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Account Menu"
+          >
+            <User className="h-6 w-6 cursor-pointer" />
+          </button>
+
+          {isAccountMenuOpen && (
+            <div className="absolute right-0 top-10 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
+              <Link
+                href="/profile"
+                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                Profile
+              </Link>
+              <button
+                onClick={() => {
+                  // Add logout logic here
+                  alert("Logging out...");
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

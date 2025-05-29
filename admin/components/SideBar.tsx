@@ -2,11 +2,22 @@
 
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed } from "@/utils";
-import { UserPlus, Users, Menu } from "lucide-react";
+import {
+  UserPlus,
+  Users,
+  Menu,
+  UserCog,
+  ShieldCheck,
+  Plus,
+  List,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
+
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 const Sidebar = () => {
   const dispatch = useAppDispatch();
@@ -38,20 +49,45 @@ const Sidebar = () => {
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2">
-            <SidebarLink icon={UserPlus} label="Add User" href="/add_user" />
-            <SidebarLink icon={Users} label="User List" href="/user_list" />
+            <SidebarMenu
+              icon={Users}
+              label="Users"
+              items={[
+                { label: "Add User", href: "/add_user", icon: UserPlus },
+                { label: "User List", href: "/user_list", icon: List },
+              ]}
+            />
+
+            <SidebarMenu
+              icon={UserCog}
+              label="Role"
+              items={[
+                { label: "Add Role", href: "/roles/add", icon: Plus },
+                { label: "Role List", href: "/roles/list", icon: List },
+              ]}
+            />
+            <SidebarMenu
+              icon={ShieldCheck}
+              label="Privilege"
+              items={[
+                {
+                  label: "Add Privilege",
+                  href: "/privileges/add_privilege",
+                  icon: Plus,
+                },
+                {
+                  label: "Privilege List",
+                  href: "/privileges/privilege_list",
+                  icon: List,
+                },
+              ]}
+            />
           </nav>
         </div>
       )}
     </aside>
   );
 };
-
-interface SidebarLinkProps {
-  href: string;
-  icon: React.ElementType;
-  label: string;
-}
 
 const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
   const pathname = usePathname();
@@ -76,5 +112,74 @@ const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
     </Link>
   );
 };
+
+const SidebarMenu = ({
+  icon: Icon,
+  label,
+  items,
+}: {
+  icon: React.ElementType;
+  label: string;
+  items: SidebarLinkProps[];
+}) => {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(
+    items.some((item) => pathname === item.href)
+  );
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full px-5 py-2 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+      >
+        <div className="flex items-center gap-3">
+          <Icon className="w-5 h-5" />
+          <span className="text-xl font-medium">{label}</span>
+        </div>
+        {open ? (
+          <ChevronDown className="w-4 h-4" />
+        ) : (
+          <ChevronRight className="w-4 h-4" />
+        )}
+      </button>
+
+      {open && (
+        <div className="ml-10 mt-2 space-y-2">
+          {items.map((item) => (
+            <SidebarLinkSmall key={item.href} {...item} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SidebarLinkSmall = ({ href, icon: Icon, label }: SidebarLinkProps) => {
+  const pathname = usePathname();
+  const isActive = pathname === href;
+
+  return (
+    <Link href={href} className="block">
+      <div
+        className={`relative flex items-center gap-2 px-3 py-1 rounded-md transition-all text-sm
+          ${
+            isActive
+              ? "bg-blue-100 text-blue-700 dark:bg-gray-800"
+              : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400"
+          }`}
+      >
+        <Icon className="w-4 h-4" />
+        {label}
+      </div>
+    </Link>
+  );
+};
+
+interface SidebarLinkProps {
+  href: string;
+  icon: React.ElementType;
+  label: string;
+}
 
 export default Sidebar;
