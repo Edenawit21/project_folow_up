@@ -2,7 +2,8 @@
 
 import React, { useEffect } from "react";
 import Navbar from "@/components/NavBar";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/SideBar";
+
 import StoreProvider, { useAppSelector } from "./redux";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -17,20 +18,18 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [isDarkMode]);
+  });
 
   return (
-    <div
-      className={`flex min-h-screen w-full bg-[var(--background)] text-[var(--text)]`}
-    >
+    <div className="flex min-h-screen w-full bg-gray-50 text-gray-900">
       <Sidebar />
       <main
-        className={`flex w-full flex-col transition-padding duration-300 ease-in-out border-[var(--border)] ${
+        className={`flex w-full flex-col bg-gray-50 dark:bg-gray-900 ${
           isSidebarCollapsed ? "" : "md:pl-64"
-        } bg-[var(--background)] text-[var(--text)]`}
+        }`}
       >
         <Navbar />
-        <div className="flex-grow">{children}</div>
+        {children}
       </main>
     </div>
   );

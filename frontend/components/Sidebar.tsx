@@ -25,15 +25,21 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-full z-40 flex flex-col bg-[var(--background)] shadow-xl
+      className={`fixed top-0 left-0 h-full z-40 flex flex-col shadow-xl
         overflow-hidden transition-[width] duration-500 ease-in-out
-        ${isSidebarCollapsed ? "w-0" : "w-64"}
-      `}
+        bg-[var(--background)]
+        ${isSidebarCollapsed ? "w-0" : "w-64"}`}
+      style={{ borderRight: "1px solid var(--border)" }}
     >
       {!isSidebarCollapsed && (
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+          <div
+            className="flex items-center justify-between px-6 py-4 border-b"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <Image src="/logo.png" alt="Logo" width={40} height={50} />
+
             <button
               className="p-1 hover:opacity-70"
               onClick={() => dispatch(setIsSidebarCollapsed(true))}
@@ -41,7 +47,6 @@ const Sidebar = () => {
             >
               <Menu className="h-6 w-6 text-[var(--text)] cursor-pointer" />
             </button>
-            <Image src="/logo.png" alt="Logo" width={40} height={50} />
           </div>
 
           {/* Navigation */}
@@ -84,21 +89,28 @@ interface SidebarLinkProps {
 
 const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
   const pathname = usePathname();
+  // Handle dashboard route match with "/dashboard" as alias
   const isActive =
     pathname === href || (href === "/" && pathname === "/dashboard");
 
   return (
     <Link href={href} className="block w-full">
       <div
-        className={`relative flex items-center gap-4 px-6 py-3 rounded-md transition-colors duration-200 
+        className={`relative flex items-center gap-4 px-6 py-3 rounded-md transition-colors duration-200 cursor-pointer
           ${
             isActive
-              ? "bg-blue-100 dark:bg-gray-700 text-blue-700"
-              : "hover:bg-gray-100 dark:hover:bg-gray-800 text-[var(--text)]"
+              ? "text-blue-700"
+              : "text-[var(--text)] hover:bg-[var(--muted)]"
           }`}
+        style={{
+          backgroundColor: isActive ? "var(--border)" : "transparent",
+        }}
       >
         {isActive && (
-          <span className="absolute left-0 h-full w-1 bg-blue-500 rounded-r" />
+          <span
+            className="absolute left-0 h-full w-1 rounded-r"
+            style={{ backgroundColor: "#3b82f6" /* blue-500 */ }}
+          />
         )}
         <Icon className="h-6 w-6" />
         <span className="text-xl font-medium">{label}</span>

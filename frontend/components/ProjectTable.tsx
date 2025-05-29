@@ -39,7 +39,14 @@ export default function ProjectDashboard({
     ? projects.filter((p) => p.riskLevel === filters.riskLevel)
     : projects;
 
-  const timelineData = filteredProjects.map((p) => ({
+const timelineData = filteredProjects.map((p) => ({
+  id: p.projectKey,
+  group: p.projectManager,
+  title: p.projectName,
+  start_time: moment(p.lastSyncedAt).subtract(30, "days").valueOf(),
+  end_time: moment(p.lastSyncedAt).valueOf(),
+}));
+
     id: p.projectKey,
     group: p.projectManager,
     title: p.projectName,
@@ -51,7 +58,13 @@ export default function ProjectDashboard({
     new Set(filteredProjects.map((p) => p.riskLevel || "Unknown"))
   );
 
-  const graphData = filteredProjects.map((p) => ({
+const graphData = filteredProjects.map((p) => ({
+  name: p.projectName,
+  issuesDone: p.issuesDone,
+  issuesInProgress: p.issuesInProgress,
+  issuesRemaining: Math.max(0, p.totalIssues - p.issuesDone - p.issuesInProgress),
+}));
+
     name: p.projectName,
     issuesDone: p.issuesDone,
     issuesInProgress: p.issuesInProgress,
@@ -64,44 +77,111 @@ export default function ProjectDashboard({
   }));
 
   return (
-    <div>
-      {/* TABLE VIEW */}
-      {viewMode === "table" && (
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100 text-sm">
-              <th className="p-2 border">Key</th>
-              <th className="p-2 border">Project title</th>
-              <th className="p-2 border">Project Manager</th>
-              <th className="p-2 border">Risk</th>
-              <th className="p-2 border">Done</th>
-              <th className="p-2 border">In Progress</th>
-              <th className="p-2 border">Total</th>
-              <th className="p-2 border">Story Points</th>
-              <th className="p-2 border">Last Synced</th>
-              <th className="p-2 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProjects.map((p) => (
-              <tr key={p.projectKey} className="hover:bg-gray-50 text-sm">
-                <td className="p-2 border">{p.projectKey}</td>
-                <td className="p-2 border">{p.projectName}</td>
-                <td className="p-2 border">{p.projectManager}</td>
-                <td className="p-2 border">{p.riskLevel || "N/A"}</td>
-                <td className="p-2 border">{p.issuesDone}</td>
-                <td className="p-2 border">{p.issuesInProgress}</td>
-                <td className="p-2 border">{p.totalIssues}</td>
-                <td className="p-2 border">{p.storyPointsDone}</td>
-                <td className="p-2 border">
-                  {moment(p.lastSyncedAt).format("YYYY-MM-DD")}
-                </td>
-                <td className="p-2 border text-center relative">
-                  <ActionMenu
-                    onEdit={() => onEdit(p)}
-                    onDelete={() => onDelete(p.projectKey)}
-                  />
-                </td>
+<div
+  className="p-4"
+  style={{
+    backgroundColor: "var(--background)",
+    color: "var(--text)",
+  }}
+>
+  {/* View buttons */}
+  <div className="mb-4 flex gap-3">
+    {["table", "board", "timeline", "graph"].map((v) => (
+      <button
+        key={v}
+        onClick={() => setView(v as any)}
+        className={`px-4 py-2 rounded font-semibold transition-colors duration-200 ${
+          view === v
+            ? "bg-blue-600 text-white"
+            : "bg-[var(--border)] text-[var(--text)] hover:bg-[var(--muted)]"
+        }`}
+      >
+        {v.charAt(0).toUpperCase() + v.slice(1)}
+      </button>
+    ))}
+  </div>
+
+  {/* --- TABLE VIEW --- */}
+  {view === "table" && (
+    <table
+      className="w-full border-collapse"
+      style={{ borderColor: "var(--border)" }}
+    >
+      <thead
+        style={{ backgroundColor: "var(--border)" }}
+        className="select-none"
+      >
+        <tr>
+          {[
+            "Key",
+            "Name",
+            "Manager",
+            "Risk",
+            "Issues Done",
+            "In Progress",
+            "Total Issues",
+            "Story Points Done",
+            "Last Synced",
+            "Actions",
+          ].map((header) => (
+            <th
+              key={header}
+              className="border p-2 font-medium"
+              style={{ borderColor: "var(--border)" }}
+            >
+              {header}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {filteredProjects.map((p) => (
+          <tr
+            key={p.projectKey}
+            className="hover:bg-[var(--border)] transition-colors duration-150"
+          >
+            <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+              {p.projectKey}
+            </td>
+            <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+              {p.projectName}
+            </td>
+            <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+              {p.projectManager}
+            </td>
+            <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+              {p.riskLevel || "Unknown"}
+            </td>
+            <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+              {p.issuesDone}
+            </td>
+            <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+              {p.issuesInProgress}
+            </td>
+            <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+              {p.totalIssues}
+            </td>
+            <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+              {p.storyPointsDone}
+            </td>
+            <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+              {moment(p.lastSyncedAt).format("YYYY-MM-DD")}
+            </td>
+            <td className="border p-2 text-center relative" style={{ borderColor: "var(--border)" }}>
+              <ActionMenu
+                onEdit={() => onEdit(p)}
+                onDelete={() => onDelete(p.projectKey)}
+              />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+
+  {/* ...rest of your views (board, timeline, graph) go here... */}
+</div>
+
               </tr>
             ))}
           </tbody>
@@ -112,14 +192,36 @@ export default function ProjectDashboard({
       {viewMode === "board" && (
         <div className="flex gap-6">
           {boardGroups.map((risk) => (
-            <div key={risk} className="flex-1 bg-gray-100 rounded p-4">
-              <h3 className="font-semibold mb-3">{risk.toUpperCase()}</h3>
-              {filteredProjects
+<div
+  key={risk}
+  className="flex-1 rounded p-4"
+  style={{ backgroundColor: "var(--border)" }}
+>
+  <h3
+    className="font-semibold mb-3"
+    style={{ color: "var(--text)" }}
+  >
+    {risk.toUpperCase()}
+  </h3>
+  {(filteredProjects || projects)
+    .filter((p) => p.riskLevel === risk)
+    .map((p) => (
+      <div key={p.projectKey} className="mb-2">
+        {/* Render project info here */}
+        {p.projectName}
+      </div>
+    ))}
+</div>
+
                 .filter((p) => p.riskLevel === risk)
                 .map((p) => (
                   <div
                     key={p.projectKey}
-                    className="bg-white p-3 mb-3 rounded shadow-sm"
+                    className="rounded shadow-sm p-3 mb-3"
+                    style={{
+                      backgroundColor: "var(--background)",
+                      color: "var(--text)",
+                    }}
                   >
                     <strong>{p.projectName}</strong>
                     <div>Manager: {p.projectManager}</div>
@@ -136,31 +238,64 @@ export default function ProjectDashboard({
         </div>
       )}
 
-      {/* TIMELINE VIEW */}
-      {viewMode === "timeline" && (
-        <ul className="mt-3 space-y-2">
-          {timelineData.map((item) => (
-            <li key={item.id} className="border p-2 rounded">
-              <strong>{item.title}</strong> - Manager: {item.group}
-              <br />
-              Start: {moment(item.start_time).format("YYYY-MM-DD")} | End:{" "}
-              {moment(item.end_time).format("YYYY-MM-DD")}
-            </li>
-          ))}
-        </ul>
+{/* --- TIMELINE VIEW --- */}
+{view === "timeline" && (
+  <div>
+    <p style={{ color: "var(--muted)" }}>
+      * Timeline view demo. For a full timeline, use a timeline library
+      like react-calendar-timeline or similar.
+    </p>
+    <ul className="mt-3 space-y-2">
+      {timelineData.map((item) => (
+        <li
+          key={item.id}
+          className="border rounded p-2"
+          style={{ borderColor: "var(--border)", color: "var(--text)" }}
+        >
+          <strong>{item.title}</strong> - Manager: {item.group} <br />
+          Start: {moment(item.start_time).format("YYYY-MM-DD")} | End:{" "}
+          {moment(item.end_time).format("YYYY-MM-DD")}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
       )}
 
       {/* GRAPH VIEW */}
       {viewMode === "graph" && (
         <div className="space-y-10">
           <div style={{ width: "100%", height: 300 }}>
-            <h3 className="mb-3 font-semibold text-lg">Issues Status Bar Chart</h3>
-            <ResponsiveContainer>
-              <BarChart data={graphData} margin={{ top: 5, bottom: 30 }}>
-                <XAxis dataKey="name" angle={-45} textAnchor="end" interval={0} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
+<h3
+  className="mb-3 font-semibold text-lg"
+  style={{ color: "var(--text)" }}
+>
+  Issues Status Bar Chart
+</h3>
+<ResponsiveContainer>
+  <BarChart data={graphData} margin={{ top: 5, bottom: 30 }}>
+    <XAxis
+      dataKey="name"
+      angle={-45}
+      textAnchor="end"
+      interval={0}
+      stroke="var(--text)"
+    />
+    <YAxis stroke="var(--text)" />
+    <Tooltip
+      contentStyle={{
+        backgroundColor: "var(--background)",
+        color: "var(--text)",
+      }}
+    />
+    <Legend wrapperStyle={{ color: "var(--text)" }} />
+    <Bar dataKey="issuesDone" fill="#82ca9d" name="Done" />
+    <Bar dataKey="issuesInProgress" fill="#8884d8" name="In Progress" />
+    <Bar dataKey="issuesRemaining" fill="#ffc658" name="Remaining" />
+  </BarChart>
+</ResponsiveContainer>
+
                 <Bar dataKey="issuesDone" fill="#82ca9d" name="Done" />
                 <Bar dataKey="issuesInProgress" fill="#8884d8" name="In Progress" />
                 <Bar dataKey="issuesRemaining" fill="#ffc658" name="Remaining" />
@@ -169,7 +304,13 @@ export default function ProjectDashboard({
           </div>
 
           <div style={{ width: "100%", height: 300 }}>
-            <h3 className="mb-3 font-semibold text-lg">Risk Level Distribution</h3>
+<h3
+  className="mb-3 font-semibold text-lg"
+  style={{ color: "var(--text)" }}
+>
+  Risk Level Distribution
+</h3>
+
             <ResponsiveContainer>
               <PieChart>
                 <Pie
@@ -185,7 +326,12 @@ export default function ProjectDashboard({
                     <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--background)",
+                    color: "var(--text)",
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
