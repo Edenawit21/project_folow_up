@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Project } from "@/types";
 import moment from "moment";
 import {
@@ -17,45 +17,29 @@ import {
 } from "recharts";
 
 interface ProjectDashboardProps {
-  projects: Project[];
+  projects?: Project[];
   onEdit: (updatedProject: Project) => void;
   onDelete: (projectKey: string) => void;
+  viewMode: "table" | "board" | "timeline" | "graph";
+  filters?: {
+    riskLevel?: string;
+  };
 }
 
 const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 export default function ProjectDashboard({
-  projects,
+  projects = [],
   onEdit,
   onDelete,
+  viewMode,
+  filters = { riskLevel: "" },
 }: ProjectDashboardProps) {
-  const [view, setView] = useState<"table" | "board" | "timeline" | "graph">(
-    "table"
-  );
-  const [editingProjectKey, setEditingProjectKey] = useState<string | null>(null);
-  const [editingForm, setEditingForm] = useState<Partial<Project>>({});
+  const filteredProjects = filters.riskLevel
+    ? projects.filter((p) => p.riskLevel === filters.riskLevel)
+    : projects;
 
-  const handleFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setEditingForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFormSubmit = () => {
-    if (!editingProjectKey) return;
-
-    const updated = {
-      ...projects.find((p) => p.projectKey === editingProjectKey)!,
-      ...editingForm,
-    };
-
-    onEdit(updated);
-    setEditingProjectKey(null);
-    setEditingForm({});
-  };
-
-  const timelineData = projects.map((p) => ({
+  const timelineData = filteredProjects.map((p) => ({
     id: p.projectKey,
     group: p.projectManager,
     title: p.projectName,
@@ -64,144 +48,73 @@ export default function ProjectDashboard({
   }));
 
   const boardGroups = Array.from(
-    new Set(projects.map((p) => p.riskLevel || "Unknown"))
+    new Set(filteredProjects.map((p) => p.riskLevel || "Unknown"))
   );
 
-  const graphData = projects.map((p) => ({
+  const graphData = filteredProjects.map((p) => ({
     name: p.projectName,
     issuesDone: p.issuesDone,
     issuesInProgress: p.issuesInProgress,
-    issuesRemaining: p.totalIssues - p.issuesDone - p.issuesInProgress,
+    issuesRemaining: Math.max(0, p.totalIssues - p.issuesDone - p.issuesInProgress),
   }));
 
   const riskCount = boardGroups.map((risk) => ({
     name: risk,
-    value: projects.filter((p) => p.riskLevel === risk).length,
+    value: filteredProjects.filter((p) => p.riskLevel === risk).length,
   }));
 
   return (
     <div>
-      {/* View buttons */}
-      <div className="mb-4 flex gap-3">
-        {["table", "board", "timeline", "graph"].map((v) => (
-          <button
-            key={v}
-            onClick={() => setView(v as any)}
-            className={`px-4 py-2 rounded ${
-              view === v
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            {v.charAt(0).toUpperCase() + v.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {/* --- TABLE VIEW --- */}
-      {view === "table" && (
+      {/* TABLE VIEW */}
+      {viewMode === "table" && (
         <table className="w-full border-collapse border border-gray-300">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-gray-100 text-sm">
               <th className="p-2 border">Key</th>
-              <th className="p-2 border">Name</th>
-              <th className="p-2 border">Manager</th>
+              <th className="p-2 border">Project title</th>
+              <th className="p-2 border">Project Manager</th>
               <th className="p-2 border">Risk</th>
-              <th className="p-2 border">Issues Done</th>
+              <th className="p-2 border">Done</th>
               <th className="p-2 border">In Progress</th>
-              <th className="p-2 border">Total Issues</th>
+              <th className="p-2 border">Total</th>
               <th className="p-2 border">Story Points</th>
               <th className="p-2 border">Last Synced</th>
               <th className="p-2 border">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {projects.map((p) => (
-              <React.Fragment key={p.projectKey}>
-                <tr className="hover:bg-gray-50">
-                  <td className="p-2 border">{p.projectKey}</td>
-                  <td className="p-2 border">{p.projectName}</td>
-                  <td className="p-2 border">{p.projectManager}</td>
-                  <td className="p-2 border">{p.riskLevel}</td>
-                  <td className="p-2 border">{p.issuesDone}</td>
-                  <td className="p-2 border">{p.issuesInProgress}</td>
-                  <td className="p-2 border">{p.totalIssues}</td>
-                  <td className="p-2 border">{p.storyPointsDone}</td>
-                  <td className="p-2 border">{p.lastSyncedAt}</td>
-                  <td className="p-2 border text-center relative">
-                    <ActionMenu
-                      onEdit={() => {
-                        setEditingProjectKey(p.projectKey);
-                        setEditingForm(p);
-                      }}
-                      onDelete={() => onDelete(p.projectKey)}
-                    />
-                  </td>
-                </tr>
-
-                {editingProjectKey === p.projectKey && (
-                  <tr>
-                    <td colSpan={10} className="p-4 bg-gray-100">
-                      <div className="grid grid-cols-2 gap-4">
-                        <input
-                          name="projectName"
-                          placeholder="Project Name"
-                          value={editingForm.projectName || ""}
-                          onChange={handleFormChange}
-                          className="border p-2 rounded"
-                        />
-                        <input
-                          name="projectManager"
-                          placeholder="Manager"
-                          value={editingForm.projectManager || ""}
-                          onChange={handleFormChange}
-                          className="border p-2 rounded"
-                        />
-                        <select
-                          name="riskLevel"
-                          value={editingForm.riskLevel || ""}
-                          onChange={handleFormChange}
-                          className="border p-2 rounded"
-                        >
-                          <option value="">Select Risk</option>
-                          <option value="High">High</option>
-                          <option value="Medium">Medium</option>
-                          <option value="Low">Low</option>
-                        </select>
-                        <div className="flex gap-2 col-span-2 justify-end">
-                          <button
-                            onClick={() => {
-                              setEditingProjectKey(null);
-                              setEditingForm({});
-                            }}
-                            className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={handleFormSubmit}
-                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                          >
-                            Save
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </React.Fragment>
+            {filteredProjects.map((p) => (
+              <tr key={p.projectKey} className="hover:bg-gray-50 text-sm">
+                <td className="p-2 border">{p.projectKey}</td>
+                <td className="p-2 border">{p.projectName}</td>
+                <td className="p-2 border">{p.projectManager}</td>
+                <td className="p-2 border">{p.riskLevel || "N/A"}</td>
+                <td className="p-2 border">{p.issuesDone}</td>
+                <td className="p-2 border">{p.issuesInProgress}</td>
+                <td className="p-2 border">{p.totalIssues}</td>
+                <td className="p-2 border">{p.storyPointsDone}</td>
+                <td className="p-2 border">
+                  {moment(p.lastSyncedAt).format("YYYY-MM-DD")}
+                </td>
+                <td className="p-2 border text-center relative">
+                  <ActionMenu
+                    onEdit={() => onEdit(p)}
+                    onDelete={() => onDelete(p.projectKey)}
+                  />
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
       )}
 
-      {/* --- BOARD VIEW --- */}
-      {view === "board" && (
+      {/* BOARD VIEW */}
+      {viewMode === "board" && (
         <div className="flex gap-6">
           {boardGroups.map((risk) => (
             <div key={risk} className="flex-1 bg-gray-100 rounded p-4">
               <h3 className="font-semibold mb-3">{risk.toUpperCase()}</h3>
-              {projects
+              {filteredProjects
                 .filter((p) => p.riskLevel === risk)
                 .map((p) => (
                   <div
@@ -223,8 +136,8 @@ export default function ProjectDashboard({
         </div>
       )}
 
-      {/* --- TIMELINE VIEW --- */}
-      {view === "timeline" && (
+      {/* TIMELINE VIEW */}
+      {viewMode === "timeline" && (
         <ul className="mt-3 space-y-2">
           {timelineData.map((item) => (
             <li key={item.id} className="border p-2 rounded">
@@ -237,13 +150,11 @@ export default function ProjectDashboard({
         </ul>
       )}
 
-      {/* --- GRAPH VIEW --- */}
-      {view === "graph" && (
+      {/* GRAPH VIEW */}
+      {viewMode === "graph" && (
         <div className="space-y-10">
           <div style={{ width: "100%", height: 300 }}>
-            <h3 className="mb-3 font-semibold text-lg">
-              Issues Status Bar Chart
-            </h3>
+            <h3 className="mb-3 font-semibold text-lg">Issues Status Bar Chart</h3>
             <ResponsiveContainer>
               <BarChart data={graphData} margin={{ top: 5, bottom: 30 }}>
                 <XAxis dataKey="name" angle={-45} textAnchor="end" interval={0} />
@@ -271,10 +182,7 @@ export default function ProjectDashboard({
                   label
                 >
                   {riskCount.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={colors[index % colors.length]}
-                    />
+                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -294,7 +202,7 @@ function ActionMenu({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
   return (
     <div className="relative inline-block text-left">

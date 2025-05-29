@@ -1,5 +1,6 @@
 import { Project } from "@/types";
 
+export type ViewMode = "table" | "board" | "timeline" | "graph";
 export const initialProjects: Project[] = [
   {
     projectKey: "PRJ001",

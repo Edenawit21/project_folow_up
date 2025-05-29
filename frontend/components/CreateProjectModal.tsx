@@ -15,8 +15,8 @@ const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate, project }) => 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    priority: "Select priority",
-    status: "Select status",
+    priority: "",
+    status: "",
     developersInput: "",
     manager: "",
     owner: "",
@@ -30,8 +30,8 @@ const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate, project }) => 
       setFormData({
         title: project.title || "",
         description: project.description || "",
-        priority: project.priority || "Select priority",
-        status: project.status || "Select status",
+        priority: project.priority || "",
+        status: project.status || "",
         developersInput: Array.isArray(project.developers)
           ? project.developers.join(", ")
           : "",
@@ -80,103 +80,136 @@ const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate, project }) => 
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex justify-center items-center px-4 py-8 overflow-auto">
-      <div className="bg-white border border-gray-300 rounded-lg shadow-lg w-full max-w-2xl p-6">
-        <h2 className="text-xl font-semibold mb-4">
-          {isEdit ? "Edit Project" : "Create Project"}
-        </h2>
-
-        <div className="grid gap-4">
-          <input
-            name="title"
-            placeholder="Title"
-            value={formData.title}
-            onChange={handleChange}
-            className="border p-2 rounded w-full"
-          />
-          {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
-
-          <textarea
-            name="description"
-            placeholder="Description"
-            value={formData.description}
-            onChange={handleChange}
-            className="border p-2 rounded w-full"
-          />
-
-          <input
-            name="manager"
-            placeholder="Manager"
-            value={formData.manager}
-            onChange={handleChange}
-            className="border p-2 rounded w-full"
-          />
-          {errors.manager && <p className="text-red-500 text-sm">{errors.manager}</p>}
-
-          <input
-            name="owner"
-            placeholder="Owner"
-            value={formData.owner}
-            onChange={handleChange}
-            className="border p-2 rounded w-full"
-          />
-          {errors.owner && <p className="text-red-500 text-sm">{errors.owner}</p>}
-
-          <input
-            name="teamLeader"
-            placeholder="Team Leader"
-            value={formData.teamLeader}
-            onChange={handleChange}
-            className="border p-2 rounded w-full"
-          />
-
-          <input
-            name="developersInput"
-            placeholder="Developers (comma-separated)"
-            value={formData.developersInput}
-            onChange={handleChange}
-            className="border p-2 rounded w-full"
-          />
-
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="border p-2 rounded w-full"
-          >
-            <option value="">Select status</option>
-            <option value="todo">Todo</option>
-            <option value="on_progress">On Progress</option>
-            <option value="completed">Completed</option>
-          </select>
-          {errors.status && <p className="text-red-500 text-sm">{errors.status}</p>}
-
-          <select
-            name="priority"
-            value={formData.priority}
-            onChange={handleChange}
-            className="border p-2 rounded w-full"
-          >
-            <option value="">Select priority</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
-          {errors.priority && <p className="text-red-500 text-sm">{errors.priority}</p>}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-lime-50 dark:bg-[var(--background)] w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl shadow-xl p-6 space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center sticky top-0 bg-lime-50 dark:bg-[var(--background)] z-10 pb-2">
+          <h2 className="text-xl font-semibold text-[var(--text)]">
+            {isEdit ? "Edit Project" : "Create Project"}
+          </h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-red-600 text-sm">
+            ✕
+          </button>
         </div>
 
-        <div className="flex justify-end gap-2 mt-6">
+        {/* Form Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm text-[var(--muted)] mb-1">Project Title *</label>
+            <input
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="Project title"
+              className="w-full px-3 py-2 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+            />
+            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm text-[var(--muted)] mb-1">Project Manager *</label>
+            <input
+              name="manager"
+              value={formData.manager}
+              onChange={handleChange}
+              placeholder="Manager name"
+              className="w-full px-3 py-2 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+            />
+            {errors.manager && <p className="text-red-500 text-sm mt-1">{errors.manager}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm text-[var(--muted)] mb-1">Project Owner *</label>
+            <input
+              name="owner"
+              value={formData.owner}
+              onChange={handleChange}
+              placeholder="Owner name"
+              className="w-full px-3 py-2 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+            />
+            {errors.owner && <p className="text-red-500 text-sm mt-1">{errors.owner}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm text-[var(--muted)] mb-1">Team Leader</label>
+            <input
+              name="teamLeader"
+              value={formData.teamLeader}
+              onChange={handleChange}
+              placeholder="Team leader name"
+              className="w-full px-3 py-2 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm text-[var(--muted)] mb-1">Developers *</label>
+            <input
+              name="developersInput"
+              value={formData.developersInput}
+              onChange={handleChange}
+              placeholder="Comma-separated names"
+              className="w-full px-3 py-2 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-[var(--muted)] mb-1">Status *</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full px-3 py-2 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+            >
+              <option value="">Select status</option>
+              <option value="todo">Todo</option>
+              <option value="on_progress">On Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+            {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm text-[var(--muted)] mb-1">Priority *</label>
+            <select
+              name="priority"
+              value={formData.priority}
+              onChange={handleChange}
+              className="w-full px-3 py-2 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+            >
+              <option value="">Select priority</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+            {errors.priority && <p className="text-red-500 text-sm mt-1">{errors.priority}</p>}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm text-[var(--muted)] mb-1">Description</label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={4}
+            placeholder="Describe the project"
+            className="w-full px-3 py-2 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+          />
+        </div>
+
+        {/* Buttons */}
+        <div className="flex justify-end gap-3 pt-4 sticky bottom-0 bg-lime-50 dark:bg-[var(--background)] pb-2">
           <button
             onClick={onClose}
-            className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+            className="px-4 py-2 rounded border border-[var(--border)] text-[var(--text)] hover:bg-gray-100 dark:hover:bg-[var(--hover)] transition"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+            className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white transition"
           >
-            {isEdit ? "Update" : "Create"}
+            {isEdit ? "Update Project" : "Create Project"}
           </button>
         </div>
       </div>
