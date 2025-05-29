@@ -1,4 +1,5 @@
 export interface Project {
+  // Backend fields
   projectKey: string;
   projectName: string;
   projectManager: string;
@@ -9,29 +10,39 @@ export interface Project {
   storyPointsDone: number;
   riskLevel: string;
   lastSyncedAt: string;
-  id?: string;
-  key?: string;
-  projectCategory?: string;
-  leadDisplayName?: string;
-  developers?: string[];
-  status?: string; 
-  priority?: string;
+
+  // Optional fields (from form)
+  title?: string;                
+  description?: string;
+  manager?: string;            
+  owner?: string;
+  teamLeader?: string;
+  developers?: string[];      
+  status?: "todo" | "on_progress" | "completed";
+  priority?: "High" | "Medium" | "Low";
 }
 
+export interface FormProject {
+  title: string;
+  description: string;
+  manager: string;
+  owner: string;
+  teamLeader: string;
+  developers: string; 
+  status: "todo" | "on_progress" | "completed";
+  priority: "High" | "Medium" | "Low";
+}
 
-
-// types/task.ts
 export interface Task {
   status: string;
   key: string;
   summary: string;
 }
+
 export interface TeamMember {
   accountId: string | null;
   displayName: string;
 }
-
-// types/filters.ts
 
 export interface ProjectFilterState {
   status: string;
