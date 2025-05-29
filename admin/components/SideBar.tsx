@@ -6,13 +6,14 @@ import {
   UserPlus,
   Users,
   Menu,
-  FolderKanban,
-  Building2,
+  UserCog,
+  ShieldCheck,
   Plus,
   List,
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
+
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -48,49 +49,43 @@ const Sidebar = () => {
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2">
-            <SidebarLink icon={UserPlus} label="Add User" href="/add_user" />
-            <SidebarLink icon={Users} label="User List" href="/user_list" />
-            <SidebarLink
-              icon={FolderKanban}
-              label="Projects"
-              href="/projects"
+            <SidebarMenu
+              icon={Users}
+              label="Users"
+              items={[
+                { label: "Add User", href: "/add_user", icon: UserPlus },
+                { label: "User List", href: "/user_list", icon: List },
+              ]}
             />
-            <SidebarMenu />
+
+            <SidebarMenu
+              icon={UserCog}
+              label="Role"
+              items={[
+                { label: "Add Role", href: "/roles/add", icon: Plus },
+                { label: "Role List", href: "/roles/list", icon: List },
+              ]}
+            />
+            <SidebarMenu
+              icon={ShieldCheck}
+              label="Privilege"
+              items={[
+                {
+                  label: "Add Privilege",
+                  href: "/privileges/add_privilege",
+                  icon: Plus,
+                },
+                {
+                  label: "Privilege List",
+                  href: "/privileges/privilege_list",
+                  icon: List,
+                },
+              ]}
+            />
           </nav>
         </div>
       )}
     </aside>
-  );
-};
-
-const SidebarMenu = () => {
-  const pathname = usePathname();
-  const [open, setOpen] = useState(pathname.startsWith("/teams"));
-
-  return (
-    <div>
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full px-5 py-2 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-      >
-        <div className="flex items-center gap-3">
-          <Building2 className="w-5 h-5" />
-          <span className="text-xl font-medium">Teams</span>
-        </div>
-        {open ? (
-          <ChevronDown className="w-4 h-4" />
-        ) : (
-          <ChevronRight className="w-4 h-4" />
-        )}
-      </button>
-
-      {open && (
-        <div className="ml-10 mt-2 space-y-2">
-          <SidebarLinkSmall icon={Plus} label="Add Team" href="/add_team" />
-          <SidebarLinkSmall icon={List} label="Team List" href="/team_list" />
-        </div>
-      )}
-    </div>
   );
 };
 
@@ -115,6 +110,48 @@ const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
         <span className="text-xl font-medium">{label}</span>
       </div>
     </Link>
+  );
+};
+
+const SidebarMenu = ({
+  icon: Icon,
+  label,
+  items,
+}: {
+  icon: React.ElementType;
+  label: string;
+  items: SidebarLinkProps[];
+}) => {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(
+    items.some((item) => pathname === item.href)
+  );
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full px-5 py-2 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+      >
+        <div className="flex items-center gap-3">
+          <Icon className="w-5 h-5" />
+          <span className="text-xl font-medium">{label}</span>
+        </div>
+        {open ? (
+          <ChevronDown className="w-4 h-4" />
+        ) : (
+          <ChevronRight className="w-4 h-4" />
+        )}
+      </button>
+
+      {open && (
+        <div className="ml-10 mt-2 space-y-2">
+          {items.map((item) => (
+            <SidebarLinkSmall key={item.href} {...item} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
