@@ -26,28 +26,37 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
     rounded-md
     border
     transition-all
-    bg-[var(--background)]
-    text-[var(--text)]
-    border-[var(--border)]
-    placeholder-[var(--muted)]
-    hover:border-[var(--text)]
-    focus:border-[var(--text)]
-    focus:ring-[1px]
-    focus:ring-[var(--text)]
+    bg-white
+    text-gray-900
+    border-gray-300
+    placeholder-gray-400
+    hover:border-gray-500
+    focus:border-gray-700
+    focus:ring-1
+    focus:ring-gray-700
     focus:outline-none
     cursor-pointer
+    dark:bg-gray-900
+    dark:text-gray-100
+    dark:border-gray-700
+    dark:placeholder-gray-500
+    dark:hover:border-gray-400
+    dark:focus:border-gray-200
+    dark:focus:ring-gray-200
   `;
 
   const labelClasses = `
-    flex items-center gap-1 text-xs font-medium text-[var(--muted)]
+    flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400
   `;
 
   return (
-    <div className="space-y-3 p-2 rounded-lg bg-[var(--background)] overflow-x-auto">
+    <div className="space-y-3 p-2 rounded-lg bg-white dark:bg-gray-800">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Sliders className="w-4 h-4 text-[var(--text)]" />
-        <h2 className="text-m font-semibold text-[var(--text)]">Filter Projects</h2>
+        <Sliders className="w-4 h-4 text-gray-800 dark:text-gray-100" />
+        <h2 className="text-m font-semibold text-gray-900 dark:text-white">
+          Filter Projects
+        </h2>
       </div>
 
       {/* Filters */}
@@ -60,9 +69,7 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
           </label>
           <select
             value={filters.riskLevel}
-            onChange={(e) =>
-              setFilters({ riskLevel: e.target.value })
-            }
+            onChange={(e) => setFilters({ riskLevel: e.target.value })}
             className={filterItemClasses}
           >
             <option value="">All risk levels</option>
@@ -82,7 +89,9 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
             <select
               value={view}
               onChange={(e) =>
-                setView(e.target.value as "table" | "board" | "timeline" | "graph")
+                setView(
+                  e.target.value as "table" | "board" | "timeline" | "graph"
+                )
               }
               className={filterItemClasses}
             >
@@ -94,7 +103,7 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
 
             <button
               onClick={() => setFilters({ riskLevel: "" })}
-              className="px-3 py-1.5 text-xs font-medium text-[var(--text)] hover:text-[var(--muted)] transition-colors cursor-pointer rounded border border-[var(--border)] bg-[var(--background)] hover:bg-[color:rgba(0,0,0,0.03)] dark:hover:bg-[color:rgba(255,255,255,0.05)]"
+              className="px-3 py-1.5 text-xs font-medium text-gray-700 hover:text-gray-900 dark:text-gray-200 dark:hover:text-white transition-colors cursor-pointer rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Clear filter
             </button>

@@ -3,15 +3,15 @@
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed } from "@/utils";
 import {
-  UserPlus,
-  Users,
   Menu,
-  UserCog,
+  User,
+  Briefcase,
   ShieldCheck,
-  Plus,
-  List,
   ChevronDown,
   ChevronRight,
+  Key,
+  UserPlus,
+  Users
 } from "lucide-react";
 
 import Image from "next/image";
@@ -49,38 +49,23 @@ const Sidebar = () => {
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2">
-            <SidebarMenu
+            <SidebarLink
+              icon={UserPlus}
+              label="AddUsers"
+              href="/users/add_user"
+            />
+            <SidebarLink
               icon={Users}
-              label="Users"
-              items={[
-                { label: "Add User", href: "/add_user", icon: UserPlus },
-                { label: "User List", href: "/user_list", icon: List },
-              ]}
+              label="UserList"
+              href="/users/user_list"
             />
 
-            <SidebarMenu
-              icon={UserCog}
-              label="Role"
-              items={[
-                { label: "Add Role", href: "/roles/add", icon: Plus },
-                { label: "Role List", href: "/roles/list", icon: List },
-              ]}
-            />
-            <SidebarMenu
+            <SidebarLink icon={Briefcase} label="Projects" href="/projects" />
+            <SidebarLink icon={Key} label="Roles" href="/roles" />
+            <SidebarLink
               icon={ShieldCheck}
-              label="Privilege"
-              items={[
-                {
-                  label: "Add Privilege",
-                  href: "/privileges/add_privilege",
-                  icon: Plus,
-                },
-                {
-                  label: "Privilege List",
-                  href: "/privileges/privilege_list",
-                  icon: List,
-                },
-              ]}
+              label="Privileges"
+              href="/privileges"
             />
           </nav>
         </div>
