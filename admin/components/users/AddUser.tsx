@@ -11,7 +11,6 @@ const AddUser = () => {
     email: "",
     password: "",
     role: "",
-    privilege: "",
   });
 
   const handleChange = (
@@ -23,13 +22,7 @@ const AddUser = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      !form.username ||
-      !form.email ||
-      !form.password ||
-      !form.role ||
-      !form.privilege
-    ) {
+    if (!form.username || !form.email || !form.password || !form.role) {
       toast.warn("Please fill in all fields.");
       return;
     }
@@ -52,7 +45,6 @@ const AddUser = () => {
         email: "",
         password: "",
         role: "",
-        privilege: "",
       });
     } catch (error) {
       console.error("Failed to add user:", error);
@@ -61,11 +53,11 @@ const AddUser = () => {
   };
 
   return (
-    <div className="flex items-center justify-center bg-white dark:bg-gray-900 px-4 min-h-screen border border-gray-200 dark:border-gray-700">
+    <div className="flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 min-h-screen border border-gray-200 dark:border-gray-700">
       <form
         onSubmit={handleSubmit}
         autoComplete="off"
-        className="w-full max-w-md p-8 bg-white dark:bg-gray-800 rounded-md shadow-lg space-y-6"
+        className="w-full max-w-xl p-8 bg-white dark:bg-gray-800 rounded-md shadow-lg space-y-6"
       >
         {/* Username */}
         <div>
@@ -77,9 +69,8 @@ const AddUser = () => {
             name="username"
             value={form.username}
             onChange={handleChange}
-            autoComplete="off"
             placeholder="Enter username"
-            className="w-full px-4 py-3 rounded-[1px] border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
+            className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
           />
         </div>
 
@@ -93,9 +84,8 @@ const AddUser = () => {
             name="email"
             value={form.email}
             onChange={handleChange}
-            autoComplete="new-email"
             placeholder="Enter user's email"
-            className="w-full px-4 py-3 rounded-[1px] border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
+            className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
           />
         </div>
 
@@ -109,61 +99,37 @@ const AddUser = () => {
             name="password"
             value={form.password}
             onChange={handleChange}
-            autoComplete="new-password"
             placeholder="••••••••"
-            className="w-full px-4 py-3 rounded-[1px] border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
+            className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
           />
         </div>
 
-        {/* Role and Privilege in one row */}
-        <div className="flex gap-4">
-          {/* Role */}
-          <div className="flex-1">
-            <label className="block mb-2 font-semibold text-gray-800 dark:text-gray-300 cursor-pointer">
-              Role
-            </label>
-            <select
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-[1px] border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-            >
-              <option value="" disabled>
-                Select a role
-              </option>
-              <option value="Admin">Admin</option>
-              <option value="Director">Director</option>
-              <option value="ProjectManager">Project Manager</option>
-              <option value="TeamLeader">Team Leader</option>
-              <option value="ProjectOwner">Project Owner</option>
-            </select>
-          </div>
-
-          {/* Privilege */}
-          <div className="flex-1">
-            <label className="block mb-2 font-semibold text-gray-800 dark:text-gray-300 cursor-pointer">
-              Privilege
-            </label>
-            <select
-              name="privilege"
-              value={form.privilege}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-[1px] border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-            >
-              <option value="" disabled>
-                Select a privilege
-              </option>
-              <option value="Read">Read</option>
-              <option value="Write">Write</option>
-              <option value="Admin">Admin</option>
-            </select>
-          </div>
+        {/* Role */}
+        <div>
+          <label className="block mb-2 font-semibold text-gray-800 dark:text-gray-300">
+            Role
+          </label>
+          <select
+            name="role"
+            value={form.role}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-[1px] border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
+          >
+            <option value="" disabled>
+              Select a role
+            </option>
+            <option value="Admin">Admin</option>
+            <option value="Director">Director</option>
+            <option value="ProjectManager">Project Manager</option>
+            <option value="TeamLeader">Team Leader</option>
+            <option value="ProjectOwner">Project Owner</option>
+          </select>
         </div>
 
         {/* Submit */}
         <button
           type="submit"
-          className="w-full py-3 rounded-[1px] bg-green-600 hover:bg-green-700 text-white font-bold text-lg transition-colors duration-300"
+          className="w-full py-3 rounded bg-green-600 hover:bg-green-700 text-white font-bold text-lg transition-colors duration-300"
         >
           Register User
         </button>

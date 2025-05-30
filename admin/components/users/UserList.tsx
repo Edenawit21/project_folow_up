@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import { Pencil, Trash2, Save, X } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -13,63 +12,41 @@ interface User {
 }
 
 interface UserListProps {
-  token: string;
+  token?: string; // token is unused for now
 }
 
-const UserList: React.FC<UserListProps> = ({ token }) => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+const initialUsers: User[] = [
+  {
+    id: "1",
+    userName: "john_doe",
+    email: "john@example.com",
+    roles: ["Admin", "ProjectManager"],
+  },
+  {
+    id: "2",
+    userName: "jane_smith",
+    email: "jane@example.com",
+    roles: ["TeamLeader"],
+  },
+  {
+    id: "3",
+    userName: "bob_jones",
+    email: "bob@example.com",
+    roles: ["Director", "Admin"],
+  },
+];
+
+const UserList: React.FC<UserListProps> = () => {
+  const [users, setUsers] = useState<User[]>(initialUsers);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
 
   // Allow roles as string (editable) for editData
-  const [editData, setEditData] = useState<
-    Partial<User> & { roles?: string }
-  >({});
-
-  useEffect(() => {
-    fetchUsers();
-  }, [token]);
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const res = await axios.get<User[]>(
-        `${apiBaseUrl}/api/admin/users-with-roles`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setUsers(res.data);
-    } catch (err: any) {
-      setError(err.response?.data || err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
-    try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      await axios.delete(`${apiBaseUrl}/api/admin/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUsers(users.filter((user) => user.id !== id));
-      toast.success("User deleted successfully");
-    } catch (err: any) {
-      toast.error(
-        "Failed to delete user: " + (err.response?.data || err.message)
-      );
-    }
-  };
+  const [editData, setEditData] = useState<Partial<User> & { roles?: string }>(
+    {}
+  );
 
   const startEdit = (user: User) => {
     setEditingUserId(user.id);
-    // Convert roles array to comma separated string for editing
-    // setEditData({ ...user, roles: user.roles.join(", ") });
   };
 
   const cancelEdit = () => {
@@ -84,42 +61,39 @@ const UserList: React.FC<UserListProps> = ({ token }) => {
     setEditData((prev) => ({ ...prev, [field]: e.target.value }));
   };
 
-  const saveEdit = async () => {
-    try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const saveEdit = () => {
+    if (!editingUserId) return;
 
-      // Convert roles string to array safely
-      const rolesArray =
-        typeof editData.roles === "string"
-          ? editData.roles
-              .split(",")
-              .map((r: string) => r.trim())
-              .filter((r: string) => r.length > 0)
-          : Array.isArray(editData.roles)
-          ? editData.roles
-          : [];
+    const rolesArray =
+      typeof editData.roles === "string"
+        ? editData.roles
+            .split(",")
+            .map((r) => r.trim())
+            .filter((r) => r.length > 0)
+        : [];
 
-      // Build updated user object
-      const updatedUser = {
-        ...editData,
-        roles: rolesArray,
-      };
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === editingUserId
+          ? {
+              ...user,
+              userName: editData.userName || user.userName,
+              email: editData.email || user.email,
+              roles: rolesArray,
+            }
+          : user
+      )
+    );
 
-      await axios.put(
-        `${apiBaseUrl}/api/admin/users/${editingUserId}`,
-        updatedUser,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      toast.success("User updated successfully!");
-      await fetchUsers();
-      cancelEdit();
-    } catch (err: any) {
-      toast.error(
-        "Failed to update user: " + (err.response?.data || err.message)
-      );
-    }
+    toast.success("User updated successfully!");
+    cancelEdit();
+  };
+
+  const handleDelete = (id: string) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+
+    setUsers((prev) => prev.filter((user) => user.id !== id));
+    toast.success("User deleted successfully");
   };
 
   return (
@@ -129,125 +103,118 @@ const UserList: React.FC<UserListProps> = ({ token }) => {
           All Users and Roles
         </h2>
 
-        {loading && <p className="text-center">Loading users...</p>}
-        {error && <p className="text-center text-red-500">Error: {error}</p>}
-
-        {!loading && !error && (
-          <>
-            {users.length === 0 ? (
-              <p className="text-center text-gray-500 dark:text-gray-400">
-                No users found.
-              </p>
-            ) : (
-              <div className="overflow-auto rounded shadow border border-gray-300 dark:border-gray-700">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-200 dark:bg-gray-800">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold">
-                        Username
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold">
-                        Email
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold">
-                        Roles
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                    {users.map((user) => (
-                      <tr
-                        key={user.id}
-                        className="hover:bg-gray-50 dark:hover:bg-gray-800"
-                      >
-                        <td className="px-6 py-4">
-                          {editingUserId === user.id ? (
-                            <input
-                              type="text"
-                              value={editData.userName || ""}
-                              onChange={(e) => handleEditChange(e, "userName")}
-                              className="border px-2 py-1 w-full rounded"
-                            />
-                          ) : (
-                            user.userName
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          {editingUserId === user.id ? (
-                            <input
-                              type="email"
-                              value={editData.email || ""}
-                              onChange={(e) => handleEditChange(e, "email")}
-                              className="border px-2 py-1 w-full rounded"
-                            />
-                          ) : (
-                            user.email
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          {editingUserId === user.id ? (
-                            <input
-                              type="text"
-                              value={
-                                typeof editData.roles === "string"
-                                  ? editData.roles
-                                  : ""
-                              }
-                              onChange={(e) => handleEditChange(e, "roles")}
-                              className="border px-2 py-1 w-full rounded"
-                              placeholder="Comma separated roles"
-                            />
-                          ) : (
-                            user.roles.join(", ")
-                          )}
-                        </td>
-                        <td className="px-6 py-4 space-x-2 flex items-center">
-                          {editingUserId === user.id ? (
-                            <>
-                              <button
-                                onClick={saveEdit}
-                                className="text-green-600 hover:text-green-800"
-                                aria-label="Save"
-                              >
-                                <Save size={18} />
-                              </button>
-                              <button
-                                onClick={cancelEdit}
-                                className="text-gray-500 hover:text-gray-700"
-                                aria-label="Cancel"
-                              >
-                                <X size={18} />
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                onClick={() => startEdit(user)}
-                                className="text-blue-600 hover:text-blue-800"
-                                aria-label="Edit"
-                              >
-                                <Pencil size={18} />
-                              </button>
-                              <button
-                                onClick={() => handleDelete(user.id)}
-                                className="text-red-600 hover:text-red-800"
-                                aria-label="Delete"
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </>
+        {users.length === 0 ? (
+          <p className="text-center text-gray-500 dark:text-gray-400">
+            No users found.
+          </p>
+        ) : (
+          <div className="overflow-auto rounded shadow border border-gray-300 dark:border-gray-700">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-200 dark:bg-gray-800">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">
+                    Username
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">
+                    Email
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">
+                    Roles
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                {users.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    <td className="px-6 py-4">
+                      {editingUserId === user.id ? (
+                        <input
+                          type="text"
+                          value={editData.userName || ""}
+                          onChange={(e) => handleEditChange(e, "userName")}
+                          className="border px-2 py-1 w-full rounded"
+                        />
+                      ) : (
+                        user.userName
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {editingUserId === user.id ? (
+                        <input
+                          type="email"
+                          value={editData.email || ""}
+                          onChange={(e) => handleEditChange(e, "email")}
+                          className="border px-2 py-1 w-full rounded"
+                        />
+                      ) : (
+                        user.email
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {editingUserId === user.id ? (
+                        <input
+                          type="text"
+                          value={
+                            typeof editData.roles === "string"
+                              ? editData.roles
+                              : ""
+                          }
+                          onChange={(e) => handleEditChange(e, "roles")}
+                          className="border px-2 py-1 w-full rounded"
+                          placeholder="Comma separated roles"
+                        />
+                      ) : (
+                        user.roles.join(", ")
+                      )}
+                    </td>
+                    <td className="px-6 py-4 space-x-2 flex items-center">
+                      {editingUserId === user.id ? (
+                        <>
+                          <button
+                            onClick={saveEdit}
+                            className="text-green-600 hover:text-green-800"
+                            aria-label="Save"
+                          >
+                            <Save size={18} />
+                          </button>
+                          <button
+                            onClick={cancelEdit}
+                            className="text-gray-500 hover:text-gray-700"
+                            aria-label="Cancel"
+                          >
+                            <X size={18} />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => startEdit(user)}
+                            className="text-blue-600 hover:text-blue-800"
+                            aria-label="Edit"
+                          >
+                            <Pencil size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(user.id)}
+                            className="text-red-600 hover:text-red-800"
+                            aria-label="Delete"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

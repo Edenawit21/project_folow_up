@@ -11,7 +11,7 @@ import {
   ChevronRight,
   Key,
   UserPlus,
-  Users
+  Users,
 } from "lucide-react";
 
 import Image from "next/image";
@@ -49,23 +49,23 @@ const Sidebar = () => {
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2">
-            <SidebarLink
+            {/* <SidebarLink
               icon={UserPlus}
               label="AddUsers"
               href="/users/add_user"
-            />
+            /> */}
             <SidebarLink
               icon={Users}
-              label="UserList"
+              label="Users"
               href="/users/user_list"
             />
 
             <SidebarLink icon={Briefcase} label="Projects" href="/projects" />
-            <SidebarLink icon={Key} label="Roles" href="/roles" />
+            <SidebarLink icon={Key} label="Roles" href="/roles/role_list" />
             <SidebarLink
               icon={ShieldCheck}
               label="Privileges"
-              href="/privileges"
+              href="/privileges/privilege_list"
             />
           </nav>
         </div>

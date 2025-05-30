@@ -22,14 +22,14 @@ const Role: React.FC<RoleProps> = ({ roles }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 overflow-auto rounded shadow border border-gray-300 dark:border-gray-700">
+    <div className="max-w-4xl mx-auto mt-28 overflow-auto rounded shadow border border-gray-300 dark:border-gray-700">
       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead className="bg-gray-200 dark:bg-gray-800">
           <tr>
-            <th className="px-6 py-3 text-left text-sm font-semibold">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
               Role Name
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
               Description
             </th>
           </tr>
@@ -40,8 +40,12 @@ const Role: React.FC<RoleProps> = ({ roles }) => {
               key={role.id}
               className="hover:bg-gray-50 dark:hover:bg-gray-800"
             >
-              <td className="px-6 py-4">{role.name}</td>
-              <td className="px-6 py-4">{role.description || "-"}</td>
+              <td className="px-6 py-4 text-gray-900 dark:text-gray-100">
+                {role.name}
+              </td>
+              <td className="px-6 py-4 text-gray-700 dark:text-gray-300">
+                {role.description || "-"}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -50,4 +54,14 @@ const Role: React.FC<RoleProps> = ({ roles }) => {
   );
 };
 
-export default Role;
+const DemoRoleList = () => {
+  const demoRoles: Role[] = [
+    { id: "1", name: "Admin", description: "Has full system access" },
+    { id: "2", name: "Editor", description: "Can edit content" },
+    { id: "3", name: "Viewer", description: "Can view content only" },
+  ];
+
+  return <Role roles={demoRoles} />;
+};
+
+export default DemoRoleList;
