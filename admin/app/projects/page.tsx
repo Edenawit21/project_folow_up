@@ -6,6 +6,7 @@ import ProjectFilter from "@/components/ProjectFilter";
 import ProjectTable from "@/components/ProjectTable";
 import { initialProjects } from "@/constants";
 import CreateProjectModal from "@/components/CreateProjectModal";
+import { Plus } from "lucide-react";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -69,13 +70,14 @@ export default function ProjectsPage() {
         </div>
 
         <button
-          className="bg-lime-600 hover:bg-lime-700 text-white px-4 py-2 rounded-lg shadow transition"
+          className="absolute top-20 right-4 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-sm transition shadow-md"
           onClick={() => {
             setEditingProject(undefined);
             setShowModal(true);
           }}
         >
-          + Create Project
+          <Plus size={12} />
+          Create Project
         </button>
       </div>
 

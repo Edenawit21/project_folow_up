@@ -22,7 +22,7 @@ export default function RolesPage() {
         Create Role
       </button>
 
-      <RoleList roles={[]} />
+      <RoleList />
     </div>
   );
 }
