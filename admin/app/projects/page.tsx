@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { Project } from "@/types";
-import ProjectFilter from "@/components/ProjectFilter";
-import ProjectTable from "@/components/ProjectTable";
+import ProjectFilter from "../../../admin/components/ProjectFilter";
+import ProjectTable from "../../../admin/components/ProjectTable";
 import { initialProjects } from "@/constants";
 import CreateProjectModal from "@/components/CreateProjectModal";
 
@@ -13,7 +13,9 @@ export default function ProjectsPage() {
     riskLevel: "",
   });
 
-  const [view, setView] = useState<"table" | "board" | "timeline" | "graph">("table");
+  const [view, setView] = useState<"table" | "board" | "timeline" | "graph">(
+    "table"
+  );
   const [showModal, setShowModal] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | undefined>();
 
@@ -26,7 +28,9 @@ export default function ProjectsPage() {
     if (editingProject) {
       setProjects((prev) =>
         prev.map((proj) =>
-          proj.projectKey === editingProject.projectKey ? { ...proj, ...data } : proj
+          proj.projectKey === editingProject.projectKey
+            ? { ...proj, ...data }
+            : proj
         )
       );
     } else {
@@ -51,7 +55,7 @@ export default function ProjectsPage() {
 
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
-       console.log("Filtering:", project.riskLevel, filters.riskLevel);
+      console.log("Filtering:", project.riskLevel, filters.riskLevel);
       return (
         filters.riskLevel === "" || project.riskLevel === filters.riskLevel
       );

@@ -1,4 +1,4 @@
-import ProjectDetail from "@/components/ProjectsDetails";
+import ProjectDetail from "../../../../admin/components/ProjectsDetails";
 import { fetchProjectTasks, FetchSingleProject } from "@/utils/Jira";
 import { notFound } from "next/navigation";
 
