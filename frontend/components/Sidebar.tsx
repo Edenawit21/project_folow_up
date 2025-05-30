@@ -51,7 +51,11 @@ const Sidebar = () => {
 
           {/* Navigation */}
           <nav className="flex-1 px-2 py-4 space-y-1">
-            <SidebarLink icon={LayoutDashboard} label="Dashboard" href="/" />
+            <SidebarLink 
+              icon={LayoutDashboard} 
+              label="Dashboard" 
+              href="/" 
+            />
             <SidebarLink
               icon={FolderKanban}
               label="Projects"
