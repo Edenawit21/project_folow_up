@@ -21,7 +21,7 @@ const AddRole = () => {
   };
 
   return (
-    <div className="w-[500px] ml-64 mt-10 p-6 bg-white dark:bg-gray-900 shadow-md rounded-lg">
+    <div className="w-[500px] ml-64 mt-10 p-6 bg-white dark:bg-gray-900 shadow-sm rounded-sm border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">
           Add Role
