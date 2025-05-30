@@ -67,23 +67,10 @@ export default function ProjectDashboard({
   }));
 
   return (
-    <div
-      className="p-4"
-      style={{
-        backgroundColor: "var(--background)",
-        color: "var(--text)",
-      }}
-    >
-      {/* --- TABLE VIEW --- */}
+    <div className="p-4 bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
       {viewMode === "table" && (
-        <table
-          className="w-full border-collapse"
-          style={{ borderColor: "var(--border)" }}
-        >
-          <thead
-            style={{ backgroundColor: "var(--border)" }}
-            className="select-none"
-          >
+        <table className="w-full border-collapse border border-gray-300 dark:border-gray-700">
+          <thead className="bg-gray-100 dark:bg-gray-800">
             <tr>
               {[
                 "Key",
@@ -99,8 +86,7 @@ export default function ProjectDashboard({
               ].map((header) => (
                 <th
                   key={header}
-                  className="border p-2 font-medium"
-                  style={{ borderColor: "var(--border)" }}
+                  className="border p-2 font-medium border-gray-300 dark:border-gray-700"
                 >
                   {header}
                 </th>
@@ -111,39 +97,36 @@ export default function ProjectDashboard({
             {filteredProjects.map((p) => (
               <tr
                 key={p.projectKey}
-                className="hover:bg-[var(--border)] transition-colors duration-150"
+                className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150"
               >
-                <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+                <td className="border p-2 border-gray-300 dark:border-gray-700">
                   {p.projectKey}
                 </td>
-                <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+                <td className="border p-2 border-gray-300 dark:border-gray-700">
                   {p.projectName}
                 </td>
-                <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+                <td className="border p-2 border-gray-300 dark:border-gray-700">
                   {p.projectManager}
                 </td>
-                <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+                <td className="border p-2 border-gray-300 dark:border-gray-700">
                   {p.riskLevel || "Unknown"}
                 </td>
-                <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+                <td className="border p-2 border-gray-300 dark:border-gray-700">
                   {p.issuesDone}
                 </td>
-                <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+                <td className="border p-2 border-gray-300 dark:border-gray-700">
                   {p.issuesInProgress}
                 </td>
-                <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+                <td className="border p-2 border-gray-300 dark:border-gray-700">
                   {p.totalIssues}
                 </td>
-                <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+                <td className="border p-2 border-gray-300 dark:border-gray-700">
                   {p.storyPointsDone}
                 </td>
-                <td className="border p-2" style={{ borderColor: "var(--border)" }}>
+                <td className="border p-2 border-gray-300 dark:border-gray-700">
                   {moment(p.lastSyncedAt).format("YYYY-MM-DD")}
                 </td>
-                <td
-                  className="border p-2 text-center relative"
-                  style={{ borderColor: "var(--border)" }}
-                >
+                <td className="border p-2 text-center border-gray-300 dark:border-gray-700">
                   <ActionMenu
                     onEdit={() => onEdit(p)}
                     onDelete={() => onDelete(p.projectKey)}
@@ -155,16 +138,14 @@ export default function ProjectDashboard({
         </table>
       )}
 
-      {/* --- BOARD VIEW --- */}
       {viewMode === "board" && (
         <div className="flex gap-6">
           {boardGroups.map((risk) => (
             <div
               key={risk}
-              className="flex-1 rounded p-4"
-              style={{ backgroundColor: "var(--border)" }}
+              className="flex-1 rounded p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
             >
-              <h3 className="font-semibold mb-3" style={{ color: "var(--text)" }}>
+              <h3 className="font-semibold mb-3 text-gray-900 dark:text-white">
                 {risk.toUpperCase()}
               </h3>
               {filteredProjects
@@ -172,16 +153,16 @@ export default function ProjectDashboard({
                 .map((p) => (
                   <div
                     key={p.projectKey}
-                    className="rounded shadow-sm p-3 mb-3"
-                    style={{
-                      backgroundColor: "var(--background)",
-                      color: "var(--text)",
-                    }}
+                    className="rounded shadow-sm p-3 mb-3 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white"
                   >
                     <strong>{p.projectName}</strong>
                     <div>Manager: {p.projectManager}</div>
-                    <div>Issues: {p.issuesDone}/{p.totalIssues}</div>
-                    <div>Story Points: {p.storyPointsDone}/{p.totalStoryPoint}</div>
+                    <div>
+                      Issues: {p.issuesDone}/{p.totalIssues}
+                    </div>
+                    <div>
+                      Story Points: {p.storyPointsDone}/{p.totalStoryPoint}
+                    </div>
                   </div>
                 ))}
             </div>
@@ -189,19 +170,16 @@ export default function ProjectDashboard({
         </div>
       )}
 
-      {/* --- TIMELINE VIEW --- */}
       {viewMode === "timeline" && (
         <div>
-          <p style={{ color: "var(--muted)" }}>
-            * Timeline view demo. For a full timeline, use a timeline library
-            like react-calendar-timeline or similar.
+          <p className="text-gray-500 dark:text-gray-400">
+            * Timeline view demo. For a full timeline, use a timeline library.
           </p>
           <ul className="mt-3 space-y-2">
             {timelineData.map((item) => (
               <li
                 key={item.id}
-                className="border rounded p-2"
-                style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                className="border rounded p-2 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
               >
                 <strong>{item.title}</strong> - Manager: {item.group}
                 <br />
@@ -213,15 +191,10 @@ export default function ProjectDashboard({
         </div>
       )}
 
-      {/* --- GRAPH VIEW --- */}
       {viewMode === "graph" && (
         <div className="space-y-10">
-          {/* Issues Status Bar Chart */}
-          <div style={{ width: "100%", height: 300 }}>
-            <h3
-              className="mb-3 font-semibold text-lg"
-              style={{ color: "var(--text)" }}
-            >
+          <div className="w-full h-[300px]">
+            <h3 className="mb-3 font-semibold text-lg text-gray-900 dark:text-white">
               Issues Status Bar Chart
             </h3>
             <ResponsiveContainer>
@@ -231,29 +204,31 @@ export default function ProjectDashboard({
                   angle={-45}
                   textAnchor="end"
                   interval={0}
-                  stroke="var(--text)"
+                  stroke="currentColor"
                 />
-                <YAxis stroke="var(--text)" />
+                <YAxis stroke="currentColor" />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: "var(--background)",
-                    color: "var(--text)",
-                  }}
+                  contentStyle={{ backgroundColor: "black", color: "white" }}
+                  wrapperStyle={{ border: "none" }}
                 />
-                <Legend wrapperStyle={{ color: "var(--text)" }} />
+                <Legend className="text-gray-900 dark:text-white" />
                 <Bar dataKey="issuesDone" fill="#82ca9d" name="Done" />
-                <Bar dataKey="issuesInProgress" fill="#8884d8" name="In Progress" />
-                <Bar dataKey="issuesRemaining" fill="#ffc658" name="Remaining" />
+                <Bar
+                  dataKey="issuesInProgress"
+                  fill="#8884d8"
+                  name="In Progress"
+                />
+                <Bar
+                  dataKey="issuesRemaining"
+                  fill="#ffc658"
+                  name="Remaining"
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Risk Distribution Pie Chart */}
-          <div style={{ width: "100%", height: 300 }}>
-            <h3
-              className="mb-3 font-semibold text-lg"
-              style={{ color: "var(--text)" }}
-            >
+          <div className="w-full h-[300px]">
+            <h3 className="mb-3 font-semibold text-lg text-gray-900 dark:text-white">
               Risk Level Distribution
             </h3>
             <ResponsiveContainer>
@@ -275,10 +250,8 @@ export default function ProjectDashboard({
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: "var(--background)",
-                    color: "var(--text)",
-                  }}
+                  contentStyle={{ backgroundColor: "black", color: "white" }}
+                  wrapperStyle={{ border: "none" }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -289,7 +262,6 @@ export default function ProjectDashboard({
   );
 }
 
-// Action menu component
 function ActionMenu({
   onEdit,
   onDelete,
@@ -303,7 +275,7 @@ function ActionMenu({
     <div className="relative inline-block text-left">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="p-1 rounded hover:bg-[var(--muted)]"
+        className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
         aria-label="Actions menu"
       >
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -312,13 +284,13 @@ function ActionMenu({
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-[var(--background)] ring-1 ring-white ring-opacity-5 z-10">
+        <div className="absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
           <button
             onClick={() => {
               onEdit();
               setOpen(false);
             }}
-            className="block w-full px-4 py-2 text-left hover:bg-[var(--muted)]"
+            className="block w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
           >
             Edit
           </button>
@@ -327,7 +299,7 @@ function ActionMenu({
               onDelete();
               setOpen(false);
             }}
-            className="block w-full px-4 py-2 text-left hover:bg-[var(--muted)] text-red-500"
+            className="block w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
           >
             Delete
           </button>
