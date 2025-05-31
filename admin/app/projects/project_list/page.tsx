@@ -1,52 +1,25 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Project } from "@/types";
 import ProjectFilter from "@/components/ProjectFilter";
 import ProjectTable from "@/components/ProjectTable";
 import { initialProjects } from "@/constants";
-import CreateProjectModal from "@/components/CreateProjectModal";
 import { Plus } from "lucide-react";
 
 export default function ProjectsPage() {
+  const router = useRouter();
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [filters, setFilters] = useState({ riskLevel: "" });
-
   const [view, setView] = useState<"table" | "board" | "timeline" | "graph">(
     "table"
   );
-  const [showModal, setShowModal] = useState(false);
-  const [editingProject, setEditingProject] = useState<Project | undefined>();
 
   useEffect(() => {
     setProjects(initialProjects);
   }, []);
-
-  const handleCreateOrUpdate = (data: any) => {
-    if (editingProject) {
-      setProjects((prev) =>
-        prev.map((proj) =>
-          proj.projectKey === editingProject.projectKey
-            ? { ...proj, ...data }
-            : proj
-        )
-      );
-    } else {
-      const newProject = {
-        ...data,
-        projectKey: `PRJ-${Date.now()}`,
-      };
-      setProjects((prev) => [...prev, newProject]);
-    }
-
-    setEditingProject(undefined);
-    setShowModal(false);
-  };
-
-  const handleEdit = (project: Project) => {
-    setEditingProject(project);
-    setShowModal(true);
-  };
 
   const handleDelete = (projectKey: string) => {
     setProjects((prev) => prev.filter((p) => p.projectKey !== projectKey));
@@ -71,10 +44,7 @@ export default function ProjectsPage() {
 
         <button
           className="absolute top-20 right-4 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-sm transition shadow-md"
-          onClick={() => {
-            setEditingProject(undefined);
-            setShowModal(true);
-          }}
+          onClick={() => router.push("/projects/add_project")}
         >
           <Plus size={12} />
           Create Project
@@ -98,24 +68,12 @@ export default function ProjectsPage() {
         ) : (
           <ProjectTable
             projects={filteredProjects}
-            onEdit={handleEdit}
+            onEdit={() => alert("Edit removed.")}
             onDelete={handleDelete}
             viewMode={view}
           />
         )}
       </div>
-
-      {/* Modal */}
-      {showModal && (
-        <CreateProjectModal
-          onClose={() => {
-            setShowModal(false);
-            setEditingProject(undefined);
-          }}
-          onCreate={handleCreateOrUpdate}
-          project={editingProject}
-        />
-      )}
     </div>
   );
 }
