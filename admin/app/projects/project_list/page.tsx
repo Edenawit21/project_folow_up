@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Project } from "@/types";
 import ProjectFilter from "@/components/ProjectFilter";
-import ProjectTable from "@/components/ProjectTable";
+import ProjectTable from "@/components/projects/ProjectList";
 import { initialProjects } from "@/constants";
 import { Plus } from "lucide-react";
 
@@ -23,6 +23,10 @@ export default function ProjectsPage() {
 
   const handleDelete = (projectKey: string) => {
     setProjects((prev) => prev.filter((p) => p.projectKey !== projectKey));
+  };
+
+  const onCreateClick = () => {
+    router.push("/projects/add_project");
   };
 
   const filteredProjects = useMemo(() => {
@@ -44,7 +48,7 @@ export default function ProjectsPage() {
 
         <button
           className="absolute top-20 right-4 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-sm transition shadow-md"
-          onClick={() => router.push("/projects/add_project")}
+          onClick={onCreateClick}
         >
           <Plus size={12} />
           Create Project
