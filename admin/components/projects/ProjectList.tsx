@@ -3,24 +3,12 @@
 import React from "react";
 import { Project } from "@/types";
 import moment from "moment";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
 
 interface ProjectDashboardProps {
   projects?: Project[];
   onEdit: (updatedProject: Project) => void;
   onDelete: (projectKey: string) => void;
-  viewMode: "table" | "board" | "timeline" | "graph";
+  viewMode: "table" | "board";
   filters?: {
     riskLevel?: string;
   };
@@ -171,92 +159,6 @@ export default function ProjectDashboard({
                 ))}
             </div>
           ))}
-        </div>
-      )}
-
-      {viewMode === "timeline" && (
-        <div>
-          <ul className="mt-3 space-y-2">
-            {timelineData.map((item) => (
-              <li
-                key={item.id}
-                className="border rounded p-2 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
-              >
-                <strong>{item.title}</strong> - Manager: {item.group}
-                <br />
-                Start: {moment(item.start_time).format("YYYY-MM-DD")} | End:{" "}
-                {moment(item.end_time).format("YYYY-MM-DD")}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {viewMode === "graph" && (
-        <div className="space-y-10">
-          <div className="w-full h-[300px]">
-            <h3 className="mb-3 font-semibold text-lg text-gray-900 dark:text-white">
-              Issues Status Bar Chart
-            </h3>
-            <ResponsiveContainer>
-              <BarChart data={graphData} margin={{ top: 5, bottom: 30 }}>
-                <XAxis
-                  dataKey="name"
-                  angle={-45}
-                  textAnchor="end"
-                  interval={0}
-                  stroke="currentColor"
-                />
-                <YAxis stroke="currentColor" />
-                <Tooltip
-                  contentStyle={{ backgroundColor: "black", color: "white" }}
-                  wrapperStyle={{ border: "none" }}
-                />
-                <Legend className="text-gray-900 dark:text-white" />
-                <Bar dataKey="issuesDone" fill="#82ca9d" name="Done" />
-                <Bar
-                  dataKey="issuesInProgress"
-                  fill="#8884d8"
-                  name="In Progress"
-                />
-                <Bar
-                  dataKey="issuesRemaining"
-                  fill="#ffc658"
-                  name="Remaining"
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="w-full h-[300px]">
-            <h3 className="mb-3 font-semibold text-lg text-gray-900 dark:text-white">
-              Risk Level Distribution
-            </h3>
-            <ResponsiveContainer>
-              <PieChart>
-                <Pie
-                  data={riskCount}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label
-                >
-                  {riskCount.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={colors[index % colors.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ backgroundColor: "black", color: "white" }}
-                  wrapperStyle={{ border: "none" }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
         </div>
       )}
     </div>

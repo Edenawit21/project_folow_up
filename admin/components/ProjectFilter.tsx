@@ -8,8 +8,8 @@ interface ProjectFilterProps {
     riskLevel: string;
   };
   setFilters: (filters: { riskLevel: string }) => void;
-  view: "table" | "board" | "timeline" | "graph";
-  setView: (view: "table" | "board" | "timeline" | "graph") => void;
+  view: "table" | "board";
+  setView: (view: "table" | "board") => void;
 }
 
 const ProjectFilter: React.FC<ProjectFilterProps> = ({
@@ -90,15 +90,12 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
               value={view}
               onChange={(e) =>
                 setView(
-                  e.target.value as "table" | "board" | "timeline" | "graph"
-                )
+                  e.target.value as "table" | "board")
               }
               className={filterItemClasses}
             >
               <option value="table">Table</option>
               <option value="board">Board</option>
-              <option value="timeline">Timeline</option>
-              <option value="graph">Graph</option>
             </select>
 
             <button
