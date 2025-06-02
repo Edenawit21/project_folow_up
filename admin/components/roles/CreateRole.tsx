@@ -12,11 +12,10 @@ interface Privilege {
 const CreateRole: React.FC = () => {
   const [roleName, setRoleName] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedPrivilege, setSelectedPrivilege] = useState<string>("");
+  const [selectedPrivilege, setSelectedPrivilege] = useState("");
 
   const router = useRouter();
 
-  // Dummy data for privileges (since backend is removed)
   const privileges: Privilege[] = [
     { id: "1", name: "View Dashboard" },
     { id: "2", name: "Manage Users" },
@@ -36,56 +35,72 @@ const CreateRole: React.FC = () => {
       return;
     }
 
-    // Simulate success
     toast.success("Role created (simulated).");
     router.push("/roles");
   };
 
+  const handleCancel = () => {
+    router.back();
+  };
+
   return (
-    <div className="w-[500px] ml-64 mt-10 bg-gray-100 dark:bg-gray-800 p-6 rounded-[1px] shadow">
-      <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
+    <div className="w-[500px] ml-64 mt-10 bg-white dark:bg-gray-800 p-6 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md">
+      <h2 className="text-xl font-bold mb-6 text-gray-800 dark:text-white">
         Create Role
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+
+      <form onSubmit={handleSubmit} className="space-y-6 p-4">
         {/* Role Name */}
         <div>
-          <label className="block text-gray-700 dark:text-gray-300 mb-2">
+          <label
+            htmlFor="roleName"
+            className="block mb-2 text-gray-700 dark:text-gray-300 font-medium"
+          >
             Role Name
           </label>
           <input
+            id="roleName"
             type="text"
             value={roleName}
             onChange={(e) => setRoleName(e.target.value)}
-            className="w-full px-4 py-2 border rounded-[1px] bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             placeholder="Enter role name"
             required
+            className="w-full px-4 py-2 border border-gray-300 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
 
         {/* Description */}
         <div>
-          <label className="block text-gray-700 dark:text-gray-300 mb-2">
+          <label
+            htmlFor="description"
+            className="block mb-2 text-gray-700 dark:text-gray-300 font-medium"
+          >
             Description
           </label>
           <textarea
+            id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-4 py-2 border rounded-[1px] bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             placeholder="Enter description (optional)"
             rows={3}
+            className="w-full px-4 py-2 border border-gray-300 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
 
-        {/* Privilege Dropdown */}
+        {/* Privilege Select */}
         <div>
-          <label className="block text-gray-700 dark:text-gray-300 mb-2">
+          <label
+            htmlFor="privilege"
+            className="block mb-2 text-gray-700 dark:text-gray-300 font-medium"
+          >
             Assign Privilege
           </label>
           <select
+            id="privilege"
             value={selectedPrivilege}
             onChange={(e) => setSelectedPrivilege(e.target.value)}
-            className="w-full px-4 py-2 border rounded-[1px] bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer"
             required
+            className="w-full px-4 py-2 border border-gray-300 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option value="">Select privilege</option>
             {privileges.map((priv) => (
@@ -96,13 +111,22 @@ const CreateRole: React.FC = () => {
           </select>
         </div>
 
-        {/* Submit */}
-        <button
-          type="submit"
-          className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-semibold"
-        >
-          Create Role
-        </button>
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-4 pt-2">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="w-1/2 py-2 bg-gray-300 hover:bg-gray-400 text-gray-900 rounded font-semibold transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="w-1/2 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-semibold transition-colors"
+          >
+            Create Role
+          </button>
+        </div>
       </form>
     </div>
   );

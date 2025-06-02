@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import { Project } from "@/types";
+import { useRouter } from "next/navigation";
 
 interface AddProjectProps {
   onCreate: (data: Project) => void;
   onClose: () => void;
 }
 
-export default function AddProject({ onCreate, onClose }: AddProjectProps) {
+export default function AddProject({ onCreate }: AddProjectProps) {
+  const router = useRouter();
+
   const [formData, setFormData] = useState<Project>({
     projectKey: "",
     projectName: "",
@@ -50,6 +53,10 @@ export default function AddProject({ onCreate, onClose }: AddProjectProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onCreate(formData);
+  };
+
+  const handleCancel = () => {
+    router.back();
   };
 
   return (
@@ -166,18 +173,18 @@ export default function AddProject({ onCreate, onClose }: AddProjectProps) {
         </div>
       </div>
 
-      {/* Buttons */}
-      <div className="flex justify-end gap-4 pt-4">
+      {/* Action Buttons */}
+      <div className="flex justify-between gap-4 pt-2">
         <button
           type="button"
-          onClick={onClose}
-          className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
+          onClick={handleCancel}
+          className="w-1/2 px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white"
+          className="w-1/2 px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white"
         >
           Create Project
         </button>
