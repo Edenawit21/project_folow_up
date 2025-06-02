@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Router, X } from "lucide-react";
 import { Project } from "@/types";
+import { useRouter } from "next/navigation";
 
 interface AddProjectProps {
   onCreate: (data: Project) => void;
@@ -9,6 +11,8 @@ interface AddProjectProps {
 }
 
 export default function AddProject({ onCreate, onClose }: AddProjectProps) {
+  const router = useRouter();
+
   const [formData, setFormData] = useState<Project>({
     projectKey: "",
     projectName: "",
@@ -51,12 +55,26 @@ export default function AddProject({ onCreate, onClose }: AddProjectProps) {
     e.preventDefault();
     onCreate(formData);
   };
+  const handleCancel = () => {
+    router.back();
+  };
+
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-6 space-y-6 bg-white border rounded-xl shadow-md dark:bg-gray-900 dark:border-gray-700 max-w-3xl mx-auto"
+      className="relative p-6 space-y-6 bg-white border rounded-xl shadow-md dark:bg-gray-900 dark:border-gray-700 max-w-3xl mx-auto"
     >
+      {/* Close Icon */}
+      <button
+        type="button"
+        onClick={handleCancel}
+        className="absolute top-4 right-4 text-gray-600 hover:text-red-500 transition"
+        aria-label="Close form"
+      >
+        <X size={24} />
+      </button>
+
       <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
         Add New Project
       </h2>

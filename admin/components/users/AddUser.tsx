@@ -1,11 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { registerUser, assignRole } from "@/utils/auth";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {X } from "lucide-react";
 
 const AddUser = () => {
+  const router = useRouter();
+
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -40,25 +44,34 @@ const AddUser = () => {
       });
 
       toast.success("User registered and role assigned!");
-      setForm({
-        username: "",
-        email: "",
-        password: "",
-        role: "",
-      });
+      router.push("/users"); // Or any page you prefer
     } catch (error) {
       console.error("Failed to add user:", error);
       toast.error("Error registering user or assigning role.");
     }
   };
 
+  const handleCancel = () => {
+    router.back();
+  };
+
   return (
-    <div className="flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 min-h-screen border border-gray-200 dark:border-gray-700">
+    <div className="flex items-center justify-center bg-white dark:bg-gray-900 px-4 min-h-screen border border-gray-200 dark:border-gray-700">
       <form
         onSubmit={handleSubmit}
         autoComplete="off"
-        className="w-full max-w-xl p-8 bg-white dark:bg-gray-800 rounded-md shadow-lg space-y-6"
+        className="relative w-full max-w-xl p-8 bg-white dark:bg-gray-800 rounded-sm shadow-md space-y-6 border border-gray-200 dark:border-gray-700"
       >
+        {/* X Button */}
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition"
+          aria-label="Close form"
+        >
+          <X size={24} />
+        </button>
+
         {/* Username */}
         <div>
           <label className="block mb-2 font-semibold text-gray-800 dark:text-gray-300">

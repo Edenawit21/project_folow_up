@@ -1,6 +1,7 @@
 "use client";
-
 import React, { useState } from "react";
+import { useRouter } from "next/navigation"; 
+import { toast } from "react-toastify";
 
 type FormState = {
   username: string;
@@ -8,6 +9,8 @@ type FormState = {
 };
 
 const Login = () => {
+  const router = useRouter(); 
+
   const [form, setForm] = useState<FormState>({ username: "", password: "" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,8 +21,9 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Submitted form data:", form);
-    alert(`Logged in as: ${form.username}`);
-    // No backend call, no validation, just UI.
+    toast(`Logged in as: ${form.username}`);
+
+    router.push("/"); // use this to navigate
   };
 
   return (
@@ -65,8 +69,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="  w-full py-2 rounded-md bg-green-700 hover:bg-green-800 text-white font-semibold transition-colors duration-200 border border-transparent hover:border-gray-900 dark:hover:border-white focus:outline-none focus:ring-2 focus:ring-green-500
-  "
+            className="w-full py-2 rounded-sm bg-green-700 hover:bg-green-800 text-white font-semibold transition-colors duration-200 border border-transparent hover:border-gray-900 dark:hover:border-white focus:outline-none focus:ring-1 focus:ring-green-500"
           >
             Login
           </button>

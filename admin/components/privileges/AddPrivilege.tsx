@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface AddPrivilegeProps {
   onCreate: (data: { name: string; description: string }) => void;
@@ -9,6 +11,7 @@ interface AddPrivilegeProps {
 
 export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
   const [formData, setFormData] = useState({ name: "", description: "" });
+  const router = useRouter();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -21,20 +24,33 @@ export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
     e.preventDefault();
     onCreate(formData);
   };
+  const handleCancel = () => {
+    router.back();
+  };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-[500px] p-4 bg-white dark:bg-gray-800 rounded-sm shadow space-y-4 ml-64 mt-10 "
+      className="relative w-[500px] ml-64 mt-10 p-6 bg-gray-100 dark:bg-gray-800 rounded shadow space-y-5"
     >
-      <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+      {/* Close Icon */}
+      <button
+        type="button"
+        onClick={handleCancel}
+        className="absolute top-4 right-4 text-gray-600 hover:text-red-500 transition"
+        aria-label="Close form"
+      >
+        <X size={22} />
+      </button>
+
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
         Add Privilege
       </h2>
 
       <div>
         <label
           htmlFor="name"
-          className="block text-gray-700 dark:text-gray-300 mb-1"
+          className="block mb-1 text-gray-700 dark:text-gray-300"
         >
           Name
         </label>
@@ -45,7 +61,7 @@ export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
           value={formData.name}
           onChange={handleChange}
           required
-          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           placeholder="Privilege name"
         />
       </div>
@@ -53,7 +69,7 @@ export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
       <div>
         <label
           htmlFor="description"
-          className="block text-gray-700 dark:text-gray-300 mb-1"
+          className="block mb-1 text-gray-700 dark:text-gray-300"
         >
           Description
         </label>
@@ -63,22 +79,15 @@ export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
           value={formData.description}
           onChange={handleChange}
           rows={4}
-          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           placeholder="Describe the privilege"
         />
       </div>
 
-      <div className="flex justify-end gap-3">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
-        >
-          Cancel
-        </button>
+      <div className="flex justify-end">
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="w-full px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
         >
           Create Privilege
         </button>
