@@ -12,12 +12,12 @@ export interface Project {
   lastSyncedAt: string;
 
   // Optional fields (from form)
-  title?: string;                
+  title?: string;
   description?: string;
-  manager?: string;            
+  manager?: string;
   owner?: string;
   teamLeader?: string;
-  developers?: string[];      
+  developers?: string[];
   status?: "todo" | "on_progress" | "completed";
   priority?: "High" | "Medium" | "Low";
 }
@@ -28,7 +28,7 @@ export interface FormProject {
   manager: string;
   owner: string;
   teamLeader: string;
-  developers: string; 
+  developers: string;
   status: "todo" | "on_progress" | "completed";
   priority: "High" | "Medium" | "Low";
 }
@@ -55,4 +55,25 @@ export interface ProjectFilterState {
 export interface Entity {
   id: string;
   name: string;
+}
+
+export interface RoleData {
+  id: string;
+  name: string;
+  description?: string;
+  privilegeId: string;
+  privileges?: Privilege[];
+  createdAt?: string;
+  updatedAt?: string;
+  privilege?: string;
+  action?: string;
+  
+}
+
+export interface Privilege {
+  id: number;
+  privilegeName: string;
+  description: string;
+  createdAt: string;
+  action: string;
 }

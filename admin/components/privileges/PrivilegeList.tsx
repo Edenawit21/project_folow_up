@@ -57,7 +57,7 @@ const PrivilegeList: React.FC = () => {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              {["ID", "Name", "Description", "Created At", "Actions"].map(
+              {["Name", "Description", "Created At", "Actions"].map(
                 (header) => (
                   <th
                     key={header}
@@ -78,9 +78,6 @@ const PrivilegeList: React.FC = () => {
                   className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {p.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                     {p.privilegeName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
@@ -112,7 +109,7 @@ const PrivilegeList: React.FC = () => {
             ) : (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={4}
                   className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
                 >
                   No privileges found.
