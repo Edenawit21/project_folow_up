@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import {
   TypedUseSelectorHook,
@@ -88,7 +88,13 @@ export default function StoreProvider({
     storeRef.current = makeStore();
     setupListeners(storeRef.current.dispatch);
   }
+
   const persistor = persistStore(storeRef.current);
+
+  // Purge persisted state once on mount to avoid unexpected keys warning
+  useEffect(() => {
+    persistor.purge();
+  }, []);
 
   return (
     <Provider store={storeRef.current}>

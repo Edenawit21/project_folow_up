@@ -23,7 +23,7 @@ export default function PrivilegeListPage() {
           title="Create new privilege"
           className="
             flex items-center gap-2 bg-green-600 text-white px-5 py-2 rounded-[1px] shadow-md
-            hover:bg-green-700 hover:shadow-lg
+            hover:bg-green-700 
             focus:outline-none focus:ring-4 focus:ring-green-400 focus:ring-opacity-75
             transition-transform duration-200 cursor-pointer hover:scale-105
           "

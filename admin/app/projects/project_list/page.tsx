@@ -6,6 +6,8 @@ import { Project } from "@/types";
 import ProjectFilter from "@/components/ProjectFilter";
 import ProjectTable from "@/components/projects/ProjectList";
 import { initialProjects } from "@/constants";
+import PaginationFooter from "@/components/footer/PaginationFooter";
+
 import { Plus } from "lucide-react";
 
 export default function ProjectsPage() {
@@ -16,6 +18,9 @@ export default function ProjectsPage() {
   const [view, setView] = useState<"table" | "board" | "timeline" | "graph">(
     "table"
   );
+  
+  const itemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     setProjects(initialProjects);
@@ -36,6 +41,13 @@ export default function ProjectsPage() {
       );
     });
   }, [projects, filters.riskLevel]);
+
+  const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
+
+  const paginatedProjects = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredProjects.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredProjects, currentPage]);
 
   return (
     <div className="p-6 bg-white dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
@@ -70,12 +82,21 @@ export default function ProjectsPage() {
             No projects found.
           </div>
         ) : (
-          <ProjectTable
-            projects={filteredProjects}
-            onEdit={() => alert("Edit removed.")}
-            onDelete={handleDelete}
-            viewMode={view}
-          />
+          <>
+            <ProjectTable
+              projects={paginatedProjects}
+              onEdit={() => alert("Edit removed.")}
+              onDelete={handleDelete}
+              viewMode={view}
+            />
+            {totalPages > 1 && (
+              <PaginationFooter
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
+          </>
         )}
       </div>
     </div>
