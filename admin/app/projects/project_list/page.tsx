@@ -15,10 +15,8 @@ export default function ProjectsPage() {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [filters, setFilters] = useState({ riskLevel: "" });
-  const [view, setView] = useState<"table" | "board" | "timeline" | "graph">(
-    "table"
-  );
-  
+  const [view, setView] = useState<"table" | "board" >( "table");
+
   const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
