@@ -81,6 +81,7 @@ export default function ProjectDashboard({
                 "In Progress",
                 "Total Issues",
                 "Story Points Done",
+                "Total Story Point",
                 "Last Synced",
                 "Actions",
               ].map((header) => (
@@ -122,6 +123,9 @@ export default function ProjectDashboard({
                 </td>
                 <td className="border p-2 border-gray-300 dark:border-gray-700">
                   {p.storyPointsDone}
+                </td>
+                <td className="border p-2 border-gray-300 dark:border-gray-700">
+                  {p.totalStoryPoint}
                 </td>
                 <td className="border p-2 border-gray-300 dark:border-gray-700">
                   {moment(p.lastSyncedAt).format("YYYY-MM-DD")}
@@ -172,9 +176,6 @@ export default function ProjectDashboard({
 
       {viewMode === "timeline" && (
         <div>
-          <p className="text-gray-500 dark:text-gray-400">
-            * Timeline view demo. For a full timeline, use a timeline library.
-          </p>
           <ul className="mt-3 space-y-2">
             {timelineData.map((item) => (
               <li
