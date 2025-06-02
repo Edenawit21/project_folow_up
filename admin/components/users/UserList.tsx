@@ -97,10 +97,10 @@ const UserList: React.FC<UserListProps> = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white py-10 px-6">
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-10 px-6">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-2xl font-bold mb-6 text-center">
-          All Users and Roles
+          User Management
         </h2>
 
         {users.length === 0 ? (
@@ -108,7 +108,7 @@ const UserList: React.FC<UserListProps> = () => {
             No users found.
           </p>
         ) : (
-          <div className="overflow-auto rounded shadow border border-gray-300 dark:border-gray-700">
+          <div className="overflow-auto rounded-sm shadow border border-gray-300 dark:border-gray-700">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-200 dark:bg-gray-800">
                 <tr>

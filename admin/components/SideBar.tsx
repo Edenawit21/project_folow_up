@@ -49,12 +49,13 @@ const Sidebar = () => {
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2">
-            <SidebarLink icon={Users} label="Users" href="/users/user_list" />
             <SidebarLink
               icon={Briefcase}
               label="Projects"
               href="/projects/project_list"
             />
+            <SidebarLink icon={Users} label="Users" href="/users/user_list" />
+
             <SidebarLink icon={Key} label="Roles" href="/roles/role_list" />
             <SidebarLink
               icon={ShieldCheck}

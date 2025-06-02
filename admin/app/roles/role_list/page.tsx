@@ -16,7 +16,7 @@ export default function RolesPage() {
     <div className="relative p-4">
       <button
         onClick={handleCreateRole}
-        className="absolute top-4 right-4 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-sm transition shadow-md"
+        className="absolute top-4 right-4 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-2 rounded-sm transition shadow-md"
       >
         <Plus size={18} />
         Create Role
