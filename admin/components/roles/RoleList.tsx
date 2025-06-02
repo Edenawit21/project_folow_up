@@ -22,6 +22,14 @@ const Role: React.FC<RoleProps> = ({ roles }) => {
     );
   }
 
+  const startEdit = (role: Role) => {
+    alert(`Edit role: ${role.name}`);
+  };
+
+  const handleDelete = (id: string) => {
+    alert(`Delete role with ID: ${id}`);
+  };
+
   return (
     <div className="max-w-4xl mx-auto mt-20 px-4">
       <h1 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-gray-100">
@@ -57,18 +65,16 @@ const Role: React.FC<RoleProps> = ({ roles }) => {
                 <td className="px-6 py-4 text-right">
                   <div className="inline-flex gap-2">
                     <button
-                      type="button"
-                      className="p-2 rounded bg-blue-600 hover:bg-blue-700 text-white transition"
+                      onClick={() => startEdit(role)}
+                      className="text-blue-600 hover:text-blue-800"
                       aria-label={`Edit role ${role.name}`}
-                      // Add your edit handler here
                     >
                       <Edit2 size={18} />
                     </button>
                     <button
-                      type="button"
-                      className="p-2 rounded bg-red-600 hover:bg-red-700 text-white transition"
+                      onClick={() => handleDelete(role.id)}
+                      className="text-red-600 hover:text-red-800"
                       aria-label={`Delete role ${role.name}`}
-                      // Add your delete handler here
                     >
                       <Trash2 size={18} />
                     </button>

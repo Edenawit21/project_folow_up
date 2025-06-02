@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Trash2, Edit2 } from "lucide-react";
 
 interface Privilege {
@@ -14,7 +13,6 @@ interface Privilege {
 
 const PrivilegeList: React.FC = () => {
   const [privileges, setPrivileges] = useState<Privilege[]>([]);
-  const router = useRouter();
 
   useEffect(() => {
     // TODO: Replace with actual API call
@@ -36,6 +34,14 @@ const PrivilegeList: React.FC = () => {
     ];
     setPrivileges(mockData);
   }, []);
+
+  const startEdit = (privilege: Privilege) => {
+    alert(`Edit privilege: ${privilege.privilegeName}`);
+  };
+
+  const handleDelete = (id: number) => {
+    alert(`Delete privilege with ID: ${id}`);
+  };
 
   return (
     <div className="max-w-5xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
@@ -84,16 +90,18 @@ const PrivilegeList: React.FC = () => {
                     {new Date(p.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 justify-end">
                       <button
-                        className="inline-flex items-center justify-center rounded-md bg-blue-600 p-2 hover:bg-blue-700 text-white transition"
-                        aria-label="Edit privilege"
+                        onClick={() => startEdit(p)}
+                        className="text-blue-600 hover:text-blue-800"
+                        aria-label={`Edit privilege ${p.privilegeName}`}
                       >
                         <Edit2 size={18} />
                       </button>
                       <button
-                        className="inline-flex items-center justify-center rounded-md bg-red-600 p-2 hover:bg-red-700 text-white transition"
-                        aria-label="Delete privilege"
+                        onClick={() => handleDelete(p.id)}
+                        className="text-red-600 hover:text-red-800"
+                        aria-label={`Delete privilege ${p.privilegeName}`}
                       >
                         <Trash2 size={18} />
                       </button>

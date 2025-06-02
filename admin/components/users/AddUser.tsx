@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { registerUser, assignRole } from "@/utils/auth";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {X } from "lucide-react";
 
 const AddUser = () => {
   const router = useRouter();
@@ -44,7 +43,7 @@ const AddUser = () => {
       });
 
       toast.success("User registered and role assigned!");
-      router.push("/users"); // Or any page you prefer
+      router.push("/users");
     } catch (error) {
       console.error("Failed to add user:", error);
       toast.error("Error registering user or assigning role.");
@@ -56,21 +55,15 @@ const AddUser = () => {
   };
 
   return (
-    <div className="flex items-center justify-center bg-white dark:bg-gray-900 px-4 min-h-screen border border-gray-200 dark:border-gray-700">
+    <div className="flex items-center justify-center bg-white dark:bg-gray-900 px-4 min-h-screen">
       <form
         onSubmit={handleSubmit}
         autoComplete="off"
-        className="relative w-full max-w-xl p-8 bg-white dark:bg-gray-800 rounded-sm shadow-md space-y-6 border border-gray-200 dark:border-gray-700"
+        className="w-full max-w-xl p-8 bg-white dark:bg-gray-800 rounded-sm shadow-2xl space-y-6 border border-gray-200 dark:border-gray-700"
       >
-        {/* X Button */}
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition"
-          aria-label="Close form"
-        >
-          <X size={24} />
-        </button>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          Register New User
+        </h2>
 
         {/* Username */}
         <div>
@@ -126,7 +119,7 @@ const AddUser = () => {
             name="role"
             value={form.role}
             onChange={handleChange}
-            className="w-full px-4 py-3 rounded-[1px] border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
+            className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
           >
             <option value="" disabled>
               Select a role
@@ -139,13 +132,22 @@ const AddUser = () => {
           </select>
         </div>
 
-        {/* Submit */}
-        <button
-          type="submit"
-          className="w-full py-3 rounded bg-green-600 hover:bg-green-700 text-white font-bold text-lg transition-colors duration-300"
-        >
-          Register User
-        </button>
+        {/* Buttons */}
+        <div className="flex justify-between gap-4 pt-4">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="w-1/2 py-3 rounded bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold transition-colors duration-300"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="w-1/2 py-3 rounded bg-green-600 hover:bg-green-700 text-white font-semibold transition-colors duration-300"
+          >
+            Register User
+          </button>
+        </div>
       </form>
     </div>
   );

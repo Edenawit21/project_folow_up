@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface AddPrivilegeProps {
@@ -24,25 +23,16 @@ export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
     e.preventDefault();
     onCreate(formData);
   };
+
   const handleCancel = () => {
-    router.back();
+    router.back(); // or onClose() if passed from parent
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative w-[500px] ml-64 mt-10 p-6 bg-gray-100 dark:bg-gray-800 rounded shadow space-y-5"
+      className="relative w-[500px] ml-64 mt-10 p-6 bg-gray-50 dark:bg-gray-800 rounded-sm shadow-2xl space-y-5 border border-gray-200 dark:border-gray-700"
     >
-      {/* Close Icon */}
-      <button
-        type="button"
-        onClick={handleCancel}
-        className="absolute top-4 right-4 text-gray-600 hover:text-red-500 transition"
-        aria-label="Close form"
-      >
-        <X size={22} />
-      </button>
-
       <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
         Add Privilege
       </h2>
@@ -84,10 +74,18 @@ export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
         />
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between gap-3">
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="w-1/2 px-5 py-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-900 dark:text-white rounded transition"
+        >
+          Cancel
+        </button>
+
         <button
           type="submit"
-          className="w-full px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
+          className="w-1/2 px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
         >
           Create Privilege
         </button>

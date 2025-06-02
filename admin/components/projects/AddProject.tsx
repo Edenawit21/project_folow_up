@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Router, X } from "lucide-react";
 import { Project } from "@/types";
 import { useRouter } from "next/navigation";
 
@@ -10,7 +9,7 @@ interface AddProjectProps {
   onClose: () => void;
 }
 
-export default function AddProject({ onCreate, onClose }: AddProjectProps) {
+export default function AddProject({ onCreate }: AddProjectProps) {
   const router = useRouter();
 
   const [formData, setFormData] = useState<Project>({
@@ -55,26 +54,16 @@ export default function AddProject({ onCreate, onClose }: AddProjectProps) {
     e.preventDefault();
     onCreate(formData);
   };
+
   const handleCancel = () => {
     router.back();
   };
 
-
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative p-6 space-y-6 bg-white border rounded-xl shadow-md dark:bg-gray-900 dark:border-gray-700 max-w-3xl mx-auto"
+      className="p-6 space-y-6 bg-white border rounded-xl shadow-md dark:bg-gray-900 dark:border-gray-700 max-w-3xl mx-auto"
     >
-      {/* Close Icon */}
-      <button
-        type="button"
-        onClick={handleCancel}
-        className="absolute top-4 right-4 text-gray-600 hover:text-red-500 transition"
-        aria-label="Close form"
-      >
-        <X size={24} />
-      </button>
-
       <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
         Add New Project
       </h2>
@@ -184,18 +173,18 @@ export default function AddProject({ onCreate, onClose }: AddProjectProps) {
         </div>
       </div>
 
-      {/* Buttons */}
-      <div className="flex justify-end gap-4 pt-4">
+      {/* Action Buttons */}
+      <div className="flex justify-between gap-4 pt-2">
         <button
           type="button"
-          onClick={onClose}
-          className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
+          onClick={handleCancel}
+          className="w-1/2 px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white"
+          className="w-1/2 px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white"
         >
           Create Project
         </button>

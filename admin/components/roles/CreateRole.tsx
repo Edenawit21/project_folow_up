@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { X } from "lucide-react";
 
 interface Privilege {
   id: string;
@@ -45,27 +44,17 @@ const CreateRole: React.FC = () => {
   };
 
   return (
-    <div className="relative w-[500px] ml-64 mt-10 bg-white dark:bg-gray-800 p-6 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md ">
-      {/* Close Button */}
-      <button
-        type="button"
-        onClick={handleCancel}
-        aria-label="Close form"
-        className="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition-colors"
-      >
-        <X size={24} />
-      </button>
-
+    <div className="w-[500px] ml-64 mt-10 bg-white dark:bg-gray-800 p-6 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md">
       <h2 className="text-xl font-bold mb-6 text-gray-800 dark:text-white">
         Create Role
       </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6 p-4 ">
+      <form onSubmit={handleSubmit} className="space-y-6 p-4">
         {/* Role Name */}
         <div>
           <label
             htmlFor="roleName"
-            className="block mb-2 text-gray-700 dark:text-gray-300 font-medium "
+            className="block mb-2 text-gray-700 dark:text-gray-300 font-medium"
           >
             Role Name
           </label>
@@ -122,13 +111,22 @@ const CreateRole: React.FC = () => {
           </select>
         </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded font-semibold transition-colors"
-        >
-          Create Role
-        </button>
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-4 pt-2">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="w-1/2 py-2 bg-gray-300 hover:bg-gray-400 text-gray-900 rounded font-semibold transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="w-1/2 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-semibold transition-colors"
+          >
+            Create Role
+          </button>
+        </div>
       </form>
     </div>
   );
