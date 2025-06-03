@@ -4,15 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { UserForm } from "@/types";
 import { registerUser, updateUser } from "@/utils/userApi";
-
-interface UserForm {
-  username: string;
-  email: string;
-  password: string;
-  role: string;
-}
 
 interface AddUserProps {
   userId?: string; // If editing an existing user
@@ -23,10 +16,10 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
   const router = useRouter();
 
   const [form, setForm] = useState<UserForm>({
-    username: "",
+    userName: "",
     email: "",
     password: "",
-    role: "",
+    roles: [""],
     ...initialData,
   });
 
@@ -53,10 +46,10 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
     e.preventDefault();
 
     if (
-      !form.username ||
+      !form.userName ||
       !form.email ||
       (!form.password && !isEditMode) ||
-      !form.role
+      !form.roles
     ) {
       toast.warn("Please fill in all required fields.");
       return;
@@ -67,7 +60,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
         // Prepare data for update - exclude empty password to keep current
         const updateData: Partial<UserForm> = {
           email: form.email,
-          role: form.role,
+          roles: form.roles,
         };
         if (form.password) {
           updateData.password = form.password;
@@ -109,7 +102,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
           <input
             type="text"
             name="username"
-            value={form.username}
+            value={form.userName}
             onChange={handleChange}
             placeholder="Enter username"
             className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
@@ -157,13 +150,13 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
           </label>
           <select
             name="role"
-            value={form.role}
+            value={form.roles}
             onChange={handleChange}
             className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
             required
           >
             <option value="" disabled>
-              Select a role
+              Select a roles
             </option>
             <option value="Admin">Admin</option>
             <option value="Director">Director</option>
