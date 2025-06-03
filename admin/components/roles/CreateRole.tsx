@@ -1,8 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
+import { RoleData } from "@/types";
+import {
+  fetchRoleById,
+  createRole,
+  updateRole,
+  fetchPrivileges,
+} from "@/utils/roleApi";
 
 interface Privilege {
   id: string;
@@ -13,16 +20,49 @@ const CreateRole: React.FC = () => {
   const [roleName, setRoleName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedPrivilege, setSelectedPrivilege] = useState("");
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [privileges, setPrivileges] = useState<Privilege[]>([]);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const privileges: Privilege[] = [
-    { id: "1", name: "View Dashboard" },
-    { id: "2", name: "Manage Users" },
-    { id: "3", name: "Edit Roles" },
-  ];
+  const roleId = searchParams.get("id");
+  const isEdit = searchParams.get("edit");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const loadPrivileges = async () => {
+      try {
+        const data = await fetchPrivileges();
+        setPrivileges(data);
+      } catch {
+        toast.error("Failed to load privileges.");
+      }
+    };
+
+    loadPrivileges();
+  }, []);
+
+  useEffect(() => {
+    if (isEdit && roleId) {
+      setIsEditMode(true);
+
+      const loadRole = async () => {
+        try {
+          const role = await fetchRoleById(roleId);
+          setRoleName(role.name);
+          setDescription(role.description || "");
+          setSelectedPrivilege(role.privilegeId);
+        } catch {
+          toast.error("Failed to load role.");
+          router.push("/roles/role_list");
+        }
+      };
+
+      loadRole();
+    }
+  }, [isEdit, roleId, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!roleName.trim()) {
@@ -35,8 +75,25 @@ const CreateRole: React.FC = () => {
       return;
     }
 
-    toast.success("Role created (simulated).");
-    router.push("/roles");
+    const payload = {
+      name: roleName,
+      description,
+      privilegeId: selectedPrivilege,
+    };
+
+    try {
+      if (isEditMode && roleId) {
+        await updateRole(roleId, payload);
+        toast.success("Role updated.");
+      } else {
+        await createRole(payload);
+        toast.success("Role created.");
+      }
+
+      router.push("/roles/role_list");
+    } catch {
+      toast.error("Failed to save role.");
+    }
   };
 
   const handleCancel = () => {
@@ -46,11 +103,10 @@ const CreateRole: React.FC = () => {
   return (
     <div className="w-[500px] ml-64 mt-10 bg-white dark:bg-gray-800 p-6 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md">
       <h2 className="text-xl font-bold mb-6 text-gray-800 dark:text-white">
-        Create Role
+        {isEditMode ? "Edit Role" : "Create Role"}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6 p-4">
-        {/* Role Name */}
         <div>
           <label
             htmlFor="roleName"
@@ -63,13 +119,12 @@ const CreateRole: React.FC = () => {
             type="text"
             value={roleName}
             onChange={(e) => setRoleName(e.target.value)}
-            placeholder="Enter role name"
             required
+            placeholder="Enter role name"
             className="w-full px-4 py-2 border border-gray-300 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
 
-        {/* Description */}
         <div>
           <label
             htmlFor="description"
@@ -87,7 +142,6 @@ const CreateRole: React.FC = () => {
           />
         </div>
 
-        {/* Privilege Select */}
         <div>
           <label
             htmlFor="privilege"
@@ -100,7 +154,7 @@ const CreateRole: React.FC = () => {
             value={selectedPrivilege}
             onChange={(e) => setSelectedPrivilege(e.target.value)}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option value="">Select privilege</option>
             {privileges.map((priv) => (
@@ -111,7 +165,6 @@ const CreateRole: React.FC = () => {
           </select>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex justify-end gap-4 pt-2">
           <button
             type="button"
@@ -124,7 +177,7 @@ const CreateRole: React.FC = () => {
             type="submit"
             className="w-1/2 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-semibold transition-colors"
           >
-            Create Role
+            {isEditMode ? "Update Role" : "Create Role"}
           </button>
         </div>
       </form>
