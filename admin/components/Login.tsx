@@ -45,7 +45,7 @@ const Login = () => {
         transition={{ duration: 0.6 }}
         className="w-full max-w-md bg-white dark:bg-gray-900 rounded-xl p-10 border border-green-100"
         style={{
-          boxShadow: "0 4px 24px rgba(0, 132, 61, 0.2)", // Light green shadow
+          boxShadow: "0 4px 24px rgba(0, 132, 61, 0.2)", 
         }}
       >
         <h2 className="text-4xl font-bold text-center mb-8 text-black dark:text-white">
@@ -53,7 +53,6 @@ const Login = () => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
-          {/* Username */}
           <div>
             <label
               htmlFor="username"
@@ -79,7 +78,6 @@ const Login = () => {
             )}
           </div>
 
-          {/* Password */}
           <div>
             <label
               htmlFor="password"
@@ -104,7 +102,6 @@ const Login = () => {
               <p className="text-red-600 text-sm mt-1">{errors.password}</p>
             )}
 
-            {/* Forgot Password link just below password */}
             <div className="mt-2 text-right">
              <span
               onClick={(e) => e.preventDefault()}
