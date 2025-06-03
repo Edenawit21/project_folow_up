@@ -6,7 +6,7 @@ import Navbar from "@/components/NavBar";
 import Sidebar from "@/components/SideBar";
 import StoreProvider, { useAppSelector } from "./redux";
 
-const HIDDEN_LAYOUT_ROUTES = ["/login"]; // add more if needed
+const HIDDEN_LAYOUT_ROUTES = ["/login"]; 
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector(
