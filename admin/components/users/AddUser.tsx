@@ -4,18 +4,11 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { UserForm } from "@/types";
 import { registerUser, updateUser } from "@/utils/userApi";
 
-interface UserForm {
-  username: string;
-  email: string;
-  password: string;
-  role: string;
-}
-
 interface AddUserProps {
-  userId?: string; // If editing an existing user
+  userId?: string;
   initialData?: Partial<UserForm>;
 }
 
@@ -37,7 +30,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
       setForm((prev) => ({
         ...prev,
         ...initialData,
-        password: "", // clear password field on edit
+        password: "", // Clear password field on edit
       }));
     }
   }, [initialData, isEditMode]);
@@ -64,7 +57,6 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
 
     try {
       if (isEditMode) {
-        // Prepare data for update - exclude empty password to keep current
         const updateData: Partial<UserForm> = {
           email: form.email,
           role: form.role,
@@ -79,6 +71,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
         await registerUser(form);
         toast.success("User registered successfully!");
       }
+
       router.push("/users/user_list");
     } catch (error) {
       console.error("Error:", error);

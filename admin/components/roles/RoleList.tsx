@@ -55,13 +55,7 @@ const RoleList: React.FC = () => {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              {[
-                "Name",
-                "Description",
-                "Privilege",
-                "Created At",
-                "Actions",
-              ].map((header) => (
+              {["Name", "Description", "Privilege", "Created At", "Actions"].map((header) => (
                 <th
                   key={header}
                   className="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"

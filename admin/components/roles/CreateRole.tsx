@@ -51,7 +51,7 @@ const CreateRole: React.FC = () => {
           const role = await fetchRoleById(roleId);
           setRoleName(role.name);
           setDescription(role.description || "");
-          setSelectedPrivilege(role.privilegeId);
+          setSelectedPrivilege(role.privilegeId ?? "");
         } catch {
           toast.error("Failed to load role.");
           router.push("/roles/role_list");
