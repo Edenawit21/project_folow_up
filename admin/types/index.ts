@@ -90,7 +90,7 @@ export interface PrivilegeResponse {
 
 export interface User {
   id: string;
-  username: string;
+  Username: string;
   email: string;
   roles: string[];
 }
