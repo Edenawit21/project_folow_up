@@ -2,58 +2,55 @@
 
 import React, { useEffect, useState } from "react";
 import { Trash2, Edit2 } from "lucide-react";
-import { Privilege } from "@/types";
+import { RoleData } from "@/types";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { fetchAllRoles, deleteRole } from "@/utils/roleApi";
 
-const PrivilegeList: React.FC = () => {
+const RoleList: React.FC = () => {
   const router = useRouter();
-  const [privileges, setPrivileges] = useState<Privilege[]>([]);
+  const [roles, setRoles] = useState<RoleData[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Replace with actual API call
-    const mockData: Privilege[] = [
-      {
-        id: 1,
-        privilegeName: "EditProject",
-        description: "Allows editing of project details",
-        createdAt: new Date().toISOString(),
-        action: "Edit",
-      },
-      {
-        id: 2,
-        privilegeName: "DeleteProject",
-        description: "Allows deletion of a project",
-        createdAt: new Date().toISOString(),
-        action: "Delete",
-      },
-    ];
-    setPrivileges(mockData);
+    const loadRoles = async () => {
+      try {
+        const data = await fetchAllRoles();
+        setRoles(data);
+      } catch (error) {
+        toast.error("Failed to load roles.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRoles();
   }, []);
 
-  const handleEdit = (role: Privilege) => {
+  const handleEdit = (role: RoleData) => {
     router.push(`/roles/create_role?edit=true&id=${role.id}`);
   };
 
-  const handleDelete = (id: number) => {
-    const confirmDelete = confirm("Are you sure you want to delete this privilege?");
-    if (!confirmDelete) return;
-  
-    setPrivileges((prev) => prev.filter((priv) => priv.id !== id));
-    toast.success("Privilege deleted successfully.");
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this role?")) return;
+
+    try {
+      await deleteRole(id);
+      setRoles((prev) => prev.filter((r) => r.id !== id));
+      toast.success("Role deleted successfully.");
+    } catch (error) {
+      toast.error("Failed to delete role.");
+    }
   };
-  
 
   return (
     <div className="max-w-5xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="flex items-center justify-center mb-8">
         <h2 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
-          Privilege Management
+          Role Management
         </h2>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
@@ -61,13 +58,12 @@ const PrivilegeList: React.FC = () => {
               {[
                 "Name",
                 "Description",
-                "Created At",
                 "Privilege",
+                "Created At",
                 "Actions",
               ].map((header) => (
                 <th
                   key={header}
-                  scope="col"
                   className="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
                 >
                   {header}
@@ -76,37 +72,48 @@ const PrivilegeList: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {privileges.length > 0 ? (
-              privileges.map((p) => (
+            {loading ? (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="text-center px-6 py-8 text-gray-500 dark:text-gray-400"
+                >
+                  Loading...
+                </td>
+              </tr>
+            ) : roles.length > 0 ? (
+              roles.map((role) => (
                 <tr
-                  key={p.id}
+                  key={role.id}
                   className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {p.privilegeName}
+                    {role.name}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
-                    {p.description}
+                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                    {role.description}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                    {new Date(p.createdAt).toLocaleDateString()}
+                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                    {role.privilege?.name || role.privilegeId}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                    {p.action ?? "N/A"}
+                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                    {role.createdAt
+                      ? new Date(role.createdAt).toLocaleDateString()
+                      : "N/A"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className="px-6 py-4 text-sm">
                     <div className="flex gap-3 justify-end">
                       <button
-                        onClick={() => handleEdit(p)}
+                        onClick={() => handleEdit(role)}
                         className="text-blue-600 hover:text-blue-800"
-                        aria-label={`Edit privilege ${p.privilegeName}`}
+                        aria-label={`Edit role ${role.name}`}
                       >
                         <Edit2 size={18} />
                       </button>
                       <button
-                        onClick={() => handleDelete(p.id)}
+                        onClick={() => handleDelete(role.id)}
                         className="text-red-600 hover:text-red-800"
-                        aria-label={`Delete privilege ${p.privilegeName}`}
+                        aria-label={`Delete role ${role.name}`}
                       >
                         <Trash2 size={18} />
                       </button>
@@ -120,7 +127,7 @@ const PrivilegeList: React.FC = () => {
                   colSpan={5}
                   className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
                 >
-                  No privileges found.
+                  No roles found.
                 </td>
               </tr>
             )}
@@ -131,4 +138,4 @@ const PrivilegeList: React.FC = () => {
   );
 };
 
-export default PrivilegeList;
+export default RoleList;

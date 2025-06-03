@@ -25,7 +25,7 @@ export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
   };
 
   const handleCancel = () => {
-    router.back(); // or onClose() if passed from parent
+    router.back(); 
   };
 
   return (

@@ -60,14 +60,13 @@ export interface Entity {
 export interface RoleData {
   id: string;
   name: string;
-  description?: string;
+  description: string;
+  createdAt: string;
   privilegeId: string;
-  privileges?: Privilege[];
-  createdAt?: string;
-  updatedAt?: string;
-  privilege?: string;
-  action?: string;
-  
+  privilege?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface Privilege {
@@ -76,4 +75,23 @@ export interface Privilege {
   description: string;
   createdAt: string;
   action: string;
+}
+export interface PrivilegePayload {
+  privilegeName: string;
+  description: string;
+}
+
+export interface PrivilegeResponse {
+  id: number;
+  privilegeName: string;
+  description: string;
+  createdAt: string;
+  action?: string;
+}
+
+export interface User {
+  id: string;
+  userName: string;
+  email: string;
+  roles: string[];
 }

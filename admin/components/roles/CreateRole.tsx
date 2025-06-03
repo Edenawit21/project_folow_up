@@ -4,6 +4,12 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { RoleData } from "@/types";
+import {
+  fetchRoleById,
+  createRole,
+  updateRole,
+  fetchPrivileges,
+} from "@/utils/roleApi";
 
 interface Privilege {
   id: string;
@@ -15,38 +21,48 @@ const CreateRole: React.FC = () => {
   const [description, setDescription] = useState("");
   const [selectedPrivilege, setSelectedPrivilege] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
+  const [privileges, setPrivileges] = useState<Privilege[]>([]);
 
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const privileges: Privilege[] = [
-    { id: "1", name: "View Dashboard" },
-    { id: "2", name: "Manage Users" },
-    { id: "3", name: "Edit Roles" },
-  ];
+  const roleId = searchParams.get("id");
+  const isEdit = searchParams.get("edit");
 
   useEffect(() => {
-    const isEdit = searchParams.get("edit");
-    const roleId = searchParams.get("id");
+    const loadPrivileges = async () => {
+      try {
+        const data = await fetchPrivileges();
+        setPrivileges(data);
+      } catch {
+        toast.error("Failed to load privileges.");
+      }
+    };
 
+    loadPrivileges();
+  }, []);
+
+  useEffect(() => {
     if (isEdit && roleId) {
       setIsEditMode(true);
 
-      // TODO: Replace this with API fetch by roleId
-      const mockRole: RoleData = {
-        id: roleId,
-        name: "Admin",
-        description: "System administrator",
-        privilegeId: "2",
+      const loadRole = async () => {
+        try {
+          const role = await fetchRoleById(roleId);
+          setRoleName(role.name);
+          setDescription(role.description || "");
+          setSelectedPrivilege(role.privilegeId);
+        } catch {
+          toast.error("Failed to load role.");
+          router.push("/roles/role_list");
+        }
       };
 
-      setRoleName(mockRole.name);
-      setDescription(mockRole.description || "");
-      setSelectedPrivilege(mockRole.privilegeId);
+      loadRole();
     }
-  }, [searchParams]);
+  }, [isEdit, roleId, router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!roleName.trim()) {
@@ -59,13 +75,25 @@ const CreateRole: React.FC = () => {
       return;
     }
 
-    if (isEditMode) {
-      toast.success("Role updated (simulated).");
-    } else {
-      toast.success("Role created (simulated).");
-    }
+    const payload = {
+      name: roleName,
+      description,
+      privilegeId: selectedPrivilege,
+    };
 
-    router.push("/roles/role_list");
+    try {
+      if (isEditMode && roleId) {
+        await updateRole(roleId, payload);
+        toast.success("Role updated.");
+      } else {
+        await createRole(payload);
+        toast.success("Role created.");
+      }
+
+      router.push("/roles/role_list");
+    } catch {
+      toast.error("Failed to save role.");
+    }
   };
 
   const handleCancel = () => {
