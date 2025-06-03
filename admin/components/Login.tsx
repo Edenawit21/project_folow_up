@@ -106,13 +106,13 @@ const Login = () => {
 
             {/* Forgot Password link just below password */}
             <div className="mt-2 text-right">
-              <a
-                href="/forgot-password"
-                className="text-sm text-green-700 hover:underline dark:text-green-400"
-              >
-                Forgot Password?
-              </a>
-            </div>
+             <span
+              onClick={(e) => e.preventDefault()}
+              className="text-sm text-green-700 hover:underline dark:text-green-400 cursor-pointer"
+             >
+              Forgot Password?
+             </span>
+           </div>
           </div>
 
           <motion.button
