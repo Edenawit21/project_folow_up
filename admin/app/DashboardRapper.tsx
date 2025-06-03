@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Navbar from "@/components/NavBar";
 import Sidebar from "@/components/SideBar";
-
 import StoreProvider, { useAppSelector } from "./redux";
+
+const HIDDEN_LAYOUT_ROUTES = ["/login"]; // add more if needed
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector(
@@ -18,7 +20,16 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     } else {
       document.documentElement.classList.remove("dark");
     }
-  });
+  }, [isDarkMode]);
+
+  const pathname = usePathname();
+
+  const shouldHideLayout = HIDDEN_LAYOUT_ROUTES.includes(pathname);
+
+  // Return only the page content (no layout) for login, register, etc.
+  if (shouldHideLayout) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="flex min-h-screen w-full bg-gray-50 text-gray-900">
