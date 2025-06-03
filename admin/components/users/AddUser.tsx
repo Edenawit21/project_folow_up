@@ -8,7 +8,7 @@ import { UserForm } from "@/types";
 import { registerUser, updateUser } from "@/utils/userApi";
 
 interface AddUserProps {
-  userId?: string; // If editing an existing user
+  userId?: string;
   initialData?: Partial<UserForm>;
 }
 
@@ -16,10 +16,10 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
   const router = useRouter();
 
   const [form, setForm] = useState<UserForm>({
-    userName: "",
+    username: "",
     email: "",
     password: "",
-    roles: [""],
+    role: "",
     ...initialData,
   });
 
@@ -30,7 +30,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
       setForm((prev) => ({
         ...prev,
         ...initialData,
-        password: "", // clear password field on edit
+        password: "", // Clear password field on edit
       }));
     }
   }, [initialData, isEditMode]);
@@ -46,10 +46,10 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
     e.preventDefault();
 
     if (
-      !form.userName ||
+      !form.username ||
       !form.email ||
       (!form.password && !isEditMode) ||
-      !form.roles
+      !form.role
     ) {
       toast.warn("Please fill in all required fields.");
       return;
@@ -57,10 +57,9 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
 
     try {
       if (isEditMode) {
-        // Prepare data for update - exclude empty password to keep current
         const updateData: Partial<UserForm> = {
           email: form.email,
-          roles: form.roles,
+          role: form.role,
         };
         if (form.password) {
           updateData.password = form.password;
@@ -72,6 +71,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
         await registerUser(form);
         toast.success("User registered successfully!");
       }
+
       router.push("/users/user_list");
     } catch (error) {
       console.error("Error:", error);
@@ -102,7 +102,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
           <input
             type="text"
             name="username"
-            value={form.userName}
+            value={form.username}
             onChange={handleChange}
             placeholder="Enter username"
             className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
@@ -150,13 +150,13 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
           </label>
           <select
             name="role"
-            value={form.roles}
+            value={form.role}
             onChange={handleChange}
             className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
             required
           >
             <option value="" disabled>
-              Select a roles
+              Select a role
             </option>
             <option value="Admin">Admin</option>
             <option value="Director">Director</option>

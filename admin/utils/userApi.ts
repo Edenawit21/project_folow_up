@@ -1,12 +1,15 @@
 import axios from "axios";
-import { UserForm } from "@/types";
+
+export interface UserForm {
+  username: string;
+  email?: string;
+  password?: string;
+  roles: string[];
+}
 
 // Register a new user
 export const registerUser = async (userData: UserForm) => {
-  const response = await axios.post(
-    "http://localhost:5263//api/Account/register",
-    userData
-  );
+  const response = await axios.post("/api/users", userData);
   return response.data;
 };
 
@@ -19,17 +22,14 @@ export const updateUser = async (
   return response.data;
 };
 
-// Additional helper to get users list (used in your UserList component)
-export const getUsers = async (p0: { token: string | undefined }) => {
+// Get users list
+export const getUsers = async (params?: { token?: string }) => {
   const response = await axios.get("/api/users");
   return response.data;
 };
 
 // Delete a user by ID
-export const deleteUser = async (
-  userId: string,
-  p0: { token: string | undefined }
-) => {
+export const deleteUser = async (userId: string, params?: { token?: string }) => {
   const response = await axios.delete(`/api/users/${userId}`);
   return response.data;
 };

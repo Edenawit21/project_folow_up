@@ -62,11 +62,10 @@ export interface RoleData {
   name: string;
   description: string;
   createdAt?: string;
-  privilege?: Privilege; 
-  privileges?: Privilege[]; 
+  privilege?: Privilege;
+  privileges?: Privilege[];
   privilegeId?: string;
 }
-
 
 export interface Privilege {
   id: number;
@@ -75,6 +74,7 @@ export interface Privilege {
   createdAt: string;
   action: string;
 }
+
 export interface PrivilegePayload {
   privilegeName: string;
   description: string;
@@ -90,13 +90,13 @@ export interface PrivilegeResponse {
 
 export interface User {
   id: string;
-  userName: string;
+  username: string;
   email: string;
   roles: string[];
 }
 
 export interface UserForm {
-  userName: string;
+  username: string;
   email?: string;
   password?: string;
   roles: string[];

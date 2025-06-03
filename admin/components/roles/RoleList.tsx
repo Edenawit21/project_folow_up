@@ -55,13 +55,7 @@ const RoleList: React.FC = () => {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              {[
-                "Name",
-                "Description",
-                "Privileges",
-                "Created At",
-                "Actions",
-              ].map((header) => (
+              {["Name", "Description", "Privilege", "Created At", "Actions"].map((header) => (
                 <th
                   key={header}
                   className="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
@@ -94,20 +88,7 @@ const RoleList: React.FC = () => {
                     {role.description}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                    {role.privileges && role.privileges.length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {role.privileges.map((priv) => (
-                          <span
-                            key={priv.id}
-                            className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-white rounded-full"
-                          >
-                            {priv.privilegeName || priv.privilegeName}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-gray-400">—</span>
-                    )}
+                    {role.privilege?.name || role.privilegeId}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                     {role.createdAt
