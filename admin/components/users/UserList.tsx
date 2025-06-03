@@ -87,7 +87,7 @@ const UserList: React.FC<UserListProps> = ({ token }) => {
                   className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {user.userName}
+                    {user.Username}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
                     {user.roles.join(", ")}
@@ -97,14 +97,14 @@ const UserList: React.FC<UserListProps> = ({ token }) => {
                       <button
                         onClick={() => handleEdit(user)}
                         className="text-blue-600 hover:text-blue-800"
-                        aria-label={`Edit user ${user.userName}`}
+                        aria-label={`Edit user ${user.Username}`}
                       >
                         <Pencil size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(user.id)}
                         className="text-red-600 hover:text-red-800"
-                        aria-label={`Delete user ${user.userName}`}
+                        aria-label={`Delete user ${user.Username}`}
                       >
                         <Trash2 size={18} />
                       </button>

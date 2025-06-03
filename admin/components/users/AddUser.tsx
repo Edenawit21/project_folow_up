@@ -19,7 +19,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
     username: "",
     email: "",
     password: "",
-    role: "",
+    roles: [""],
     ...initialData,
   });
 
@@ -49,7 +49,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
       !form.username ||
       !form.email ||
       (!form.password && !isEditMode) ||
-      !form.role
+      !form.roles
     ) {
       toast.warn("Please fill in all required fields.");
       return;
@@ -59,7 +59,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
       if (isEditMode) {
         const updateData: Partial<UserForm> = {
           email: form.email,
-          role: form.role,
+          roles: form.roles,
         };
         if (form.password) {
           updateData.password = form.password;
@@ -150,7 +150,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
           </label>
           <select
             name="role"
-            value={form.role}
+            value={form.roles}
             onChange={handleChange}
             className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
             required
