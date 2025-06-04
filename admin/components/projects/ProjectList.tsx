@@ -27,27 +27,9 @@ export default function ProjectDashboard({
     ? projects.filter((p) => p.riskLevel === filters.riskLevel)
     : projects;
 
-  const timelineData = filteredProjects.map((p) => ({
-    id: p.projectKey,
-    group: p.projectManager,
-    title: p.projectName,
-    start_time: moment(p.lastSyncedAt).subtract(30, "days").valueOf(),
-    end_time: moment(p.lastSyncedAt).valueOf(),
-  }));
-
   const boardGroups = Array.from(
     new Set(filteredProjects.map((p) => p.riskLevel || "Unknown"))
   );
-
-  const graphData = filteredProjects.map((p) => ({
-    name: p.projectName,
-    issuesDone: p.issuesDone,
-    issuesInProgress: p.issuesInProgress,
-    issuesRemaining: Math.max(
-      0,
-      p.totalIssues - p.issuesDone - p.issuesInProgress
-    ),
-  }));
 
   const riskCount = boardGroups.map((risk) => ({
     name: risk,

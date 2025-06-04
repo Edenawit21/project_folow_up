@@ -7,7 +7,6 @@ import ProjectFilter from "@/components/ProjectFilter";
 import ProjectTable from "@/components/projects/ProjectList";
 import { initialProjects } from "@/constants";
 import PaginationFooter from "@/components/footer/PaginationFooter";
-
 import { Plus } from "lucide-react";
 
 export default function ProjectsPage() {
