@@ -84,7 +84,7 @@ const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
   };
 
   return (
-    <div className="flex items-center justify-center bg-white dark:bg-gray-900 px-4 min-h-screen">
+    <div className="flex items-center justify-center bg-white dark:bg-gray-900 px-4 min-h-screen mt-10">
       <form
         onSubmit={handleSubmit}
         autoComplete="off"
