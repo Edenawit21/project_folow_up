@@ -2,62 +2,60 @@
 
 import React, { useEffect, useState } from "react";
 import { Trash2, Edit2 } from "lucide-react";
-
-interface Privilege {
-  id: number;
-  privilegeName: string;
-  description: string;
-  createdAt: string;
-  action: string;
-}
+import { toast } from "react-toastify";
+import { fetchPrivileges, deletePrivilege } from "@/utils/privilegeApi";
+import { PrivilegeResponse } from "@/types";
+import { useRouter } from "next/navigation";
 
 const PrivilegeList: React.FC = () => {
-  const [privileges, setPrivileges] = useState<Privilege[]>([]);
+  const [privileges, setPrivileges] = useState<PrivilegeResponse[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    // TODO: Replace with actual API call
-    const mockData: Privilege[] = [
-      {
-        id: 1,
-        privilegeName: "EditProject",
-        description: "Allows editing of project details",
-        createdAt: new Date().toISOString(),
-        action: "Edit",
-      },
-      {
-        id: 2,
-        privilegeName: "DeleteProject",
-        description: "Allows deletion of a project",
-        createdAt: new Date().toISOString(),
-        action: "Delete",
-      },
-    ];
-    setPrivileges(mockData);
+    const loadPrivileges = async () => {
+      try {
+        const data = await fetchPrivileges();
+        setPrivileges(data);
+      } catch (error) {
+        toast.error("Failed to load privileges.");
+      }
+    };
+
+    loadPrivileges();
   }, []);
 
-  const startEdit = (privilege: Privilege) => {
-    alert(`Edit privilege: ${privilege.privilegeName}`);
+  const startEdit = (privilege: PrivilegeResponse) => {
+    router.push(`/privileges/edit?id=${privilege.id}`);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete privilege with ID: ${id}`);
+  const handleDelete = async (id: number) => {
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this privilege?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await deletePrivilege(id);
+      setPrivileges((prev) => prev.filter((p) => p.id !== id));
+      toast.success("Privilege deleted successfully.");
+    } catch (error) {
+      toast.error("Failed to delete privilege.");
+    }
   };
 
   return (
     <div className="max-w-5xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="flex items-center justify-center mb-8">
         <h2 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
           Privilege Management
         </h2>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              {["ID", "Name", "Description", "Created At", "Actions"].map(
+              {["Name", "Description", "Created At", "Actions"].map(
                 (header) => (
                   <th
                     key={header}
@@ -78,9 +76,6 @@ const PrivilegeList: React.FC = () => {
                   className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {p.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                     {p.privilegeName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
@@ -112,7 +107,7 @@ const PrivilegeList: React.FC = () => {
             ) : (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={4}
                   className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
                 >
                   No privileges found.
