@@ -1,41 +1,17 @@
 "use client";
 
-import React from "react";
-import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
-import { useRouter, usePathname } from "next/navigation";
 import React, { useEffect } from "react";
 import Navbar from "@/components/NavBar";
 import Sidebar from "@/components/SideBar";
-import { store, persistor, useAppSelector } from "./redux";
-
-const HIDDEN_LAYOUT_ROUTES = ["/login"];
-
-const AuthGuard = ({ children }: { children: React.ReactNode }) => {
-  const isLoggedIn = useAppSelector((state) => state.global.isLoggedIn);
-  const pathname = usePathname();
-  const router = useRouter();
-
-  React.useEffect(() => {
-    if (!isLoggedIn && pathname !== "/login") {
-      router.replace("/login");
-    }
-  }, [isLoggedIn, pathname, router]);
-
-  if (!isLoggedIn && pathname !== "/login") {
-    // Prevent showing protected content before redirect
-    return null;
-  }
-
-  return <>{children}</>;
-};
+import StoreProvider, { useAppSelector } from "./redux";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  const isSidebarCollapsed = useAppSelector((state) => state.global.isSidebarCollapsed);
+  const isSidebarCollapsed = useAppSelector(
+    (state) => state.global.isSidebarCollapsed
+  );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
-  const pathname = usePathname();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
     } else {
@@ -43,15 +19,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isDarkMode]);
 
-  if (HIDDEN_LAYOUT_ROUTES.includes(pathname)) {
-    return <>{children}</>;
-  }
-
   return (
-    <div className="flex min-h-screen w-full bg-gray-50 text-gray-900 dark:bg-gray-900">
+    <div className="flex min-h-screen w-full bg-gray-50 text-gray-900 dark:bg-black dark:text-white">
       <Sidebar />
       <main
-        className={`flex w-full flex-col ${isSidebarCollapsed ? "" : "md:pl-64"}`}
+        className={`flex w-full flex-col bg-white dark:bg-black ${
+          isSidebarCollapsed ? "" : "md:pl-64"
+        }`}
       >
         <Navbar />
         {children}
@@ -60,14 +34,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default function DashboardWrapper({ children }: { children: React.ReactNode }) {
+const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Provider store={store}>
-      <PersistGate loading={<div>Loading app state...</div>} persistor={persistor}>
-        <AuthGuard>
-          <DashboardLayout>{children}</DashboardLayout>
-        </AuthGuard>
-      </PersistGate>
-    </Provider>
+    <StoreProvider>
+      <DashboardLayout>{children}</DashboardLayout>
+    </StoreProvider>
   );
-}
+};
+
+export default DashboardWrapper;
