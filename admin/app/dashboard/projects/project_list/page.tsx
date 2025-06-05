@@ -14,10 +14,10 @@ export default function ProjectsPage() {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [filters, setFilters] = useState({ riskLevel: "" });
-  const [view, setView] = useState<"table" | "board" >( "table");
+  const [view, setView] = useState<"table" | "board">("table");
 
-  const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     setProjects(initialProjects);
@@ -28,7 +28,7 @@ export default function ProjectsPage() {
   };
 
   const onCreateClick = () => {
-    router.push("/projects/add_project");
+    router.push("/dashboard/projects/add_project");
   };
 
   const filteredProjects = useMemo(() => {
@@ -39,12 +39,19 @@ export default function ProjectsPage() {
     });
   }, [projects, filters.riskLevel]);
 
-  const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredProjects.length / rowsPerPage);
+
+  // Reset page when rowsPerPage changes or page exceeds total pages
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [rowsPerPage, totalPages]);
 
   const paginatedProjects = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredProjects.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredProjects, currentPage]);
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    return filteredProjects.slice(startIndex, startIndex + rowsPerPage);
+  }, [filteredProjects, currentPage, rowsPerPage]);
 
   return (
     <div className="p-6 bg-white dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
@@ -86,13 +93,13 @@ export default function ProjectsPage() {
               onDelete={handleDelete}
               viewMode={view}
             />
-            {totalPages > 1 && (
-              <PaginationFooter
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            )}
+            <PaginationFooter
+              currentPage={currentPage}
+              rowsPerPage={rowsPerPage}
+              totalItems={filteredProjects.length}
+              onPageChange={setCurrentPage}
+              onRowsPerPageChange={setRowsPerPage}
+            />
           </>
         )}
       </div>

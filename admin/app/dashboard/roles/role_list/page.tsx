@@ -9,7 +9,7 @@ export default function RolesPage() {
   const router = useRouter();
 
   const handleCreateRole = () => {
-    router.push("/roles/create_role");
+    router.push("/dashboard/roles/create_role");
   };
 
   const handleAssignPrivileges = () => {
@@ -19,15 +19,8 @@ export default function RolesPage() {
   return (
     <div className="relative p-4">
       {/* Top Buttons: Left and Right */}
-      <div className="flex justify-between mb-6">
+      <div className="flex justify-end mb-6">
         {/* Left: Assign Privileges */}
-        <button
-          onClick={handleAssignPrivileges}
-          className="flex items-center gap-2 px-4 py-2 rounded-sm shadow bg-gray-200 dark:bg-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700"
-        >
-          <ShieldCheck size={18} />
-          Assign Privileges
-        </button>
 
         {/* Right: Create Role */}
         <button

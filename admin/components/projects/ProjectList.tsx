@@ -28,7 +28,7 @@ export default function ProjectDashboard({
     : projects;
 
   const boardGroups = Array.from(
-    new Set(filteredProjects.map((p) => p.riskLevel || "Unknown"))
+    new Set(filteredProjects.map((p) => p.riskLevel ||  "Unknown"))
   );
 
   const riskCount = boardGroups.map((risk) => ({
@@ -112,7 +112,7 @@ export default function ProjectDashboard({
         </table>
       )}
 
-      {viewMode === "board" && (
+{viewMode === "board" && (
         <div className="flex gap-6">
           {boardGroups.map((risk) => (
             <div

@@ -62,7 +62,7 @@ export interface RoleData {
   name: string;
   description: string;
   createdAt?: string;
-  privilege?: Privilege;
+  Permissions?: Privilege;
   privileges?: Privilege[];
   privilegeId?: string;
 }
