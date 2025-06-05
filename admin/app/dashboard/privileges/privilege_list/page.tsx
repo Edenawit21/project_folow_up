@@ -8,7 +8,7 @@ export default function PrivilegeListPage() {
   const router = useRouter();
 
   const handleCreateClick = () => {
-    router.push("/privileges/add_privilege");
+    router.push("/dashboard/privileges/add_privilege");
   };
 
   return (
@@ -21,7 +21,7 @@ export default function PrivilegeListPage() {
           className="
             flex items-center gap-2 bg-green-600 text-white px-5 py-2 rounded-[1px] shadow-md
             hover:bg-green-700 hover:shadow-lg
-            focus:outline-none focus:ring-4 focus:ring-green-400 focus:ring-opacity-75
+            focus:outline-none
             transition-transform duration-200 cursor-pointer hover:scale-105
           "
         >

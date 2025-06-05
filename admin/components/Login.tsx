@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { login } from "@/utils/auth"; 
 
 type FormState = {
   username: string;
@@ -12,21 +13,24 @@ type FormState = {
 type Errors = {
   username?: string;
   password?: string;
+  general?: string;
 };
 
 const Login = () => {
   const router = useRouter();
   const [form, setForm] = useState<FormState>({ username: "", password: "" });
   const [errors, setErrors] = useState<Errors>({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" }));
+    setErrors((prev) => ({ ...prev, [name]: "", general: "" }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const newErrors: Errors = {};
     if (!form.username.trim()) newErrors.username = "Username is required.";
     if (!form.password.trim()) newErrors.password = "Password is required.";
@@ -34,25 +38,42 @@ const Login = () => {
       setErrors(newErrors);
       return;
     }
-    router.push("/projects/project_list");
+
+    try {
+      setLoading(true);
+      const response = await login(form.username, form.password, {
+        username: form.username,
+        password: form.password,
+      });
+
+      localStorage.setItem("token", response.token);
+
+      // Redirect to project list
+      router.push("/dashboard");
+    } catch (err: any) {
+      setErrors({ general: err.message || "Login failed." });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-4">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-md bg-white dark:bg-gray-900 rounded-xl p-10 border border-green-100"
-        style={{
-          boxShadow: "0 4px 24px rgba(0, 132, 61, 0.2)", 
-        }}
+        className="w-full max-w-md bg-white dark:bg-gray-900 rounded-xl p-10 border border-green-100 shadow-lg"
       >
         <h2 className="text-4xl font-bold text-center mb-8 text-black dark:text-white">
           Welcome
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
+          {errors.general && (
+            <p className="text-red-600 text-sm text-center">{errors.general}</p>
+          )}
+
           <div>
             <label
               htmlFor="username"
@@ -101,24 +122,24 @@ const Login = () => {
             {errors.password && (
               <p className="text-red-600 text-sm mt-1">{errors.password}</p>
             )}
-
             <div className="mt-2 text-right">
-             <span
-              onClick={(e) => e.preventDefault()}
-              className="text-sm text-green-700 hover:underline dark:text-green-400 cursor-pointer"
-             >
-              Forgot Password?
-             </span>
-           </div>
+              <span
+                onClick={(e) => e.preventDefault()}
+                className="text-sm text-green-700 hover:underline dark:text-green-400 cursor-pointer"
+              >
+                Forgot Password?
+              </span>
+            </div>
           </div>
 
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             type="submit"
+            disabled={loading}
             className="w-full py-2 px-4 text-base bg-[#00843D] hover:bg-[#006E33] text-white font-semibold rounded-md transition duration-200"
           >
-            Log In
+            {loading ? "Logging in..." : "Log In"}
           </motion.button>
         </form>
       </motion.div>
