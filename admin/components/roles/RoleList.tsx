@@ -58,7 +58,7 @@ const RoleList: React.FC = () => {
               {[
                 "Name",
                 "Description",
-                "Privilege",
+                "Permissions",
                 "Created At",
                 "Actions",
               ].map((header) => (
@@ -94,7 +94,7 @@ const RoleList: React.FC = () => {
                     {role.description}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                    {role.privilege?.privilegeName || role.privilegeId}
+                    {role.Permissions?.privilegeName || role.privilegeId}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                     {role.createdAt

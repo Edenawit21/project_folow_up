@@ -4,6 +4,7 @@ import React from "react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { useRouter, usePathname } from "next/navigation";
+import React, { useEffect } from "react";
 import Navbar from "@/components/NavBar";
 import Sidebar from "@/components/SideBar";
 import { store, persistor, useAppSelector } from "./redux";

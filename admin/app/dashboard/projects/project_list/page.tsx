@@ -28,7 +28,7 @@ export default function ProjectsPage() {
   };
 
   const onCreateClick = () => {
-    router.push("/projects/add_project");
+    router.push("/dashboard/projects/add_project");
   };
 
   const filteredProjects = useMemo(() => {

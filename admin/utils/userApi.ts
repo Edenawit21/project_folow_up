@@ -1,8 +1,7 @@
-
 import axios from "axios";
 import { UserForm } from "@/types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // fixed typo here
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Register a new user
 export const registerUser = async (userData: UserForm) => {
@@ -22,15 +21,30 @@ export const updateUser = async (
   return response.data;
 };
 
-// Get users list
-export const getUsers = async (p0: { token: string | undefined; }) => {
-  const response = await axios.get(`${BASE_URL}/api/Admin/users-with-roles`);
+// Get users list with Authorization header
+export const getUsers = async ({ token }: { token?: string }) => {
+  if (!token) throw new Error("Authorization token is required");
+
+  const response = await axios.get(`${BASE_URL}/api/Admin/users-with-roles`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };
 
-// Delete a user by ID
-export const deleteUser = async (userId: string, p0: { token: string | undefined; }) => {
-  const response = await axios.delete(`${BASE_URL}/api/users/${userId}`);
+// Delete a user by ID with Authorization header
+export const deleteUser = async (
+  userId: string,
+  { token }: { token?: string }
+) => {
+  if (!token) throw new Error("Authorization token is required");
+
+  const response = await axios.delete(`${BASE_URL}/api/users/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };
 

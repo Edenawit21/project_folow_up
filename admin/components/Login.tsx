@@ -14,6 +14,7 @@ type FormState = {
 type Errors = {
   username?: string;
   password?: string;
+  general?: string;
 };
 
 const Login = () => {
@@ -22,14 +23,15 @@ const Login = () => {
 
   const [form, setForm] = useState<FormState>({ username: "", password: "" });
   const [errors, setErrors] = useState<Errors>({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" }));
+    setErrors((prev) => ({ ...prev, [name]: "", general: "" }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const newErrors: Errors = {};
@@ -49,7 +51,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-4">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -64,6 +66,10 @@ const Login = () => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
+          {errors.general && (
+            <p className="text-red-600 text-sm text-center">{errors.general}</p>
+          )}
+
           <div>
             <label
               htmlFor="username"
@@ -112,7 +118,6 @@ const Login = () => {
             {errors.password && (
               <p className="text-red-600 text-sm mt-1">{errors.password}</p>
             )}
-
             <div className="mt-2 text-right">
               <span
                 onClick={(e) => e.preventDefault()}
@@ -127,9 +132,10 @@ const Login = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             type="submit"
+            disabled={loading}
             className="w-full py-2 px-4 text-base bg-[#00843D] hover:bg-[#006E33] text-white font-semibold rounded-md transition duration-200"
           >
-            Log In
+            {loading ? "Logging in..." : "Log In"}
           </motion.button>
         </form>
       </motion.div>

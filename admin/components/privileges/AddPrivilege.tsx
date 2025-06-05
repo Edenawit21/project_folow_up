@@ -4,12 +4,20 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface AddPrivilegeProps {
-  onCreate: (data: { name: string; description: string }) => void;
+  onCreate: (data: {
+    name: string;
+    description: string;
+    actions: string;
+  }) => void;
   onClose: () => void;
 }
 
 export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
-  const [formData, setFormData] = useState({ name: "", description: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    actions: "",
+  });
   const router = useRouter();
 
   const handleChange = (
@@ -21,11 +29,11 @@ export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onCreate(formData);
+    onCreate(formData); // Pass all fields, including actions
   };
 
   const handleCancel = () => {
-    router.back(); 
+    router.back();
   };
 
   return (
@@ -71,6 +79,24 @@ export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
           rows={4}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           placeholder="Describe the privilege"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="actions"
+          className="block mb-1 text-gray-700 dark:text-gray-300"
+        >
+          Actions (comma separated)
+        </label>
+        <input
+          id="actions"
+          name="actions"
+          type="text"
+          value={formData.actions}
+          onChange={handleChange}
+          placeholder="e.g. create, read, update, delete"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         />
       </div>
 

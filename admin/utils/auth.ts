@@ -9,10 +9,12 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  message: string;
+  error: any;
   token: string;
 }
 
-export const login = async (data: LoginRequest): Promise<LoginResponse> => {
+export const login = async (username: string, password: string, data: LoginRequest): Promise<LoginResponse> => {
   try {
     const response = await axios.post<LoginResponse>(`${API_URL}/login`, data, {
       headers: {
