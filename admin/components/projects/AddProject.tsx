@@ -52,7 +52,7 @@ export default function AddProject({ onCreate }: AddProjectProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-8 space-y-6 bg-white border border-gray-200 rounded-2xl shadow-lg dark:bg-gray-900 dark:border-gray-700 max-w-2xl mt-10 ml-64"
+      className="p-8 space-y-6 bg-white border border-gray-200 rounded-2xl shadow-lg dark:bg-gray-900 dark:border-gray-700 max-w-2xl mt-10 ml-52"
     >
       <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
         Add New Project
