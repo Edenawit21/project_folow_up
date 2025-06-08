@@ -8,16 +8,16 @@ export interface Project {
   issuesInProgress: number;
   totalStoryPoint: number;
   storyPointsDone: number;
-  riskLevel: string;
+  projectHealth: string;
   lastSyncedAt: string;
 
   // Optional fields (from form)
-  title?: string;                
+  title?: string;
   description?: string;
-  manager?: string;            
+  manager?: string;
   owner?: string;
   teamLeader?: string;
-  developers?: string[];      
+  developers?: string[];
   status?: "todo" | "on_progress" | "completed";
   priority?: "High" | "Medium" | "Low";
 }
@@ -28,7 +28,7 @@ export interface FormProject {
   manager: string;
   owner: string;
   teamLeader: string;
-  developers: string; 
+  developers: string;
   status: "todo" | "on_progress" | "completed";
   priority: "High" | "Medium" | "Low";
 }
@@ -37,11 +37,6 @@ export interface Task {
   status: string;
   key: string;
   summary: string;
-}
-
-export interface TeamMember {
-  accountId: string | null;
-  displayName: string;
 }
 
 export interface ProjectFilterState {
@@ -55,4 +50,63 @@ export interface ProjectFilterState {
 export interface Entity {
   id: string;
   name: string;
+}
+
+export interface RoleData {
+  id: string;
+  name: string;
+  description: string;
+  createdAt?: string;
+  privileges?: Privilege[];
+  privilegeId?: string;
+}
+
+
+export interface Privilege {
+  id: string;
+  permissionName: string;
+  description: string;
+  createdAt: string;
+  action: string;
+}
+
+export interface PrivilegePayload {
+  permissionName: string;
+  description: string;
+  action: string;
+}
+
+export interface PrivilegeResponse {
+  id: string;
+  permissionName: string;
+  description: string;
+  action?: string;
+  createdAt?: string;
+}
+
+export interface User {
+  id: string;
+  Username: string;
+  email: string;
+  roles: string[];
+}
+
+export interface UserForm {
+  username: string;
+  email?: string;
+  password?: string;
+  role: string;
+}
+export interface Errors {
+  email?: string;
+  password?: string;
+  general?: string;
+}
+export interface FormState {
+  email: string;
+  password: string;
+}
+export interface LoginRequest{
+  email: string,
+  password: string
 }

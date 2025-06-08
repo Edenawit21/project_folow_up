@@ -3,7 +3,6 @@
 import React, { useEffect } from "react";
 import Navbar from "@/components/NavBar";
 import Sidebar from "@/components/SideBar";
-
 import StoreProvider, { useAppSelector } from "./redux";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -18,13 +17,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     } else {
       document.documentElement.classList.remove("dark");
     }
-  });
+  }, [isDarkMode]);
 
   return (
-    <div className="flex min-h-screen w-full bg-gray-50 text-gray-900">
+    <div className="flex min-h-screen w-full bg-gray-50 text-gray-900 dark:bg-black dark:text-white">
       <Sidebar />
       <main
-        className={`flex w-full flex-col bg-gray-50 dark:bg-gray-900 ${
+        className={`flex w-full flex-col bg-white dark:bg-black ${
           isSidebarCollapsed ? "" : "md:pl-64"
         }`}
       >

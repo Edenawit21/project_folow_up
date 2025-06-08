@@ -5,11 +5,11 @@ import { Sliders, LayoutGrid, ShieldAlert } from "lucide-react";
 
 interface ProjectFilterProps {
   filters: {
-    riskLevel: string;
+    projectHealth: string;
   };
-  setFilters: (filters: { riskLevel: string }) => void;
-  view: "table" | "board" | "timeline" | "graph";
-  setView: (view: "table" | "board" | "timeline" | "graph") => void;
+  setFilters: (filters: { projectHealth: string }) => void;
+  view: "table" | "board";
+  setView: (view: "table" | "board") => void;
 }
 
 const ProjectFilter: React.FC<ProjectFilterProps> = ({
@@ -18,6 +18,26 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
   view,
   setView,
 }) => {
+  const handleProjectHealthChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setFilters({
+      ...filters,
+      projectHealth: e.target.value.toLowerCase(), // normalize casing for safety
+    });
+  };
+
+  const handleViewChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setView(e.target.value as "table" | "board");
+  };
+
+  const clearFilter = () => {
+    setFilters({
+      ...filters,
+      projectHealth: "",
+    });
+  };
+
   const filterItemClasses = `
     min-w-[155px]
     px-2
@@ -61,25 +81,25 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
 
       {/* Filters */}
       <div className="flex flex-wrap gap-4 overflow-x-auto pb-2">
-        {/* Risk Level */}
+        {/* Project Health */}
         <div className="flex flex-col space-y-1">
           <label className={labelClasses}>
             <ShieldAlert className="w-4 h-4" />
-            Risk Level
+            Project Health
           </label>
           <select
-            value={filters.riskLevel}
-            onChange={(e) => setFilters({ riskLevel: e.target.value })}
+            value={filters.projectHealth}
+            onChange={handleProjectHealthChange}
             className={filterItemClasses}
           >
-            <option value="">All risk levels</option>
-            <option value="on track">on track</option>
-            <option value="medium risk">medium risk</option>
-            <option value="high risk">high risk</option>
+            <option value="">All project health</option>
+            <option value="critical">critical</option>
+            <option value="needs attention">needs attention</option>
+            <option value="at risk">at risk</option>
           </select>
         </div>
 
-        {/* View Mode + Clear Filter */}
+        {/* View Mode + Clear */}
         <div className="flex flex-col space-y-1">
           <label className={labelClasses}>
             <LayoutGrid className="w-4 h-4" />
@@ -88,24 +108,18 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
           <div className="flex gap-2 items-center">
             <select
               value={view}
-              onChange={(e) =>
-                setView(
-                  e.target.value as "table" | "board" | "timeline" | "graph"
-                )
-              }
+              onChange={handleViewChange}
               className={filterItemClasses}
             >
               <option value="table">Table</option>
               <option value="board">Board</option>
-              <option value="timeline">Timeline</option>
-              <option value="graph">Graph</option>
             </select>
 
             <button
-              onClick={() => setFilters({ riskLevel: "" })}
+              onClick={clearFilter}
               className="px-3 py-1.5 text-xs font-medium text-gray-700 hover:text-gray-900 dark:text-gray-200 dark:hover:text-white transition-colors cursor-pointer rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
-              Clear filter
+              Clear
             </button>
           </div>
         </div>

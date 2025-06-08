@@ -1,77 +1,140 @@
 "use client";
 
 import React, { useState } from "react";
-
-type FormState = {
-  username: string;
-  password: string;
-};
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { login } from "@/utils/auth"; // Your API login function
+import { Errors, FormState } from "@/types";
 
 const Login = () => {
-  const [form, setForm] = useState<FormState>({ username: "", password: "" });
+  const router = useRouter();
+  const [form, setForm] = useState<FormState>({ email: "", password: "" });
+  const [errors, setErrors] = useState<Errors>({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "", general: "" }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitted form data:", form);
-    alert(`Logged in as: ${form.username}`);
-    // No backend call, no validation, just UI.
+
+    const newErrors: Errors = {};
+    if (!form.email.trim()) newErrors.email = "Email is required.";
+    if (!form.password.trim()) newErrors.password = "Password is required.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await login({
+        email: form.email,
+        password: form.password,
+      });
+
+      localStorage.setItem("token", response.token);
+      router.push("/dashboard");
+    } catch (err: any) {
+      setErrors({ general: err.message || "Login failed." });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-start justify-center pt-10 bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-sm shadow-sm p-4">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md bg-white dark:bg-gray-900 rounded-xl p-10 border border-green-100"
+        style={{
+          boxShadow: "0 4px 24px rgba(0, 132, 61, 0.2)",
+        }}
+      >
+        <h2 className="text-4xl font-bold text-center mb-8 text-black dark:text-white">
+          Welcome
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
+          {errors.general && (
+            <p className="text-red-600 text-sm text-center">{errors.general}</p>
+          )}
+
           <div>
             <label
-              htmlFor="username"
-              className="block text-sm font-medium mb-1"
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
-              Username
+              Email
             </label>
             <input
-              id="username"
-              type="text"
-              name="username"
-              value={form.username}
+              id="email"
+              name="email"
+              type="email"
+              value={form.email}
               onChange={handleChange}
-              placeholder="Username"
-              className="w-full px-4 py-2 border rounded-sm bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+              placeholder="Enter your email"
+              className={`w-full px-4 py-2 text-base rounded-md border ${
+                errors.email
+                  ? "border-red-500"
+                  : "border-gray-300 dark:border-gray-600"
+              } bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 transition`}
             />
+            {errors.email && (
+              <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium mb-1"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
               Password
             </label>
             <input
               id="password"
-              type="password"
               name="password"
+              type="password"
               value={form.password}
               onChange={handleChange}
               placeholder="••••••••"
-              className="w-full px-4 py-2 border rounded-sm bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+              className={`w-full px-4 py-2 text-base rounded-md border ${
+                errors.password
+                  ? "border-red-500"
+                  : "border-gray-300 dark:border-gray-600"
+              } bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 transition`}
             />
+            {errors.password && (
+              <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+            )}
+            <div className="mt-2 text-right">
+              <span
+                onClick={(e) => e.preventDefault()}
+                className="text-sm text-green-700 hover:underline dark:text-green-400 cursor-pointer"
+              >
+                Forgot Password?
+              </span>
+            </div>
           </div>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
             type="submit"
-            className="  w-full py-2 rounded-md bg-green-700 hover:bg-green-800 text-white font-semibold transition-colors duration-200 border border-transparent hover:border-gray-900 dark:hover:border-white focus:outline-none focus:ring-2 focus:ring-green-500
-  "
+            disabled={loading}
+            className="w-full py-2 px-4 text-base bg-[#00843D] hover:bg-[#006E33] text-white font-semibold rounded-md transition duration-200"
           >
-            Login
-          </button>
+            {loading ? "Logging in..." : "Log In"}
+          </motion.button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };
