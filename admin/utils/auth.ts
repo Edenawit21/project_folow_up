@@ -1,24 +1,24 @@
 import axios from "axios";
+import { LoginRequest } from "@/types";
 
-const API_URL = "http://localhost:5263/api/Account";
-
-// --- Login types ---
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export interface LoginResponse {
+  message: string;
   token: string;
 }
 
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   try {
-    const response = await axios.post<LoginResponse>(`${API_URL}/login`, data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.post<LoginResponse>(
+      `${API_URL}/api/Account/login`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -26,51 +26,6 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
         throw new Error("Invalid username or password.");
       }
       throw new Error(error.response?.data?.message || "Login failed.");
-    }
-    throw error;
-  }
-};
-
-// --- Register types ---
-export interface RegisterRequest {
-  username: string;
-  email: string;
-  password: string;
-}
-
-export const registerUser = async (data: RegisterRequest) => {
-  try {
-    const response = await axios.post(`${API_URL}/register`, data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || "Registration failed.");
-    }
-    throw error;
-  }
-};
-
-// --- Assign Role types ---
-export interface AssignRoleRequest {
-  username: string;
-  role: string;
-}
-
-export const assignRole = async (data: AssignRoleRequest) => {
-  try {
-    const response = await axios.post(`${API_URL}/assign-role`, data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || "Assign role failed.");
     }
     throw error;
   }

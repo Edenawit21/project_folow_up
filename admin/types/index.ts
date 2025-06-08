@@ -8,7 +8,7 @@ export interface Project {
   issuesInProgress: number;
   totalStoryPoint: number;
   storyPointsDone: number;
-  riskLevel: string;
+  projectHealth: string;
   lastSyncedAt: string;
 
   // Optional fields (from form)
@@ -39,11 +39,6 @@ export interface Task {
   summary: string;
 }
 
-export interface TeamMember {
-  accountId: string | null;
-  displayName: string;
-}
-
 export interface ProjectFilterState {
   status: string;
   priority: string;
@@ -62,30 +57,31 @@ export interface RoleData {
   name: string;
   description: string;
   createdAt?: string;
-  privilege?: Privilege;
   privileges?: Privilege[];
   privilegeId?: string;
 }
 
+
 export interface Privilege {
-  id: number;
-  privilegeName: string;
+  id: string;
+  permissionName: string;
   description: string;
   createdAt: string;
   action: string;
 }
 
 export interface PrivilegePayload {
-  privilegeName: string;
+  permissionName: string;
   description: string;
+  action: string;
 }
 
 export interface PrivilegeResponse {
-  id: number;
-  privilegeName: string;
+  id: string;
+  permissionName: string;
   description: string;
-  createdAt: string;
   action?: string;
+  createdAt?: string;
 }
 
 export interface User {
@@ -100,4 +96,17 @@ export interface UserForm {
   email?: string;
   password?: string;
   role: string;
+}
+export interface Errors {
+  email?: string;
+  password?: string;
+  general?: string;
+}
+export interface FormState {
+  email: string;
+  password: string;
+}
+export interface LoginRequest{
+  email: string,
+  password: string
 }

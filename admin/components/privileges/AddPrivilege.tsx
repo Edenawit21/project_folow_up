@@ -1,16 +1,53 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  createPrivilege,
+  updatePrivilege,
+  fetchPrivilegeById,
+} from "@/utils/privilegeApi";
+import { toast } from "react-toastify";
 
-interface AddPrivilegeProps {
-  onCreate: (data: { name: string; description: string }) => void;
-  onClose: () => void;
+interface PrivilegeFormData {
+  permissionName: string;
+  description: string;
+  action: string;
 }
 
-export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
-  const [formData, setFormData] = useState({ name: "", description: "" });
+const AddPrivilege: React.FC = () => {
+  const [formData, setFormData] = useState<PrivilegeFormData>({
+    permissionName: "",
+    description: "",
+    action: "",
+  });
+
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+
+  useEffect(() => {
+    if (id) {
+      console.log("Fetching privilege with ID:", id);
+      setLoading(true);
+      fetchPrivilegeById(id)
+        .then((data) => {
+          console.log("Fetched data:", data); // Check this
+          setFormData({
+            permissionName: data.permissionName ?? "",
+            description: data.description ?? "",
+            action: data.action ?? "",
+          });
+        })
+        .catch((error) => {
+          toast.error("Failed to load privilege.");
+          console.error("Error fetching privilege:", error);
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [id]);
+  
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -19,47 +56,65 @@ export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onCreate(formData);
+    setLoading(true);
+
+    try {
+      if (id) {
+        await updatePrivilege(id, formData);
+        toast.success("Privilege updated successfully!");
+      } else {
+        await createPrivilege(formData);
+        toast.success("Privilege created successfully!");
+      }
+      router.push("/dashboard/privileges/privilege_list");
+    } catch (error) {
+      toast.error(
+        id ? "Failed to update privilege." : "Failed to create privilege."
+      );
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
-    router.back(); 
+    router.back();
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative w-[500px] ml-64 mt-10 p-6 bg-gray-50 dark:bg-gray-800 rounded-sm shadow-2xl space-y-5 border border-gray-200 dark:border-gray-700"
+      className="w-full max-w-md mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
     >
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-        Add Privilege
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        {id ? "Edit Privilege" : "Add Privilege"}
       </h2>
 
-      <div>
+      <div className="mb-4">
         <label
-          htmlFor="name"
-          className="block mb-1 text-gray-700 dark:text-gray-300"
+          htmlFor="permissionName"
+          className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
         >
-          Name
+          Permission Name
         </label>
         <input
-          id="name"
-          name="name"
+          id="permissionName"
+          name="permissionName"
           type="text"
-          value={formData.name}
+          value={formData.permissionName}
           onChange={handleChange}
           required
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          placeholder="Privilege name"
+          disabled={loading}
+          className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
       </div>
 
-      <div>
+      <div className="mb-4">
         <label
           htmlFor="description"
-          className="block mb-1 text-gray-700 dark:text-gray-300"
+          className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
         >
           Description
         </label>
@@ -69,27 +124,55 @@ export default function AddPrivilege({ onCreate, onClose }: AddPrivilegeProps) {
           value={formData.description}
           onChange={handleChange}
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          placeholder="Describe the privilege"
+          disabled={loading}
+          className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
       </div>
 
-      <div className="flex justify-between gap-3">
+      <div className="mb-4">
+        <label
+          htmlFor="action"
+          className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          Action
+        </label>
+        <input
+          id="action"
+          name="action"
+          type="text"
+          value={formData.action}
+          onChange={handleChange}
+          disabled={loading}
+          placeholder="e.g. create, read, update"
+          className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+        />
+      </div>
+
+      <div className="flex justify-between">
         <button
           type="button"
           onClick={handleCancel}
-          className="w-1/2 px-5 py-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-900 dark:text-white rounded transition"
+          disabled={loading}
+          className="w-1/2 mr-2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
         >
           Cancel
         </button>
-
         <button
           type="submit"
-          className="w-1/2 px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
+          disabled={loading}
+          className="w-1/2 ml-2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
         >
-          Create Privilege
+          {loading
+            ? id
+              ? "Updating..."
+              : "Creating..."
+            : id
+            ? "Update Privilege"
+            : "Create Privilege"}
         </button>
       </div>
     </form>
   );
-}
+};
+
+export default AddPrivilege;

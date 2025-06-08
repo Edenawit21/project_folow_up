@@ -1,39 +1,41 @@
+// DON'T import useRouter here
 import axios from "axios";
-
 import { PrivilegeResponse, PrivilegePayload } from "@/types";
 
-// 🔹 Fetch all privileges
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+// Fetch all privileges
 export const fetchPrivileges = async (): Promise<PrivilegeResponse[]> => {
-  const response = await axios.get("/api/privileges");
-  return response.data;
+  const response = await axios.get(`${API_URL}/api/Permission`);
+  return response.data.value;
 };
 
-// 🔹 Fetch single privilege by ID
+// Fetch single privilege by ID
 export const fetchPrivilegeById = async (
-  id: number
+  id: string
 ): Promise<PrivilegeResponse> => {
-  const response = await axios.get(`/api/privileges/${id}`);
+  const response = await axios.get(`${API_URL}/api/Permission/${id}`);
   return response.data;
 };
 
-// 🔹 Create a new privilege
+// Create a new privilege
 export const createPrivilege = async (
   data: PrivilegePayload
 ): Promise<PrivilegeResponse> => {
-  const response = await axios.post("/api/privileges", data);
+  const response = await axios.post(`${API_URL}/api/Permission`, data);
   return response.data;
 };
 
-// 🔹 Update an existing privilege
+// Update an existing privilege
 export const updatePrivilege = async (
-  id: number,
+  id: string,
   data: PrivilegePayload
 ): Promise<PrivilegeResponse> => {
-  const response = await axios.put(`/api/privileges/${id}`, data);
+  const response = await axios.put(`${API_URL}/api/Permission/{id}`, data);
   return response.data;
 };
 
-// 🔹 Delete a privilege
-export const deletePrivilege = async (id: number): Promise<void> => {
-  await axios.delete(`/api/privileges/${id}`);
+// Delete a privilege
+export const deletePrivilege = async (id: string): Promise<void> => {
+  await axios.delete(`${API_URL}/api/Permission/{id}`);
 };
