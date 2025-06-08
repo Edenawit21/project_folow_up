@@ -3,22 +3,12 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { login } from "@/utils/auth"; 
-
-type FormState = {
-  username: string;
-  password: string;
-};
-
-type Errors = {
-  username?: string;
-  password?: string;
-  general?: string;
-};
+import { login } from "@/utils/auth";
+import { Errors, FormState } from "@/types";
 
 const Login = () => {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>({ username: "", password: "" });
+  const [form, setForm] = useState<FormState>({ email: "", password: "" });
   const [errors, setErrors] = useState<Errors>({});
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +22,7 @@ const Login = () => {
     e.preventDefault();
 
     const newErrors: Errors = {};
-    if (!form.username.trim()) newErrors.username = "Username is required.";
+    if (!form.email.trim()) newErrors.email = "Email is required.";
     if (!form.password.trim()) newErrors.password = "Password is required.";
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -41,14 +31,12 @@ const Login = () => {
 
     try {
       setLoading(true);
-      const response = await login(form.username, form.password, {
-        username: form.username,
+      const response = await login({
+        email: form.email,
         password: form.password,
       });
 
       localStorage.setItem("token", response.token);
-
-      // Redirect to project list
       router.push("/dashboard");
     } catch (err: any) {
       setErrors({ general: err.message || "Login failed." });
@@ -76,26 +64,26 @@ const Login = () => {
 
           <div>
             <label
-              htmlFor="username"
+              htmlFor="email"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
-              Username
+              Email
             </label>
             <input
-              id="username"
-              name="username"
-              type="text"
-              value={form.username}
+              id="email"
+              name="email"
+              type="email"
+              value={form.email}
               onChange={handleChange}
-              placeholder="Enter your username"
+              placeholder="Enter your email"
               className={`w-full px-4 py-2 text-base rounded-md border ${
-                errors.username
+                errors.email
                   ? "border-red-500"
                   : "border-gray-300 dark:border-gray-600"
               } bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 transition`}
             />
-            {errors.username && (
-              <p className="text-red-600 text-sm mt-1">{errors.username}</p>
+            {errors.email && (
+              <p className="text-red-600 text-sm mt-1">{errors.email}</p>
             )}
           </div>
 

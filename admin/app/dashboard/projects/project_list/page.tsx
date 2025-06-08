@@ -13,7 +13,7 @@ export default function ProjectsPage() {
   const router = useRouter();
 
   const [projects, setProjects] = useState<Project[]>([]);
-  const [filters, setFilters] = useState({ riskLevel: "" });
+  const [filters, setFilters] = useState({ projectHealth: "" });
   const [view, setView] = useState<"table" | "board">("table");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,10 +34,11 @@ export default function ProjectsPage() {
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
       return (
-        filters.riskLevel === "" || project.riskLevel === filters.riskLevel
+        filters.projectHealth === "" ||
+        project.projectHealth === filters.projectHealth
       );
     });
-  }, [projects, filters.riskLevel]);
+  }, [projects, filters.projectHealth]);
 
   const totalPages = Math.ceil(filteredProjects.length / rowsPerPage);
 
@@ -87,12 +88,7 @@ export default function ProjectsPage() {
           </div>
         ) : (
           <>
-            <ProjectTable
-              projects={paginatedProjects}
-              onEdit={() => alert("Edit removed.")}
-              onDelete={handleDelete}
-              viewMode={view}
-            />
+            <ProjectTable projects={paginatedProjects} viewMode={view} />
             <PaginationFooter
               currentPage={currentPage}
               rowsPerPage={rowsPerPage}

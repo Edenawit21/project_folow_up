@@ -65,7 +65,7 @@ const Sidebar = () => {
             />
             <SidebarLink
               icon={ShieldCheck}
-              label="Privileges"
+              label="Permissions"
               href="/dashboard/privileges/privilege_list"
             />
           </nav>
