@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { login } from "@/utils/auth";
+import { login } from "@/utils/auth"; // Your API login function
 import { Errors, FormState } from "@/types";
 
 const Login = () => {
@@ -24,6 +24,7 @@ const Login = () => {
     const newErrors: Errors = {};
     if (!form.email.trim()) newErrors.email = "Email is required.";
     if (!form.password.trim()) newErrors.password = "Password is required.";
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -51,7 +52,10 @@ const Login = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-md bg-white dark:bg-gray-900 rounded-xl p-10 border border-green-100 shadow-lg"
+        className="w-full max-w-md bg-white dark:bg-gray-900 rounded-xl p-10 border border-green-100"
+        style={{
+          boxShadow: "0 4px 24px rgba(0, 132, 61, 0.2)",
+        }}
       >
         <h2 className="text-4xl font-bold text-center mb-8 text-black dark:text-white">
           Welcome
