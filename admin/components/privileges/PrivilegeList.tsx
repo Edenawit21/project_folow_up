@@ -1,47 +1,56 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Trash2, Edit2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { fetchPrivileges, deletePrivilege } from "@/utils/privilegeApi";
 import { PrivilegeResponse } from "@/types";
-import { useRouter } from "next/navigation";
+import { Pencil, Trash2 } from "lucide-react";
 
 const PrivilegeList: React.FC = () => {
   const [privileges, setPrivileges] = useState<PrivilegeResponse[]>([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const loadPrivileges = async () => {
-      try {
-        const data = await fetchPrivileges();
-        setPrivileges(data);
-      } catch (error) {
-        toast.error("Failed to load privileges.");
-      }
-    };
-
     loadPrivileges();
   }, []);
 
-  const startEdit = (privilege: PrivilegeResponse) => {
-    router.push(`/privileges/edit?id=${privilege.id}`);
+  const loadPrivileges = async () => {
+    try {
+      const data = await fetchPrivileges();
+      setPrivileges(data);
+    } catch (error) {
+      toast.error("Failed to load privileges.");
+    }
   };
 
-  const handleDelete = async (id: number) => {
-    const confirmDelete = confirm(
+  const handleEdit = (privilege: PrivilegeResponse) => {
+    // Optional toast
+    toast.info(`Editing privilege: ${privilege.permissionName}`);
+
+    // Navigate to edit page with ID as query param or route param
+    router.push(`/dashboard/privileges/add_privilege?id=${privilege.id}`);
+  };
+
+  const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm(
       "Are you sure you want to delete this privilege?"
     );
     if (!confirmDelete) return;
 
     try {
+      setLoading(true);
       await deletePrivilege(id);
-      setPrivileges((prev) => prev.filter((p) => p.id !== id));
       toast.success("Privilege deleted successfully.");
+      loadPrivileges();
     } catch (error) {
       toast.error("Failed to delete privilege.");
+    } finally {
+      setLoading(false);
     }
   };
+  
 
   return (
     <div className="max-w-5xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
@@ -75,39 +84,43 @@ const PrivilegeList: React.FC = () => {
                   key={p.id}
                   className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {p.privilegeName}
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {p.permissionName}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
                     {p.description}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                    {new Date(p.createdAt).toLocaleDateString()}
+                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                    {p.createdAt
+                      ? new Date(p.createdAt).toLocaleDateString()
+                      : "N/A"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="flex gap-3 justify-end">
-                      <button
-                        onClick={() => startEdit(p)}
-                        className="text-blue-600 hover:text-blue-800"
-                        aria-label={`Edit privilege ${p.privilegeName}`}
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(p.id)}
-                        className="text-red-600 hover:text-red-800"
-                        aria-label={`Delete privilege ${p.privilegeName}`}
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
+                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                    {p.action}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 flex gap-4">
+                    <button
+                      onClick={() => handleEdit(p)}
+                      className="hover:text-blue-600 cursor-pointer"
+                      title="Edit"
+                    >
+                      <Pencil size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p.id)}
+                      className="hover:text-red-600 cursor-pointer"
+                      disabled={loading}
+                      title="Delete"
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={5}
                   className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
                 >
                   No privileges found.
