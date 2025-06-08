@@ -13,7 +13,7 @@ export default function ProjectsPage() {
   const router = useRouter();
 
   const [projects, setProjects] = useState<Project[]>([]);
-  const [filters, setFilters] = useState({ projectHealth: "" });
+  const [filters, setFilters] = useState({ riskLevel: "" });
   const [view, setView] = useState<"table" | "board">("table");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,17 +28,16 @@ export default function ProjectsPage() {
   };
 
   const onCreateClick = () => {
-    router.push("/dashboard/projects/add_project");
+    router.push("/projects/add_project");
   };
 
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
       return (
-        filters.projectHealth === "" ||
-        project.projectHealth === filters.projectHealth
+        filters.riskLevel === "" || project.riskLevel === filters.riskLevel
       );
     });
-  }, [projects, filters.projectHealth]);
+  }, [projects, filters.riskLevel]);
 
   const totalPages = Math.ceil(filteredProjects.length / rowsPerPage);
 
@@ -88,7 +87,12 @@ export default function ProjectsPage() {
           </div>
         ) : (
           <>
-            <ProjectTable projects={paginatedProjects} viewMode={view} />
+            <ProjectTable
+              projects={paginatedProjects}
+              onEdit={() => alert("Edit removed.")}
+              onDelete={handleDelete}
+              viewMode={view}
+            />
             <PaginationFooter
               currentPage={currentPage}
               rowsPerPage={rowsPerPage}

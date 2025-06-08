@@ -13,10 +13,10 @@ const RoleList: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadRoles = async () => {
+    const loadData = async () => {
       try {
-        const data = await fetchAllRoles();
-        setRoles(data);
+        const roleData = await fetchAllRoles();
+        setRoles(roleData);
       } catch (error) {
         toast.error("Failed to load roles.");
       } finally {
@@ -24,11 +24,11 @@ const RoleList: React.FC = () => {
       }
     };
 
-    loadRoles();
+    loadData();
   }, []);
 
   const handleEdit = (role: RoleData) => {
-    router.push(`/roles/create_role?edit=true&id=${role.id}`);
+    router.push(`/dashboard/roles/edit/${role.id}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -55,27 +55,23 @@ const RoleList: React.FC = () => {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              {[
-                "Name",
-                "Description",
-                "Permissions",
-                "Created At",
-                "Actions",
-              ].map((header) => (
-                <th
-                  key={header}
-                  className="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
-                >
-                  {header}
-                </th>
-              ))}
+              {["Name", "Description", "Created At", "Actions"].map(
+                (header) => (
+                  <th
+                    key={header}
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
+                  >
+                    {header}
+                  </th>
+                )
+              )}
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
             {loading ? (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={4}
                   className="text-center px-6 py-8 text-gray-500 dark:text-gray-400"
                 >
                   Loading...
@@ -94,9 +90,6 @@ const RoleList: React.FC = () => {
                     {role.description}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                    {role.Permissions?.privilegeName || role.privilegeId}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                     {role.createdAt
                       ? new Date(role.createdAt).toLocaleDateString()
                       : "N/A"}
@@ -105,14 +98,14 @@ const RoleList: React.FC = () => {
                     <div className="flex gap-3 justify-end">
                       <button
                         onClick={() => handleEdit(role)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-blue-600 hover:text-blue-800 cursor-pointer"
                         aria-label={`Edit role ${role.name}`}
                       >
                         <Edit2 size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(role.id)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-red-600 hover:text-red-800 cursor-pointer"
                         aria-label={`Delete role ${role.name}`}
                       >
                         <Trash2 size={18} />
@@ -124,7 +117,7 @@ const RoleList: React.FC = () => {
             ) : (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={4}
                   className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
                 >
                   No roles found.
@@ -137,4 +130,5 @@ const RoleList: React.FC = () => {
     </div>
   );
 };
+
 export default RoleList;
