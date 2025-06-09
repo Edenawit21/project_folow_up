@@ -7,15 +7,12 @@ import {
   fetchRoleById,
   createRole,
   updateRole,
-  fetchPrivileges,
-} from "@/utils/roleApi";
+ 
+} from "@/utils/roleApi"; 
+import { fetchPrivileges} from "@/utils/privilegeApi"
 import { RoleData } from "@/types";
 
-interface Privilege {
-  id: string;
-  name: string;
-}
-
+import { Privilege } from "@/types";
 const CreateRole: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -29,17 +26,17 @@ const CreateRole: React.FC = () => {
   const [privileges, setPrivileges] = useState<Privilege[]>([]);
 
   // Load all available privileges
-  useEffect(() => {
-    const loadPrivileges = async () => {
-      try {
-        const data = await fetchPrivileges();
-        setPrivileges(data);
-      } catch {
-        toast.error("Failed to load privileges.");
-      }
-    };
-    loadPrivileges();
-  }, []);
+  // useEffect(() => {
+  //   const loadPrivileges = async () => {
+  //     try {
+  //       const data = await fetchPrivileges();
+  //       setPrivileges(data);
+  //     } catch {
+  //       toast.error("Failed to load privileges.");
+  //     }
+  //   };
+  //   loadPrivileges();
+  // }, []);
 
   // If edit mode, load the role's existing data
   useEffect(() => {
@@ -160,7 +157,7 @@ const CreateRole: React.FC = () => {
             <option value="">Select privilege</option>
             {privileges.map((priv) => (
               <option key={priv.id} value={priv.id}>
-                {priv.name}
+                {priv.permissionName}
               </option>
             ))}
           </select>

@@ -28,7 +28,7 @@ const RoleList: React.FC = () => {
   }, []);
 
   const handleEdit = (role: RoleData) => {
-    router.push(`/dashboard/roles/edit/${role.id}`);
+    router.push(`/dashboard/roles/create_role`);
   };
 
   const handleDelete = async (id: string) => {
@@ -80,7 +80,7 @@ const RoleList: React.FC = () => {
             ) : roles.length > 0 ? (
               roles.map((role) => (
                 <tr
-                  key={role.id}
+                  key={role.name}
                   className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
