@@ -1,187 +1,160 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { UserForm } from "@/types";
-import { registerUser, updateUser } from "@/utils/userApi";
+import { useEffect, useState } from "react";
+import { RoleData, CreateUserDto } from "@/types";
+import { fetchAllRoles } from "@/utils/roleApi";
+import { registerUser } from "@/utils/userApi";
+import { toast } from "react-toastify"; // Optional if you're using toast
 
-interface AddUserProps {
-  userId?: string;
-  initialData?: Partial<UserForm>;
-}
-
-const AddUser: React.FC<AddUserProps> = ({ userId, initialData }) => {
-  const router = useRouter();
-
-  const [form, setForm] = useState<UserForm>({
-    username: "",
+const AddUser = () => {
+  const [formData, setFormData] = useState<CreateUserDto>({
+    firstName: "",
+    lastName: "",
+    accountId: "",
     email: "",
-    password: "",
-    role: "",
-    ...initialData,
+    roles: [],
   });
 
-  const isEditMode = Boolean(userId);
+  const [roles, setRoles] = useState<RoleData[]>([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isEditMode && initialData) {
-      setForm((prev) => ({
-        ...prev,
-        ...initialData,
-        password: "", // Clear password field on edit
-      }));
-    }
-  }, [initialData, isEditMode]);
+    const loadRoles = async () => {
+      try {
+        const apiResponse = await fetchAllRoles();
+        const roleData: RoleData[] = apiResponse.value || [];
+        setRoles(roleData);
+      } catch (error) {
+        toast.error("Failed to load roles.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+    loadRoles();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRoleChange = (roleName: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      roles: prev.roles.includes(roleName)
+        ? prev.roles.filter((r) => r !== roleName)
+        : [...prev.roles, roleName],
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (
-      !form.username ||
-      !form.email ||
-      (!form.password && !isEditMode) ||
-      !form.role
-    ) {
-      toast.warn("Please fill in all required fields.");
-      return;
-    }
+    setMessage("");
+    setError("");
 
     try {
-      if (isEditMode) {
-        const updateData: Partial<UserForm> = {
-          email: form.email,
-          role: form.role,
-        };
-        if (form.password) {
-          updateData.password = form.password;
-        }
-
-        await updateUser(userId!, updateData);
-        toast.success("User updated successfully!");
-      } else {
-        await registerUser(form);
-        toast.success("User registered successfully!");
-      }
-
-      router.push("/users/user_list");
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("An error occurred. Please try again.");
+      await registerUser(formData);
+      setMessage("User created successfully!");
+      setFormData({
+        firstName: "",
+        lastName: "",
+        accountId: "",
+        email: "",
+        roles: [],
+      });
+    } catch (err: any) {
+      console.error("Error creating user:", err);
+      setError(err.response?.data?.message || "Failed to create user.");
     }
-  };
-
-  const handleCancel = () => {
-    router.back();
   };
 
   return (
-    <div className="flex items-center justify-center bg-white dark:bg-gray-900 px-4 min-h-screen mt-10">
-      <form
-        onSubmit={handleSubmit}
-        autoComplete="off"
-        className="w-full max-w-xl p-8 bg-white dark:bg-gray-800 rounded-sm shadow-2xl space-y-6 border border-gray-200 dark:border-gray-700"
-      >
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          {isEditMode ? "Edit User" : "Register New User"}
-        </h2>
+    <div className="max-w-md mx-auto mt-10 p-4 border rounded shadow">
+      <h2 className="text-xl font-semibold mb-4">Add User</h2>
 
-        {/* Username */}
-        <div>
-          <label className="block mb-2 font-semibold text-gray-800 dark:text-gray-300">
-            Username
-          </label>
-          <input
-            type="text"
-            name="username"
-            value={form.username}
-            onChange={handleChange}
-            placeholder="Enter username"
-            className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-            disabled={isEditMode}
-            required
-          />
-        </div>
+      {message && <p className="text-green-600 mb-2">{message}</p>}
+      {error && <p className="text-red-600 mb-2">{error}</p>}
 
-        {/* Email */}
-        <div>
-          <label className="block mb-2 font-semibold text-gray-800 dark:text-gray-300">
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Enter user's email"
-            className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-            required
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          name="firstName"
+          value={formData.firstName}
+          onChange={handleChange}
+          placeholder="First Name"
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
+          type="text"
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleChange}
+          placeholder="Last Name"
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
+          type="text"
+          name="accountId"
+          value={formData.accountId}
+          onChange={handleChange}
+          placeholder="Account ID"
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Email"
+          className="w-full p-2 border rounded"
+          required
+        />
 
-        {/* Password */}
-        <div>
-          <label className="block mb-2 font-semibold text-gray-800 dark:text-gray-300">
-            Password {isEditMode ? "(leave blank to keep current)" : ""}
-          </label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            placeholder={isEditMode ? "••••••••" : "Enter password"}
-            className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-            {...(!isEditMode && { required: true })}
-          />
-        </div>
-
-        {/* Role */}
-        <div>
-          <label className="block mb-2 font-semibold text-gray-800 dark:text-gray-300">
-            Role
-          </label>
-          <select
-            name="role"
-            value={form.role}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
-            required
-          >
-            <option value="" disabled>
-              Select a role
-            </option>
-            <option value="Admin">Admin</option>
-            <option value="Director">Director</option>
-            <option value="ProjectManager">Project Manager</option>
-            <option value="TeamLeader">Team Leader</option>
-            <option value="ProjectOwner">Project Owner</option>
-          </select>
-        </div>
-
-        {/* Buttons */}
-        <div className="flex justify-between gap-4 pt-4">
+        {/* Role Dropdown */}
+        <div className="relative">
+          <label className="block font-medium">Assign Roles</label>
           <button
             type="button"
-            onClick={handleCancel}
-            className="w-1/2 py-3 rounded bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold transition-colors duration-300"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="w-full border p-2 rounded text-left bg-white"
           >
-            Cancel
+            {formData.roles.length > 0
+              ? formData.roles.join(", ")
+              : "Select roles"}
           </button>
-          <button
-            type="submit"
-            className="w-1/2 py-3 rounded bg-green-600 hover:bg-green-700 text-white font-semibold transition-colors duration-300"
-          >
-            {isEditMode ? "Update User" : "Register User"}
-          </button>
+          {dropdownOpen && (
+            <div className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow">
+              {roles.map((role) => (
+                <label
+                  key={role.roleId}
+                  className="flex items-center px-4 py-2 hover:bg-gray-100"
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.roles.includes(role.name)}
+                    onChange={() => handleRoleChange(role.name)}
+                    className="mr-2"
+                  />
+                  {role.name}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          Add User
+        </button>
       </form>
     </div>
   );

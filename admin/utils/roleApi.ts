@@ -18,7 +18,7 @@ export const fetchAllRoles = async (): Promise<RoleData[]> => {
 // Create a new role
 export const createRole = async (data: Omit<RoleData, "id">) => {
   const response = await axios.post(`${BASE_URL}/api/Role`, data);
-  return response.data;
+  return response.data.value;
 };
 
 // Update an existing role
@@ -33,8 +33,3 @@ export const deleteRole = async (id: string) => {
   return response.data;
 };
 
-// Fetch all privileges
-export const fetchPrivileges = async () => {
-  const response = await axios.get(`${BASE_URL}/api/Permission`);
-  return response.data;
-};
