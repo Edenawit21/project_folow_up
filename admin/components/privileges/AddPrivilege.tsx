@@ -8,15 +8,17 @@ import {
   fetchPrivilegeById,
 } from "@/utils/privilegeApi";
 import { toast } from "react-toastify";
+import {PrivilegePayload} from "@/types"
 
-interface PrivilegeFormData {
-  permissionName: string;
-  description: string;
-  action: string;
+
+
+interface AddPrivilegeProps {
+  onClose: () => void;
+  onCreate?: (data: PrivilegePayload) => void;
 }
 
-const AddPrivilege: React.FC = () => {
-  const [formData, setFormData] = useState<PrivilegeFormData>({
+const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
+  const [formData, setFormData] = useState<PrivilegePayload>({
     permissionName: "",
     description: "",
     action: "",
@@ -29,11 +31,9 @@ const AddPrivilege: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      console.log("Fetching privilege with ID:", id);
       setLoading(true);
       fetchPrivilegeById(id)
         .then((data) => {
-          console.log("Fetched data:", data); // Check this
           setFormData({
             permissionName: data.permissionName ?? "",
             description: data.description ?? "",
@@ -47,7 +47,6 @@ const AddPrivilege: React.FC = () => {
         .finally(() => setLoading(false));
     }
   }, [id]);
-  
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -64,11 +63,13 @@ const AddPrivilege: React.FC = () => {
       if (id) {
         await updatePrivilege(id, formData);
         toast.success("Privilege updated successfully!");
+        router.push("/dashboard/privileges");
       } else {
         await createPrivilege(formData);
         toast.success("Privilege created successfully!");
+        if (onCreate) onCreate(formData); 
       }
-      router.push("/dashboard/privileges/privilege_list");
+      onClose(); 
     } catch (error) {
       toast.error(
         id ? "Failed to update privilege." : "Failed to create privilege."
@@ -80,13 +81,13 @@ const AddPrivilege: React.FC = () => {
   };
 
   const handleCancel = () => {
-    router.back();
+    onClose();
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-md mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
+      className=" w-[500px] mt-10 p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
         {id ? "Edit Privilege" : "Add Privilege"}
