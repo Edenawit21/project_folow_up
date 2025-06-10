@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+
+import { PrivilegeFormData } from "@/types";
 import {
   createPrivilege,
   updatePrivilege,
@@ -9,13 +11,7 @@ import {
 } from "@/utils/privilegeApi";
 import { toast } from "react-toastify";
 
-interface PrivilegeFormData {
-  permissionName: string;
-  description: string;
-  action: string;
-}
-
-const AddPrivilege: React.FC = () => {
+const AddPrivilege = () => {
   const [formData, setFormData] = useState<PrivilegeFormData>({
     permissionName: "",
     description: "",
@@ -29,25 +25,21 @@ const AddPrivilege: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      console.log("Fetching privilege with ID:", id);
       setLoading(true);
       fetchPrivilegeById(id)
         .then((data) => {
-          console.log("Fetched data:", data); // Check this
           setFormData({
             permissionName: data.permissionName ?? "",
             description: data.description ?? "",
             action: data.action ?? "",
           });
         })
-        .catch((error) => {
+        .catch(() => {
           toast.error("Failed to load privilege.");
-          console.error("Error fetching privilege:", error);
         })
         .finally(() => setLoading(false));
     }
   }, [id]);
-  
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -63,17 +55,16 @@ const AddPrivilege: React.FC = () => {
     try {
       if (id) {
         await updatePrivilege(id, formData);
-        toast.success("Privilege updated successfully!");
+        toast.success("Permission updated successfully!");
       } else {
         await createPrivilege(formData);
-        toast.success("Privilege created successfully!");
+        toast.success("Permission created successfully!");
       }
       router.push("/dashboard/privileges/privilege_list");
-    } catch (error) {
+    } catch {
       toast.error(
         id ? "Failed to update privilege." : "Failed to create privilege."
       );
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -83,13 +74,22 @@ const AddPrivilege: React.FC = () => {
     router.back();
   };
 
+  // Optional: Show loading text while fetching privilege data
+  if (id && loading) {
+    return (
+      <div className="w-full max-w-md mx-auto mt-10 p-6 text-center text-gray-700 dark:text-gray-300">
+        Loading privilege data...
+      </div>
+    );
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
       className="w-full max-w-md mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-        {id ? "Edit Privilege" : "Add Privilege"}
+        {id ? "Update Permission" : "Add Permission"}
       </h2>
 
       <div className="mb-4">
@@ -167,8 +167,8 @@ const AddPrivilege: React.FC = () => {
               ? "Updating..."
               : "Creating..."
             : id
-            ? "Update Privilege"
-            : "Create Privilege"}
+            ? "Update Permission"
+            : "Create Permission"}
         </button>
       </div>
     </form>
