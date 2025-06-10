@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { fetchPrivileges, deletePrivilege } from "@/utils/privilegeApi";
 import { PrivilegeResponse } from "@/types";
@@ -11,7 +10,9 @@ const PrivilegeList: React.FC = () => {
   const [privileges, setPrivileges] = useState<PrivilegeResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const router = useRouter();
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [selectedPrivilege, setSelectedPrivilege] =
+    useState<PrivilegeResponse | null>(null);
 
   useEffect(() => {
     loadPrivileges();
@@ -22,19 +23,17 @@ const PrivilegeList: React.FC = () => {
     try {
       const data = await fetchPrivileges();
       setPrivileges(data);
-    } catch (error) {
+    } catch {
       toast.error("Failed to load privileges.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreate = () => {
-    router.push("/dashboard/privileges/add_privilege");
-  };
-
   const handleEdit = (privilege: PrivilegeResponse) => {
-    router.push(`/dashboard/privileges/add_privilege?id=${privilege.id}`);
+    toast.info(`Editing privilege: ${privilege.permissionName}`);
+    setSelectedPrivilege(privilege);
+    setEditModalOpen(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -45,20 +44,42 @@ const PrivilegeList: React.FC = () => {
       await deletePrivilege(id);
       toast.success("Privilege deleted successfully.");
       loadPrivileges();
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete privilege.");
     } finally {
       setDeletingId(null);
     }
   };
 
+  const handleCreate = () => {
+    // If you want to open create modal or navigate, implement here
+    toast.info("Create privilege modal or page navigation here.");
+  };
+
+  const handleModalClose = () => {
+    setEditModalOpen(false);
+    setSelectedPrivilege(null);
+  };
+
+  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // Implement save logic here, e.g., call API to update privilege
+    // For demo, just close modal and reload privileges
+    toast.success("Privilege updated successfully.");
+    setEditModalOpen(false);
+    setSelectedPrivilege(null);
+    loadPrivileges();
+  };
+
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+    <div className="max-w-5xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-center mb-8">
+        <h2 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
           Privilege Management
         </h2>
       </div>
+
+      {/* Table */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

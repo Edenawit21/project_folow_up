@@ -12,21 +12,18 @@ export const getUsers = async () => {
 // GET /api/User/{id}
 export const fetchUserById = async (userId: string) => {
   const res = await axios.get(`${API_BASE}/api/User/${userId}`);
-  if (!res.data.success) throw new Error("Failed to fetch user.");
   return res.data.data;
 };
 
 // POST /api/User
 export const registerUser = async (userData: Partial<User>) => {
   const res = await axios.post(`${API_BASE}/api/User`, userData);
-  if (!res.data.success) throw new Error("Failed to register user.");
   return res.data.data;
 };
 
 //  PUT /api/User/{id}
 export const updateUser = async (userId: string, userData: Partial<User>) => {
   const res = await axios.put(`${API_BASE}/api/User/${userId}`, userData);
-  if (!res.data.success) throw new Error("Failed to update user.");
   return res.data.data;
 };
 

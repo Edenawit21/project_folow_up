@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-
-import { PrivilegeFormData } from "@/types";
+import { useRouter } from "next/navigation";
+import { PrivilegePayload } from "@/types";
 import {
   createPrivilege,
   updatePrivilege,
@@ -11,17 +10,24 @@ import {
 } from "@/utils/privilegeApi";
 import { toast } from "react-toastify";
 
-const AddPrivilege = () => {
-  const [formData, setFormData] = useState<PrivilegeFormData>({
+interface AddPrivilegeProps {
+  id?: string;
+  onClose: () => void;
+  onCreate?: (data: PrivilegePayload) => void;
+}
+
+const AddPrivilege: React.FC<AddPrivilegeProps> = ({
+  id,
+  onClose,
+  onCreate,
+}) => {
+  const [formData, setFormData] = useState<PrivilegePayload>({
     permissionName: "",
     description: "",
     action: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
 
   useEffect(() => {
     if (id) {
@@ -34,9 +40,7 @@ const AddPrivilege = () => {
             action: data.action ?? "",
           });
         })
-        .catch(() => {
-          toast.error("Failed to load privilege.");
-        })
+        .catch(() => toast.error("Failed to load privilege."))
         .finally(() => setLoading(false));
     }
   }, [id]);
@@ -55,13 +59,14 @@ const AddPrivilege = () => {
     try {
       if (id) {
         await updatePrivilege(id, formData);
-        toast.success("Permission updated successfully!");
+        toast.success("Privilege updated successfully!");
       } else {
         await createPrivilege(formData);
-        toast.success("Permission created successfully!");
+        toast.success("Privilege created successfully!");
+        if (onCreate) onCreate(formData);
       }
-      router.push("/dashboard/privileges/privilege_list");
-    } catch {
+      onClose();
+    } catch (error) {
       toast.error(
         id ? "Failed to update privilege." : "Failed to create privilege."
       );
@@ -70,23 +75,10 @@ const AddPrivilege = () => {
     }
   };
 
-  const handleCancel = () => {
-    router.back();
-  };
-
-  // Optional: Show loading text while fetching privilege data
-  if (id && loading) {
-    return (
-      <div className="w-full max-w-md mx-auto mt-10 p-6 text-center text-gray-700 dark:text-gray-300">
-        Loading privilege data...
-      </div>
-    );
-  }
-
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-md mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
+      className="w-[500px] p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
         {id ? "Update Permission" : "Add Permission"}
@@ -151,7 +143,7 @@ const AddPrivilege = () => {
       <div className="flex justify-between">
         <button
           type="button"
-          onClick={handleCancel}
+          onClick={onClose}
           disabled={loading}
           className="w-1/2 mr-2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
         >
@@ -167,8 +159,8 @@ const AddPrivilege = () => {
               ? "Updating..."
               : "Creating..."
             : id
-            ? "Update Permission"
-            : "Create Permission"}
+            ? "Update"
+            : "Create"}
         </button>
       </div>
     </form>

@@ -10,12 +10,12 @@ import { Search } from "lucide-react";
 
 interface AddUserProps {
   userId?: string;
+  onClose: () => void;
 }
 
-const AddUser = ({ userId }: AddUserProps) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const isEdit = searchParams.get("edit") === "true";
+const AddUser = ({ userId, onClose }: AddUserProps) => {
+  const isEdit = !!userId;
+;
 
   const [formData, setFormData] = useState<CreateUserDto>({
     firstName: "",
@@ -66,7 +66,7 @@ const AddUser = ({ userId }: AddUserProps) => {
   };
 
   const handleCancel = () => {
-    router.back();
+    onClose();
   };
 
   const handleRoleChange = (roleName: string) => {
@@ -110,8 +110,6 @@ const AddUser = ({ userId }: AddUserProps) => {
   const filteredRoles = roles.filter((role) =>
     role.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="max-w-md mx-auto mt-10 p-4 border rounded shadow">
@@ -175,7 +173,6 @@ const AddUser = ({ userId }: AddUserProps) => {
 
           {dropdownOpen && (
             <div className="absolute z-10 w-full bg-white border rounded mt-1 max-h-60 overflow-y-auto shadow-lg">
-              {/* Search input */}
               <div className="sticky top-0 bg-white p-2 border-b">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
