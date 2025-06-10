@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+
+import { PrivilegeFormData } from "@/types";
 import {
   createPrivilege,
   updatePrivilege,
@@ -12,6 +14,7 @@ import {PrivilegePayload} from "@/types"
 
 
 
+
 interface AddPrivilegeProps {
   onClose: () => void;
   onCreate?: (data: PrivilegePayload) => void;
@@ -19,6 +22,10 @@ interface AddPrivilegeProps {
 
 const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
   const [formData, setFormData] = useState<PrivilegePayload>({
+
+const AddPrivilege = () => {
+  const [formData, setFormData] = useState<PrivilegeFormData>({
+
     permissionName: "",
     description: "",
     action: "",
@@ -40,9 +47,8 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
             action: data.action ?? "",
           });
         })
-        .catch((error) => {
+        .catch(() => {
           toast.error("Failed to load privilege.");
-          console.error("Error fetching privilege:", error);
         })
         .finally(() => setLoading(false));
     }
@@ -62,6 +68,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
     try {
       if (id) {
         await updatePrivilege(id, formData);
+
         toast.success("Privilege updated successfully!");
         router.push("/dashboard/privileges");
       } else {
@@ -71,10 +78,10 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
       }
       onClose(); 
     } catch (error) {
+
       toast.error(
         id ? "Failed to update privilege." : "Failed to create privilege."
       );
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -84,13 +91,22 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
     onClose();
   };
 
+  // Optional: Show loading text while fetching privilege data
+  if (id && loading) {
+    return (
+      <div className="w-full max-w-md mx-auto mt-10 p-6 text-center text-gray-700 dark:text-gray-300">
+        Loading privilege data...
+      </div>
+    );
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
       className=" w-[500px] mt-10 p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-        {id ? "Edit Privilege" : "Add Privilege"}
+        {id ? "Update Permission" : "Add Permission"}
       </h2>
 
       <div className="mb-4">
@@ -168,8 +184,8 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
               ? "Updating..."
               : "Creating..."
             : id
-            ? "Update Privilege"
-            : "Create Privilege"}
+            ? "Update Permission"
+            : "Create Permission"}
         </button>
       </div>
     </form>
