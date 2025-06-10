@@ -31,7 +31,7 @@ const UserList = () => {
   }, []);
 
   const handleEdit = (userId: string) => {
-    router.push(`/users/add_user?id=${userId}`);
+    router.push(`/dashboard/users/add_user?id=${userId}`);
   };
 
   const handleDelete = async (userId: string) => {

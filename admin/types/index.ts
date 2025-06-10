@@ -58,12 +58,13 @@ export interface Entity {
 export interface RoleData {
   roleId: string;
   name: string;
-  description: string;
+  description?: string;
   permissions: string[];
-  createdAt: string;
+  createdAt?: string;
 }
 
-// API response wrapper for role-related data
+
+//API response wrapper for role-related data
 export interface ApiResponse {
   valueOrDefault: RoleData[];
   value: RoleData[];
@@ -73,6 +74,7 @@ export interface ApiResponse {
   errors: any[];
   successes: any[];
 }
+
 
 // Represents a privilege/permission entity
 export interface Privilege {

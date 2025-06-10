@@ -32,10 +32,6 @@ const RoleList = () => {
     router.push(`/dashboard/roles/create_role?id=${role.roleId}`);
   };
 
-  const handleCreate = () => {
-    router.push("/dashboard/roles/create_role");
-  };
-
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this role?")) return;
 
