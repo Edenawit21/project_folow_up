@@ -30,7 +30,7 @@ const PrivilegeList: React.FC = () => {
     toast.info(`Editing privilege: ${privilege.permissionName}`);
 
     // Navigate to edit page with ID as query param or route param
-    router.push(`/dashboard/privileges?id=${privilege.id}`);
+    router.push(`/dashboard/privileges/add_privilege?id=${privilege.id}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -53,7 +53,7 @@ const PrivilegeList: React.FC = () => {
   
 
   return (
-    <div className="max-w-5xl  mt-20 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-5xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
       <div className="flex items-center justify-center mb-8">
         <h2 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
           Privilege Management
