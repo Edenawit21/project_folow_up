@@ -161,3 +161,9 @@ export interface CreateUserDto {
   email: string;
   roles: string[];
 }
+
+export interface RolePayload {
+  name: string;
+  description: string;
+  permissionIds: string[];
+}

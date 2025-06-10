@@ -56,12 +56,12 @@ const Sidebar = () => {
             <SidebarLink
               icon={Users}
               label="Users"
-              href="/dashboard/users/user_list"
+              href="/dashboard/users"
             />
             <SidebarLink
               icon={Key}
               label="Roles"
-              href="/dashboard/roles/role_list"
+              href="/dashboard/roles"
             />
             <SidebarLink
               icon={ShieldCheck}
