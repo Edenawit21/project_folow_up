@@ -1,4 +1,3 @@
-// DON'T import useRouter here
 import axios from "axios";
 import { PrivilegeResponse, PrivilegePayload } from "@/types";
 
@@ -25,17 +24,15 @@ export const createPrivilege = async (
   const response = await axios.post(`${API_URL}/api/Permission`, data);
   return response.data;
 };
-
-// Update an existing privilege
+// Update a privilege
 export const updatePrivilege = async (
   id: string,
   data: PrivilegePayload
 ): Promise<PrivilegeResponse> => {
-  const response = await axios.put(`${API_URL}/api/Permission/{id}`, data);
+  const response = await axios.put(`${API_URL}/api/Permission/${id}`, data);
   return response.data;
 };
-
 // Delete a privilege
 export const deletePrivilege = async (id: string): Promise<void> => {
-  await axios.delete(`${API_URL}/api/Permission/{id}`);
+  await axios.delete(`${API_URL}/api/Permission/${id}`);
 };
