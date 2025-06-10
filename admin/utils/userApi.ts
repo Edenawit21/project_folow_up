@@ -10,7 +10,7 @@ export const getUsers = async () => {
 };
 
 // GET /api/User/{id}
-export const getUserById = async (userId: string) => {
+export const fetchUserById = async (userId: string) => {
   const res = await axios.get(`${API_BASE}/api/User/${userId}`);
   if (!res.data.success) throw new Error("Failed to fetch user.");
   return res.data.data;

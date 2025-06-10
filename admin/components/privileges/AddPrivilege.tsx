@@ -11,7 +11,7 @@ import {
 } from "@/utils/privilegeApi";
 import { toast } from "react-toastify";
 
-const AddPrivilege: React.FC = () => {
+const AddPrivilege = () => {
   const [formData, setFormData] = useState<PrivilegeFormData>({
     permissionName: "",
     description: "",
@@ -89,7 +89,7 @@ const AddPrivilege: React.FC = () => {
       className="w-full max-w-md mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-        {id ? "Edit Privilege" : "Add Privilege"}
+        {id ? "Update Permission" : "Add Permission"}
       </h2>
 
       <div className="mb-4">

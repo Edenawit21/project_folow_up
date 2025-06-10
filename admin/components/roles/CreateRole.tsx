@@ -6,9 +6,9 @@ import { toast } from "react-toastify";
 import { fetchRoleById, createRole, updateRole } from "@/utils/roleApi";
 import { fetchPrivileges } from "@/utils/privilegeApi";
 import { RoleData, Privilege } from "@/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 
-const CreateRole: React.FC = () => {
+const CreateRole = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const roleId = searchParams.get("id");
@@ -21,10 +21,11 @@ const CreateRole: React.FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown if clicked outside
+  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -56,7 +57,7 @@ const CreateRole: React.FC = () => {
     loadPrivileges();
   }, []);
 
-  // Load role if in edit mode
+  // Load role in edit mode
   useEffect(() => {
     if (isEdit && roleId) {
       loadRole();
@@ -125,30 +126,19 @@ const CreateRole: React.FC = () => {
     }
   };
 
-  const handleCancel = () => {
-    router.back();
-  };
+  const handleCancel = () => router.back();
 
-  const getSelectedPrivilegeNames = () => {
-    if (selectedPrivileges.length === 0) return "Select permissions";
-    return (
-      privileges
-        .filter((p) => selectedPrivileges.includes(p.id))
-        .slice(0, 3)
-        .map((p) => p.permissionName)
-        .join(", ") +
-      (selectedPrivileges.length > 3
-        ? ` +${selectedPrivileges.length - 3} more`
-        : "")
-    );
-  };
+  // Filtered privileges based on search
+  const filteredPrivileges = privileges.filter((priv) =>
+    priv.permissionName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="px-4 py-8 w-[600px] ml-60">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-            {isEdit ? "Edit Role" : "Create New Role"}
+            {isEdit ? "Update Role" : "Create New Role"}
           </h2>
         </div>
 
@@ -190,115 +180,103 @@ const CreateRole: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-              Assign Permissions *
-            </label>
+          <div ref={dropdownRef} className="relative w-full">
+            <button
+              type="button"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              disabled={loading}
+              className={`w-full px-4 py-3 border ${
+                dropdownOpen
+                  ? "border-indigo-500 ring-1 ring-indigo-500"
+                  : "border-gray-300"
+              } rounded-sm bg-white dark:bg-gray-700 text-left text-gray-900 dark:text-white focus:outline-none flex justify-between items-center transition-all`}
+            >
+              <span className="text-gray-500 dark:text-gray-400">
+                Select permissions...
+              </span>
+              <svg
+                className={`w-5 h-5 transition-transform ${
+                  dropdownOpen ? "rotate-180" : "rotate-0"
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
 
-            {loading ? (
-              <div className="flex items-center justify-center p-8 border border-gray-300 rounded-sm bg-gray-50 dark:bg-gray-700">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-600" />
-                <span className="ml-3 text-gray-600 dark:text-gray-300">
-                  Loading permissions...
-                </span>
-              </div>
-            ) : (
-              <div ref={dropdownRef} className="relative w-full">
-                <button
-                  type="button"
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  disabled={loading}
-                  className={`w-full px-4 py-3 border ${
-                    dropdownOpen
-                      ? "border-indigo-500 ring-1 ring-indigo-500"
-                      : "border-gray-300"
-                  } rounded-sm bg-white dark:bg-gray-700 text-left text-gray-900 dark:text-white focus:outline-none flex justify-between items-center transition-all`}
-                >
-                  <span className="truncate">
-                    {getSelectedPrivilegeNames()}
-                  </span>
-                  <svg
-                    className={`w-5 h-5 ml-2 transition-transform ${
-                      dropdownOpen ? "rotate-180" : "rotate-0"
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
+            {dropdownOpen && (
+              <div className="absolute z-10 mt-2 w-full bg-white dark:bg-gray-800 border-[1px] border-gray-300 rounded-sm shadow-lg max-h-60 overflow-y-auto">
+                <div className="sticky top-0 bg-white dark:bg-gray-800 p-2 border-b border-gray-200 dark:border-gray-700">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search permissions..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     />
-                  </svg>
-                </button>
+                  </div>
+                </div>
 
-                {dropdownOpen && (
-                  <div className="absolute z-10 mt-2 w-full bg-white dark:bg-gray-800 border-[1px] border-gray-300 rounded-sm shadow-lg max-h-60 overflow-y-auto">
-                    {privileges.map((priv) => (
-                      <label
-                        key={priv.id}
-                        htmlFor={`priv-${priv.id}`}
-                        className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          id={`priv-${priv.id}`}
-                          checked={selectedPrivileges.includes(priv.id)}
-                          onChange={() => togglePrivilege(priv.id)}
-                          className="h-4 w-4 text-indigo-600 rounded-sm focus:ring-indigo-500"
-                        />
-                        <div className="ml-3 flex flex-col">
-                          <span className="text-gray-900 dark:text-gray-100 font-medium">
-                            {priv.permissionName}
-                          </span>
-                        </div>
-                      </label>
-                    ))}
-
-                    {privileges.length === 0 && (
-                      <div className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
-                        No permissions available
+                {filteredPrivileges.length > 0 ? (
+                  filteredPrivileges.map((priv) => (
+                    <label
+                      key={priv.id}
+                      htmlFor={`priv-${priv.id}`}
+                      className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        id={`priv-${priv.id}`}
+                        checked={selectedPrivileges.includes(priv.id)}
+                        onChange={() => togglePrivilege(priv.id)}
+                        className="h-4 w-4 text-indigo-600 rounded-sm focus:ring-indigo-500"
+                      />
+                      <div className="ml-3 flex flex-col">
+                        <span className="text-gray-900 dark:text-gray-100 font-medium">
+                          {priv.permissionName}
+                        </span>
                       </div>
-                    )}
+                    </label>
+                  ))
+                ) : (
+                  <div className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
+                    No matching permissions found.
                   </div>
                 )}
-
-                <div className="mt-2">
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {selectedPrivileges.length} permission(s) selected
-                  </span>
-                </div>
               </div>
             )}
           </div>
 
-          <div className="flex justify-end gap-4 pt-4">
+          <div className="flex justify-between">
             <button
               type="button"
               onClick={handleCancel}
-              disabled={submitting}
-              className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-sm font-medium transition-colors disabled:opacity-50 w-1/2"
+              disabled={loading}
+              className="w-1/2 mr-2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || submitting}
-              className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-sm font-medium transition-colors flex items-center justify-center disabled:opacity-50 w-1/2"
+              className="w-1/2 ml-2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
             >
-              {submitting ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                  {isEdit ? "Updating..." : "Creating..."}
-                </>
-              ) : isEdit ? (
-                "Update Role"
-              ) : (
-                "Create Role"
-              )}
+              {submitting
+                ? isEdit
+                  ? "Updating..."
+                  : "Creating..."
+                : isEdit
+                ? "Update Role"
+                : "Create Role"}
             </button>
           </div>
         </form>
