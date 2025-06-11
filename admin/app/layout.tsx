@@ -12,6 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+
 export const metadata: Metadata = {
   title: "ProjectManagement",
   description: "Manage IT projects efficiently",
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
     icon: "/favicon.png",
   },
 };
+
 
 export default function RootLayout({
   children,

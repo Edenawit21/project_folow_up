@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, { useEffect } from "react";
 import Navbar from "@/components/NavBar";
 import { SideBar } from "@/components/SideBar"; 
@@ -19,6 +20,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isDarkMode]);
 
+  
   return (
     <div className="flex min-h-screen w-full bg-gray-50 text-gray-900 dark:bg-black dark:text-white">
       {/* Only show SideBar when not collapsed */}
@@ -35,6 +37,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <StoreProvider>
@@ -42,5 +45,6 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
     </StoreProvider>
   );
 };
+
 
 export default DashboardWrapper;

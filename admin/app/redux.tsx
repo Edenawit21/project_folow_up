@@ -6,6 +6,7 @@ import {
   useDispatch,
   useSelector,
   Provider,
+
 } from "react-redux";
 import globalReducer from "@/utils";
 import { api } from "@/utils/api";
@@ -39,6 +40,7 @@ const createNoopStorage = () => {
   };
 };
 
+
 const storage =
   typeof window === "undefined"
     ? createNoopStorage()
@@ -70,6 +72,7 @@ export const makeStore = () => {
   });
 };
 
+
 /* REDUX TYPES */
 export type AppStore = ReturnType<typeof makeStore>;
 export type RootState = ReturnType<AppStore["getState"]>;
@@ -89,8 +92,8 @@ export default function StoreProvider({
     setupListeners(storeRef.current.dispatch);
   }
 
+  
   const persistor = persistStore(storeRef.current);
-
   // Purge persisted state once on mount to avoid unexpected keys warning
   useEffect(() => {
     persistor.purge();

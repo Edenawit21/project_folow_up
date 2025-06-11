@@ -41,6 +41,7 @@ export interface Task {
   summary: string;
 }
 
+
 // Represents filter criteria for projects
 export interface ProjectFilterState {
   status: string;
@@ -55,6 +56,7 @@ export interface Entity {
   id: string;
   name: string;
 }
+
 
 // Represents a user role with permissions
 export interface RoleData {
@@ -157,6 +159,7 @@ export interface PrivilegeFormData {
   action: string;
 }
 
+
 // Data transfer object for creating a new user
 export interface CreateUserDto {
   firstName: string;
@@ -165,6 +168,7 @@ export interface CreateUserDto {
   email: string;
   roles: string[];
 }
+
 
 export interface RolePayload {
   name: string;
