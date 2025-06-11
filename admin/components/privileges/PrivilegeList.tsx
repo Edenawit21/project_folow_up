@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { fetchPrivileges, deletePrivilege } from "@/utils/privilegeApi";
 import { PrivilegeResponse } from "@/types";
-import { Pencil, Trash2, PlusCircle, Loader2 } from "lucide-react";
+import { Pencil, Trash2, Loader2 } from "lucide-react";
 
 const PrivilegeList: React.FC = () => {
   const [privileges, setPrivileges] = useState<PrivilegeResponse[]>([]);
@@ -39,11 +39,11 @@ const PrivilegeList: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this privilege?")) return;
 
+    setDeletingId(id);
     try {
-      setDeletingId(id);
       await deletePrivilege(id);
       toast.success("Privilege deleted successfully.");
-      loadPrivileges();
+      await loadPrivileges();
     } catch {
       toast.error("Failed to delete privilege.");
     } finally {
@@ -51,35 +51,14 @@ const PrivilegeList: React.FC = () => {
     }
   };
 
-  const handleCreate = () => {
-    // If you want to open create modal or navigate, implement here
-    toast.info("Create privilege modal or page navigation here.");
-  };
-
-  const handleModalClose = () => {
-    setEditModalOpen(false);
-    setSelectedPrivilege(null);
-  };
-
-  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // Implement save logic here, e.g., call API to update privilege
-    // For demo, just close modal and reload privileges
-    toast.success("Privilege updated successfully.");
-    setEditModalOpen(false);
-    setSelectedPrivilege(null);
-    loadPrivileges();
-  };
-
   return (
     <div className="max-w-5xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-center mb-8">
+      <header className="flex items-center justify-center mb-8">
         <h2 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
           Privilege Management
         </h2>
-      </div>
+      </header>
 
-      {/* Table */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -116,10 +95,8 @@ const PrivilegeList: React.FC = () => {
                     key={p.id}
                     className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {p.permissionName}
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                      {p.permissionName}
                     </td>
                     <td className="px-6 py-4 max-w-[280px]">
                       <p className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[30ch]">
@@ -148,17 +125,18 @@ const PrivilegeList: React.FC = () => {
                       <div className="flex justify-end space-x-3">
                         <button
                           onClick={() => handleEdit(p)}
-                          className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                           aria-label={`Edit privilege ${p.permissionName}`}
                           disabled={deletingId === p.id}
+                          className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                         >
                           <Pencil size={18} />
                         </button>
+
                         <button
                           onClick={() => handleDelete(p.id)}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                           aria-label={`Delete privilege ${p.permissionName}`}
                           disabled={deletingId === p.id}
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                         >
                           {deletingId === p.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -181,16 +159,6 @@ const PrivilegeList: React.FC = () => {
                       <h3 className="text-lg font-medium">
                         No privileges found
                       </h3>
-                      <p className="max-w-md">
-                        Get started by creating a new privilege
-                      </p>
-                      <button
-                        onClick={handleCreate}
-                        className="mt-3 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                      >
-                        <PlusCircle size={16} />
-                        Create Privilege
-                      </button>
                     </div>
                   </td>
                 </tr>
