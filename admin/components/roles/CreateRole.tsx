@@ -89,7 +89,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
       );
     } catch {
       toast.error("Failed to load role.");
-      onClose(); // Close the form if load fails
+      onClose();
     } finally {
       setLoading(false);
     }
@@ -155,7 +155,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
   const filteredPrivileges = privileges.filter((priv) =>
     priv.permissionName.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   return (
     <div className="px-4 py-8 w-[600px] ml-60">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -164,7 +163,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
             {isEdit ? "Update Role" : "Create New Role"}
           </h2>
         </div>
-
         {loading ? (
           <div className="flex items-center justify-center h-48">
             <Loader2 className="animate-spin h-8 w-8 text-indigo-600" />
@@ -190,7 +188,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
             </div>
-
             <div>
               <label
                 htmlFor="description"

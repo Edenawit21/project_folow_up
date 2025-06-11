@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { PrivilegePayload } from "@/types";
 import {
   createPrivilege,
@@ -26,25 +25,25 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
     description: "",
     action: "",
   });
-
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
       setLoading(true);
       fetchPrivilegeById(id)
-        .then((data) => {
+        .then((data) =>
           setFormData({
-            permissionName: data.permissionName ?? "",
-            description: data.description ?? "",
-            action: data.action ?? "",
-          });
-        })
+            permissionName: data.permissionName || "",
+            description: data.description || "",
+            action: data.action || "",
+          })
+        )
         .catch(() => toast.error("Failed to load privilege."))
         .finally(() => setLoading(false));
     }
   }, [id]);
 
+  // Single handler for all inputs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -63,10 +62,10 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
       } else {
         await createPrivilege(formData);
         toast.success("Privilege created successfully!");
-        if (onCreate) onCreate(formData);
+        onCreate?.(formData);
       }
       onClose();
-    } catch (error) {
+    } catch {
       toast.error(
         id ? "Failed to update privilege." : "Failed to create privilege."
       );
@@ -84,61 +83,49 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
         {id ? "Update Permission" : "Add Permission"}
       </h2>
 
-      <div className="mb-4">
-        <label
-          htmlFor="permissionName"
-          className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
+      <label className="block mb-4">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Permission Name
-        </label>
+        </span>
         <input
-          id="permissionName"
           name="permissionName"
           type="text"
           value={formData.permissionName}
           onChange={handleChange}
           required
           disabled={loading}
-          className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
-      </div>
+      </label>
 
-      <div className="mb-4">
-        <label
-          htmlFor="description"
-          className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
+      <label className="block mb-4">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Description
-        </label>
+        </span>
         <textarea
-          id="description"
           name="description"
           value={formData.description}
           onChange={handleChange}
           rows={4}
           disabled={loading}
-          className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
-      </div>
+      </label>
 
-      <div className="mb-4">
-        <label
-          htmlFor="action"
-          className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
+      <label className="block mb-4">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Action
-        </label>
+        </span>
         <input
-          id="action"
           name="action"
           type="text"
           value={formData.action}
           onChange={handleChange}
           disabled={loading}
           placeholder="e.g. create, read, update"
-          className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
-      </div>
+      </label>
 
       <div className="flex justify-between">
         <button

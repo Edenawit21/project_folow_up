@@ -5,7 +5,6 @@ import { RoleData, CreateUserDto } from "@/types";
 import { fetchAllRoles } from "@/utils/roleApi";
 import { registerUser, fetchUserById, updateUser } from "@/utils/userApi";
 import { toast } from "react-toastify";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 
 interface AddUserProps {
