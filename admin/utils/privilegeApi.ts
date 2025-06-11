@@ -1,53 +1,67 @@
 import axios from "axios";
-import { PrivilegeResponse, PrivilegePayload } from "@/types";
+import { Permission, PermissionApiResponse } from "@/types/privilege";
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-// Fetch all privileges
-export const fetchPrivileges = async (): Promise<PrivilegeResponse[]> => {
-  const response = await axios.get(`${API_URL}/api/Permission`);
-  
-  if (!response.data.success) {
-    throw new Error('Failed to fetch privileges');
+//  Fetch all permissions
+export const fetchAllPermissions = async (): Promise<Permission[]> => {
+  const response = await axios.get<PermissionApiResponse>(
+    `${BASE_URL}/api/Permission`
+  );
+
+  if (!response.data.isSuccess) {
+    throw new Error("Failed to fetch permissions");
   }
-  
-  return response.data.data; // Access the data array directly from the response
+
+  return response.data.value ?? [];
 };
 
-// Fetch single privilege by ID
-export const fetchPrivilegeById = async (
-  id: string
-): Promise<PrivilegeResponse> => {
-  const response = await axios.get(`${API_URL}/api/Permission/${id}`);
-  
-  if (!response.data.success) {
-    throw new Error('Failed to fetch privilege');
+// Get permission by ID
+export const getPermissionById = async (id: string): Promise<Permission> => {
+  const response = await axios.get(`${BASE_URL}/api/Permission/${id}`);
+
+  if (!response.data.isSuccess) {
+    throw new Error("Failed to fetch permission by ID");
   }
-  
-  return response.data.data; // Return the data property
+
+  return response.data.value;
 };
 
-// Create a new privilege
-export const createPrivilege = async (
-  data: PrivilegePayload
-): Promise<PrivilegeResponse> => {
-  const response = await axios.post(`${API_URL}/api/Permission`, data);
-  
-  if (!response.data.success) {
-    throw new Error('Failed to create privilege');
+// Create a new permission
+export const createPermission = async (
+  permission: Omit<Permission, "id">
+): Promise<Permission> => {
+  const response = await axios.post(`${BASE_URL}/api/Permission`, permission);
+
+  if (!response.data.isSuccess) {
+    throw new Error("Failed to create permission");
   }
-  
-  return response.data.data;
+
+  return response.data.value;
 };
-// Update a privilege
-export const updatePrivilege = async (
+
+// Update an existing permission
+export const updatePermission = async (
   id: string,
-  data: PrivilegePayload
-): Promise<PrivilegeResponse> => {
-  const response = await axios.put(`${API_URL}/api/Permission/${id}`, data);
-  return response.data;
+  permission: Partial<Permission>
+): Promise<Permission> => {
+  const response = await axios.put(
+    `${BASE_URL}/api/Permission/${id}`,
+    permission
+  );
+
+  if (!response.data.isSuccess) {
+    throw new Error("Failed to update permission");
+  }
+
+  return response.data.value;
 };
-// Delete a privilege
-export const deletePrivilege = async (id: string): Promise<void> => {
-  await axios.delete(`${API_URL}/api/Permission/${id}`);
+
+// Delete a permission
+export const deletePermission = async (id: string): Promise<void> => {
+  const response = await axios.delete(`${BASE_URL}/api/Permission/${id}`);
+
+  if (!response.data.isSuccess) {
+    throw new Error("Failed to delete permission");
+  }
 };
