@@ -34,7 +34,7 @@ const PaginationFooter: React.FC<PaginationFooterProps> = ({
           id="rowsPerPage"
           value={rowsPerPage}
           onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
-          className="px-3 py-1 border rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-400"
+          className="px-3 py-1 border rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-black"
         >
           {[10, 20, 50, 100].map((num) => (
             <option key={num} value={num}>
@@ -49,7 +49,8 @@ const PaginationFooter: React.FC<PaginationFooterProps> = ({
         <button
           disabled={currentPage === 1}
           onClick={() => onPageChange(currentPage - 1)}
-          className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-green-700 hover:text-green-700 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400"
+          className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 
+          hover:bg-green-100 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black"
         >
           Previous
         </button>
@@ -61,10 +62,10 @@ const PaginationFooter: React.FC<PaginationFooterProps> = ({
             className={`px-3 py-1 rounded-md border transition-colors duration-200
               ${
                 page === currentPage
-                  ? "bg-green-600 text-white border-green-600"
-                  : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-green-100 dark:hover:bg-green-700 hover:text-green-700 dark:hover:text-white"
+                  ? "bg-white text-black border-black"
+                  : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-green-100 dark:hover:text-white"
               }
-              focus:outline-none focus:ring-2 focus:ring-green-400`}
+              focus:outline-none focus:ring-2 `}
           >
             {page}
           </button>
@@ -73,7 +74,7 @@ const PaginationFooter: React.FC<PaginationFooterProps> = ({
         <button
           disabled={currentPage === totalPages || totalPages === 0}
           onClick={() => onPageChange(currentPage + 1)}
-          className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-green-700 hover:text-green-700 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400"
+          className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 focus:outline-none focus:ring-2"
         >
           Next
         </button>

@@ -41,6 +41,7 @@ export interface Task {
   summary: string;
 }
 
+
 // Represents filter criteria for projects
 export interface ProjectFilterState {
   status: string;
@@ -54,30 +55,6 @@ export interface ProjectFilterState {
 export interface Entity {
   id: string;
   name: string;
-}
-// Represents a privilege/permission entity
-export interface Privilege {
-  id: string;
-  permissionName: string;
-  description: string;
-  createdAt?: string;
-  action: string;
-}
-
-// Payload for creating or updating a privilege
-export interface PrivilegePayload {
-  permissionName: string;
-  description: string;
-  action: string;
-}
-
-// Privilege data returned from API
-export interface PrivilegeResponse {
-  id: string;
-  permissionName: string;
-  description: string;
-  action?: string;
-  createdAt?: string;
 }
 
 // Represents a user entity
@@ -134,6 +111,7 @@ export interface PrivilegeFormData {
   action: string;
 }
 
+
 // Data transfer object for creating a new user
 export interface CreateUserDto {
   firstName: string;
@@ -142,6 +120,7 @@ export interface CreateUserDto {
   email: string;
   roles: string[];
 }
+
 
 export interface RolePayload {
   name: string;
