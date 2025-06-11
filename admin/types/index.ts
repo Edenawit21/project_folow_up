@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 // Represents a project with backend and optional UI fields
 export interface Project {
   projectKey: string;
@@ -103,9 +105,11 @@ export interface PrivilegeResponse {
 
 // Represents a user entity
 export interface User {
-  firstName: string;
-  lastName: string;
   accountId: string;
+  lastName: ReactNode;
+  firstName: ReactNode;
+  id: string;
+  Username: string;
   email: string;
   displayName: string;
   avatarUrl: string;

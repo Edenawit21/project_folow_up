@@ -3,16 +3,31 @@ import { RoleData, ApiResponse } from "@/types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+// Helper function to transform role data from API to RoleData type
+const transformRoleData = (role: any): RoleData => ({
+  roleId: role.roleId,
+  name: role.name,
+  description: role.description,
+  createdAt: role.createdAt,
+  permissions: role.permissions || [],
+});
+
 // Fetch a single role by ID
 export const fetchRoleById = async (id: string): Promise<RoleData> => {
   const response = await axios.get(`${BASE_URL}/api/Role/${id}`);
-  return response.data;
+  if (!response.data.success) {
+    throw new Error("Failed to fetch role");
+  }
+  return transformRoleData(response.data.data);
 };
 
 // Fetch all roles - returns ApiResponse wrapper
 export const fetchAllRoles = async (): Promise<ApiResponse> => {
   const response = await axios.get(`${BASE_URL}/api/Role`);
-  return response.data;
+  if (!response.data.success) {
+    throw new Error("Failed to fetch roles");
+  }
+  return response.data.data.map(transformRoleData);
 };
 
 // Fetch all roles - returns just RoleData[] extracted from ApiResponse.value
@@ -41,5 +56,8 @@ export const updateRole = async (
 // Delete a role - returns any confirmation or status from backend
 export const deleteRole = async (id: string): Promise<any> => {
   const response = await axios.delete(`${BASE_URL}/api/Role/${id}`);
+  if (!response.data.success) {
+    throw new Error("Failed to delete role");
+  }
   return response.data;
 };

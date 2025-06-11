@@ -110,6 +110,9 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
     role.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  /* ────────────────────────────────────
+   * UI
+   * ──────────────────────────────────── */
   return (
     <div className="max-w-md mx-auto mt-10 p-4 border rounded shadow">
       <h2 className="text-xl font-semibold mb-4">
@@ -220,16 +223,9 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
           </button>
           <button
             type="submit"
-            disabled={loading || submitting}
-            className="w-1/2 ml-2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
+            className="w-1/2 py-3 rounded bg-green-600 hover:bg-green-700 text-white font-semibold transition-colors duration-300"
           >
-            {submitting
-              ? userId
-                ? "Updating..."
-                : "Creating..."
-              : userId
-              ? "Update User"
-              : "Create User"}
+            {isEdit ? "Update User" : "Register User"}
           </button>
         </div>
       </form>

@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import Navbar from "@/components/NavBar";
-import Sidebar from "@/components/SideBar";
+import { SideBar } from "@/components/SideBar"; 
 import StoreProvider, { useAppSelector } from "./redux";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -21,11 +21,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex min-h-screen w-full bg-gray-50 text-gray-900 dark:bg-black dark:text-white">
-      <Sidebar />
+      {/* Only show SideBar when not collapsed */}
+      {!isSidebarCollapsed && <SideBar />}
       <main
         className={`flex w-full flex-col bg-white dark:bg-black ${
-          isSidebarCollapsed ? "" : "md:pl-64"
-        }`}
+          isSidebarCollapsed ? "" : "md:ml-64"
+        } transition-all duration-300`}
       >
         <Navbar />
         {children}

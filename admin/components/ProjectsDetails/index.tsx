@@ -1,62 +1,151 @@
 "use client";
 
-import { Project } from "@/types";
-import { Task } from "@/types";
-import TaskList from "./TaskList";
-import { FolderKanban } from "lucide-react";
-import Link from "next/link";
+import React, { useState, useEffect } from "react";
+import ProjectHeader from "@/components/ProjectsDetails/ProjectHeader";
+import HealthCard from "@/components/ProjectsDetails/HealthCard";
+import ProgressCard from "@/components/ui/Project/ProgressCard";
+import BlockersCard from "@/components/ui/Project/BlockersCard";
+import CompletionCard from "@/components/ui/Project/CompletionCard";
+import ActiveTasksCard from "@/components/ui/Project/ActiveTasksCard";
+import PriorityCard from "@/components/ui/Project/PriorityCard";
+import StatusDistributionCard from "@/components/ui/Project/StatusDistributionCard";
+import { ProjectDto, fetchProjectById } from "@/utils/Jira";
+import { TaskDto, fetchTasksByProject } from "@/utils/task";
 
-// Add proper type guards
-function isProject(project: any): project is Project {
-  return !!project?.key && !!project?.name;
-}
+export default function ProjectDetail({ projectId }: { projectId: string }) {
+  const [project, setProject] = useState<ProjectDto | null>(null);
+  const [tasks, setTasks] = useState<TaskDto[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-function areTasks(tasks: any): tasks is Task[] {
-  return Array.isArray(tasks);
-}
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [projectData, tasksData] = await Promise.all([
+          fetchProjectById(projectId),
+          fetchTasksByProject(projectId),
+        ]);
+        console.log("Project Data:", projectData);
+        
+        setProject(projectData);
+        setTasks(tasksData);
+      } catch (error) {
+        console.error("Error fetching project data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-export default function ProjectDetail({
-  project,
-  tasks,
-}: {
-  project: Project;
-  tasks: Task[];
-}) {
-  if (!isProject(project) || !areTasks(tasks)) {
-    console.error("Invalid props:", { project, tasks });
+    fetchData();
+  }, [projectId]);
+
+  if (isLoading || !project) {
     return (
-      <div className="p-6 text-red-500">
-        Invalid project data received
-        <Link href="/projects" className="block mt-4 text-blue-600">
-          ← Back to Projects
-        </Link>
-      </div>
-    );
-  }
-  {
-    return (
-      <div className="p-6">
-        <div className="flex items-center mb-6">
-          <div className="bg-blue-100 p-3 rounded-full mr-4">
-            <FolderKanban className="text-blue-600" size={20} />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">{project.projectName}</h1>
-            <p className="text-gray-500">{project.key}</p>
-          </div>
-        </div>
-
-        <TaskList tasks={tasks} />
-
-        <div className="mt-4">
-          <Link
-            href="/projects"
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-          >
-            ← Back to Projects
-          </Link>
+      <div className="grid grid-cols-1 gap-6 p-6">
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 animate-pulse h-32"></div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 animate-pulse h-48"
+            ></div>
+          ))}
         </div>
       </div>
     );
   }
+
+  // Calculate metrics from tasks
+  const statusCounts = calculateStatusDistribution(tasks);
+  const priorityCounts = calculatePriorityDistribution(tasks);
+  const completionPercentage = calculateCompletion(tasks);
+  const activeTasksCount = statusCounts["InProgress"] || 0;
+  const overdueTasksCount = countOverdueTasks(tasks);
+
+  const handleBack = () => {
+    // Navigation logic
+  };
+
+  const handleEdit = () => {
+    // Edit logic
+  };
+
+  return (
+    <div className="grid grid-cols-1 gap-6 p-6">
+      <ProjectHeader
+        project={project}
+        onBack={handleBack}
+        onEdit={handleEdit}
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <HealthCard health={project.Health} isLoading={isLoading} />
+        <ProgressCard
+          progress={{
+            totalTasks: project.Progress.TotalTasks,
+            completedTasks: project.Progress.CompletedTasks,
+            storyPointsCompleted: project.Progress.StoryPointsCompleted,
+            storyPointsTotal: project.Progress.StoryPointsTotal,
+            // Omit activeBlockers and recentUpdates since they're not needed
+          }}
+          isLoading={isLoading}
+        />
+        <BlockersCard
+          activeBlockers={project.Progress.ActiveBlockers}
+          recentUpdates={project.Progress.RecentUpdates}
+          overdueTasks={overdueTasksCount}
+          isLoading={isLoading}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <CompletionCard
+          completionPercentage={completionPercentage}
+          isLoading={isLoading}
+        />
+        <ActiveTasksCard
+          activeTasksCount={activeTasksCount}
+          isLoading={isLoading}
+        />
+        <PriorityCard priorityCounts={priorityCounts} isLoading={isLoading} />
+      </div>
+
+      <StatusDistributionCard
+        statusCounts={statusCounts}
+        isLoading={isLoading}
+      />
+    </div>
+  );
+}
+
+function calculateStatusDistribution(tasks: TaskDto[]): Record<string, number> {
+  return tasks.reduce((acc, task) => {
+    acc[task.Status] = (acc[task.Status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+}
+
+function calculatePriorityDistribution(
+  tasks: TaskDto[]
+): Record<string, number> {
+  return tasks.reduce((acc, task) => {
+    const priority = task.Priority?.trim().toLowerCase() || "unspecified";
+    acc[priority] = (acc[priority] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+}
+
+function calculateCompletion(tasks: TaskDto[]): number {
+  const total = tasks.length;
+  const done = tasks.filter((t) => t.Status === "Done").length;
+  return total > 0 ? Math.round((done / total) * 100) : 0;
+}
+
+function countOverdueTasks(tasks: TaskDto[]): number {
+  const today = new Date();
+  return tasks.filter((t) => {
+    if (!t.DueDate) return false;
+    const dueDate = new Date(t.DueDate);
+    return dueDate < today && t.Status !== "Done";
+  }).length;
 }
