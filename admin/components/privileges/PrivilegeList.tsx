@@ -75,7 +75,7 @@ const PrivilegeList: React.FC = () => {
     <div className="max-w-5xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
       <div className="flex items-center justify-center mb-8">
         <h2 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
-          Privilege Management
+          Permission Management
         </h2>
       </div>
 
@@ -106,7 +106,7 @@ const PrivilegeList: React.FC = () => {
                   >
                     <div className="flex flex-col items-center justify-center gap-3">
                       <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-                      <span>Loading privileges...</span>
+                      <span>Loading permissions...</span>
                     </div>
                   </td>
                 </tr>
@@ -179,17 +179,17 @@ const PrivilegeList: React.FC = () => {
                     <div className="flex flex-col items-center justify-center gap-3">
                       <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-16 h-16" />
                       <h3 className="text-lg font-medium">
-                        No privileges found
+                        No permissions found
                       </h3>
                       <p className="max-w-md">
-                        Get started by creating a new privilege
+                        Get started by creating a new permission
                       </p>
                       <button
                         onClick={handleCreate}
                         className="mt-3 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
                       >
                         <PlusCircle size={16} />
-                        Create Privilege
+                        Create Permission
                       </button>
                     </div>
                   </td>

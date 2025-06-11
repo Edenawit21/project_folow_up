@@ -16,18 +16,12 @@ export default function PrivilegeListPage() {
           onClick={() => setIsAddOpen(true)}
           aria-label="Create new privilege"
           title="Create new privilege"
-          className="
-            flex items-center gap-2 bg-green-600 text-white px-5 py-2 rounded-[1px] shadow-md
-            hover:bg-green-700 hover:shadow-lg
-            focus:outline-none
-            transition-transform duration-200 cursor-pointer hover:scale-105
-          "
-        >
-          <Plus size={20} strokeWidth={2} />
-          Create Privilege
+          className="flex items-center gap-2 px-2 py-2 rounded-md shadow bg-white text-black hover:bg-gray"
+          >
+          <Plus size={18} />
+          Create Permission
         </button>
       </div>
-
       <PrivilegeList key={refreshKey} />
 
       {isAddOpen && (
