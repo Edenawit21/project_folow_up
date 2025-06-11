@@ -18,6 +18,7 @@ const RoleList = () => {
         const apiResponse = await fetchAllRoles();
         const roleData: RoleData[] = apiResponse.value || [];
         setRoles(roleData);
+        console.log("Fetched roles:", roleData);
       } catch (error) {
         toast.error("Failed to load roles.");
       } finally {
@@ -29,7 +30,7 @@ const RoleList = () => {
   }, []);
 
   const handleEdit = (role: RoleData) => {
-    router.push(`/dashboard/roles/create_role?id=${role.roleId}`);
+    router.push(`/dashboard/roles/create_role?id=${role.roleId}?id=${role.roleId}`);
   };
 
   const handleDelete = async (id: string) => {
