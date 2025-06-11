@@ -24,7 +24,7 @@ export default function UsersPage() {
         </button>
       </div>
 
-      <UserList token={""} />
+      <UserList/>
     </div>
   );
 }

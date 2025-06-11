@@ -60,6 +60,13 @@ export interface RoleData {
   privileges?: Privilege[];
   privilegeId?: string;
 }
+export interface CreateUserDto {
+  firstName: string;
+  lastName: string;
+  accountId: string;
+  email: string;
+  roles: string[];
+}
 
 
 export interface Privilege {
@@ -85,10 +92,20 @@ export interface PrivilegeResponse {
 }
 
 export interface User {
-  id: string;
-  Username: string;
+  firstName: string;
+  lastName: string;
+  accountId: string;
   email: string;
-  roles: string[];
+  displayName: string;
+  avatarUrl: string;
+  active: boolean;
+  source: string;
+  userId: string;
+}
+
+export interface UserResponse {
+  success: boolean;
+  data: User[];
 }
 
 export interface UserForm {

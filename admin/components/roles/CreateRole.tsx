@@ -3,16 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
-import {
-  fetchRoleById,
-  createRole,
-  updateRole,
- 
-} from "@/utils/roleApi"; 
-import { fetchPrivileges} from "@/utils/privilegeApi"
-import { RoleData } from "@/types";
+import { fetchRoleById, createRole, updateRole } from "@/utils/roleApi";
+import { fetchPrivileges } from "@/utils/privilegeApi";
+import { RoleData, Privilege } from "@/types";
 
-import { Privilege } from "@/types";
 const CreateRole: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -21,22 +15,32 @@ const CreateRole: React.FC = () => {
 
   const [roleName, setRoleName] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedPrivilege, setSelectedPrivilege] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [privileges, setPrivileges] = useState<Privilege[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>([]);
 
   // Load all available privileges
-  // useEffect(() => {
-  //   const loadPrivileges = async () => {
-  //     try {
-  //       const data = await fetchPrivileges();
-  //       setPrivileges(data);
-  //     } catch {
-  //       toast.error("Failed to load privileges.");
-  //     }
-  //   };
-  //   loadPrivileges();
-  // }, []);
+  useEffect(() => {
+    const loadPrivileges = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchPrivileges();
+        setPrivileges(
+          data.map((priv: any) => ({
+            ...priv,
+            createdAt: priv.createdAt ?? "",
+          }))
+        );
+      } catch (error) {
+        toast.error("Failed to load privileges.");
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadPrivileges();
+  }, []);
 
   // If edit mode, load the role's existing data
   useEffect(() => {
@@ -45,13 +49,18 @@ const CreateRole: React.FC = () => {
 
       const loadRole = async () => {
         try {
+          setIsLoading(true);
           const role: RoleData = await fetchRoleById(roleId);
           setRoleName(role.name);
           setDescription(role.description || "");
-          setSelectedPrivilege(role.privilegeId ?? "");
-        } catch {
+          setSelectedPermissionIds(role.privileges ? role.privileges
+            .map((p: any) => p.id) : []);
+        } catch (error) {
           toast.error("Failed to load role.");
-          router.push("/dashboard/roles/create_role");
+          console.error(error);
+          router.push("/dashboard/roles");
+        } finally {
+          setIsLoading(false);
         }
       };
 
@@ -59,7 +68,22 @@ const CreateRole: React.FC = () => {
     }
   }, [isEdit, roleId, router]);
 
-  // Form submission handler
+  const handlePermissionChange = (permissionId: string) => {
+    setSelectedPermissionIds(prev => 
+      prev.includes(permissionId)
+        ? prev.filter(id => id !== permissionId)
+        : [...prev, permissionId]
+    );
+  };
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedPermissionIds(privileges.map(priv => priv.id));
+    } else {
+      setSelectedPermissionIds([]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -68,18 +92,19 @@ const CreateRole: React.FC = () => {
       return;
     }
 
-    if (!selectedPrivilege) {
-      toast.warning("Please select a privilege.");
+    if (selectedPermissionIds.length === 0) {
+      toast.warning("Please select at least one permission.");
       return;
     }
 
     const payload = {
       name: roleName,
       description,
-      privilegeId: selectedPrivilege,
+      permissionIds: selectedPermissionIds,
     };
 
     try {
+      setIsLoading(true);
       if (isEditMode && roleId) {
         await updateRole(roleId, payload);
         toast.success("Role updated successfully.");
@@ -87,16 +112,23 @@ const CreateRole: React.FC = () => {
         await createRole(payload);
         toast.success("Role created successfully.");
       }
-
-      router.push("/dashboard/roles/create_role");
-    } catch {
+      router.push("/dashboard/roles/role_list");
+    } catch (error) {
       toast.error("Failed to save role.");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
+
     router.back();
   };
+
+  if (isLoading) {
+    return <div className="ml-64 mt-10 p-6">Loading...</div>;
+  }
 
   return (
     <div className="w-[500px] ml-64 mt-10 bg-white dark:bg-gray-800 p-6 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md">
@@ -141,26 +173,43 @@ const CreateRole: React.FC = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="privilege"
-            className="block mb-2 font-medium text-gray-700 dark:text-gray-300"
-          >
-            Assign Privilege
+          <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
+            Assign Permissions
           </label>
-          <select
-            id="privilege"
-            value={selectedPrivilege}
-            onChange={(e) => setSelectedPrivilege(e.target.value)}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            <option value="">Select privilege</option>
+          <div className="space-y-2 max-h-60 overflow-y-auto p-2 border rounded">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="select-all"
+                checked={selectedPermissionIds.length === privileges.length && privileges.length > 0}
+                onChange={handleSelectAll}
+                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="select-all"
+                className="ml-2 block text-sm font-medium text-gray-900 dark:text-gray-300"
+              >
+                Select All
+              </label>
+            </div>
             {privileges.map((priv) => (
-              <option key={priv.id} value={priv.id}>
-                {priv.permissionName}
-              </option>
+              <div key={priv.id} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`perm-${priv.id}`}
+                  checked={selectedPermissionIds.includes(priv.id)}
+                  onChange={() => handlePermissionChange(priv.id)}
+                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor={`perm-${priv.id}`}
+                  className="ml-2 block text-sm text-gray-900 dark:text-gray-300"
+                >
+                  {priv.permissionName}
+                </label>
+              </div>
             ))}
-          </select>
+          </div>
         </div>
 
         <div className="flex justify-end gap-4 pt-2">
@@ -168,14 +217,20 @@ const CreateRole: React.FC = () => {
             type="button"
             onClick={handleCancel}
             className="w-1/2 py-2 bg-gray-300 hover:bg-gray-400 text-gray-900 rounded font-semibold transition-colors"
+            disabled={isLoading}
           >
             Cancel
           </button>
           <button
             type="submit"
             className="w-1/2 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-semibold transition-colors"
+            disabled={isLoading}
           >
-            {isEditMode ? "Update Role" : "Create Role"}
+            {isLoading
+              ? "Processing..."
+              : isEditMode
+              ? "Update Role"
+              : "Create Role"}
           </button>
         </div>
       </form>

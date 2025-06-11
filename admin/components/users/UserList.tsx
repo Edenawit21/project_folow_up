@@ -3,129 +3,152 @@
 import React, { useEffect, useState } from "react";
 import { Trash2, Pencil } from "lucide-react";
 import { toast } from "react-toastify";
-import { User } from "@/types";
-import { userService } from "@/utils/userApi";
 import { useRouter } from "next/navigation";
+import { User } from "@/types";
+import { getUsers, deleteUser } from "@/utils/userApi";
 
-interface UserListProps {
-  token?: string;
-  onLogout?: () => void;
-}
-
-const UserList: React.FC<UserListProps> = ({ token, onLogout }) => {
+const UserList = () => {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Redirect user to login if token missing
   useEffect(() => {
-    if (!token) {
-      toast.error("Authentication required. Please log in.");
-      return;
-    }
-
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        const data = await userService.getUsers({ token }); 
-
-        setUsers(data);
+        const response = await getUsers();
+        setUsers(response.data);
       } catch (error: any) {
-        if (error.response?.status === 401) {
-          toast.error("Session expired. Please log in again.");
-          if (onLogout) onLogout();
-          return;
-        }
-        toast.error("Error loading users.");
+        console.error("Fetch error:", error);
+        toast.error("Failed to load users");
       } finally {
         setLoading(false);
       }
     };
 
     fetchUsers();
-  }, [token, router, onLogout]);
+  }, []);
 
-  const handleEdit = (user: User) => {
-    router.push(`/users/add_user?id=${user.id}`);
+  const handleEdit = (userId: string) => {
+    router.push(`/dashboard/users/add_user?id=${userId}`);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (userId: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      await userService.deleteUser(id, { token });
-      setUsers((prev) => prev.filter((u) => u.id !== id));
+      await deleteUser(userId);
+      setUsers((prev) => prev.filter((u) => u.userId !== userId));
       toast.success("User deleted successfully");
     } catch (error: any) {
-      if (error.response?.status === 401) {
-        toast.error("Session expired. Please log in again.");
-        if (onLogout) onLogout();
-        return;
-      }
-      toast.error("Failed to delete user.");
+      toast.error("Failed to delete user");
+      console.error("Delete error:", error);
     }
   };
 
   return (
-    <div className="max-w-5xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
-          User Management
-        </h2>
-      </div>
+    <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
+      <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+        User List
+      </h2>
 
-      <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+      <div className="overflow-x-auto rounded-lg shadow border border-gray-200 dark:border-gray-700">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              {["Username", "Roles", "Email", "Actions"].map((header) => (
-                <th
-                  key={header}
-                  className="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
-                >
-                  {header}
-                </th>
-              ))}
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+                First Name
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+                Last Name
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+                Account ID
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+                Email
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+                Display Name
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+                Avatar
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+                Active
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+                Source
+              </th>
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
             {loading ? (
               <tr>
-                <td
-                  colSpan={4}
-                  className="text-center px-6 py-8 text-gray-500 dark:text-gray-400"
-                >
+                <td colSpan={9} className="text-center px-4 py-8 text-gray-500">
                   Loading users...
                 </td>
               </tr>
-            ) : users.length > 0 ? (
+            ) : users.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="text-center px-4 py-8 text-gray-500">
+                  No users found.
+                </td>
+              </tr>
+            ) : (
               users.map((user) => (
                 <tr
-                  key={user.id}
-                  className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  key={user.userId}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {user.Username}
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                    {user.firstName|| "—"}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
-                    {(user.roles || []).join(", ")}
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                    {user.lastName || "—"}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                    {user.email}
+                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                    {user.accountId || "—"}
                   </td>
-                  <td className="px-6 py-4 text-sm">
+                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                    {user.email || "—"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                    {user.displayName || "—"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt="Avatar"
+                        className="w-6 h-6 rounded-full"
+                      />
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                    {user.active ? "Yes" : "No"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                    {user.source || "—"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-right">
                     <div className="flex gap-3 justify-end">
                       <button
-                        onClick={() => handleEdit(user)}
-                        className="text-blue-600 hover:text-blue-800"
-                        aria-label={`Edit user ${user.Username}`}
+                        onClick={() => handleEdit(user.userId)}
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        aria-label={`Edit user ${user.firstName} ${user.lastName}`}
                       >
                         <Pencil size={18} />
                       </button>
                       <button
-                        onClick={() => handleDelete(user.id)}
-                        className="text-red-600 hover:text-red-800"
-                        aria-label={`Delete user ${user.Username}`}
+                        onClick={() => handleDelete(user.userId)}
+                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                        aria-label={`Delete user ${user.firstName} ${user.lastName}`}
                       >
                         <Trash2 size={18} />
                       </button>
@@ -133,15 +156,6 @@ const UserList: React.FC<UserListProps> = ({ token, onLogout }) => {
                   </td>
                 </tr>
               ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={4}
-                  className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
-                >
-                  No users found.
-                </td>
-              </tr>
             )}
           </tbody>
         </table>

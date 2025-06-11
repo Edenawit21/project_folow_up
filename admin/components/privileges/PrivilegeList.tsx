@@ -20,6 +20,7 @@ const PrivilegeList: React.FC = () => {
     try {
       const data = await fetchPrivileges();
       setPrivileges(data);
+      console.log("Fetched privileges:", data);
     } catch (error) {
       toast.error("Failed to load privileges.");
     }

@@ -1,57 +1,35 @@
 import axios from "axios";
-import { UserForm } from "@/types";
+import { User } from "@/types"; // Optional: if you're using typed data
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-// Register a new user
-export const registerUser = async (userData: UserForm) => {
-  const response = await axios.post(
-    `${BASE_URL}/api/Account/register`,
-    userData
-  );
+// GET /api/User
+export const getUsers = async () => {
+  const response = await axios.get(`${API_BASE}/api/User`);
   return response.data;
 };
 
-// Update an existing user by ID
-export const updateUser = async (
-  userId: string,
-  userData: Partial<UserForm>
-) => {
-  const response = await axios.put(`${BASE_URL}/api/users/${userId}`, userData);
-  return response.data;
+// GET /api/User/{id}
+export const fetchUserById = async (userId: string) => {
+  const res = await axios.get(`${API_BASE}/api/User/${userId}`);
+  return res.data.data;
 };
 
-// Get users list with Authorization header
-export const getUsers = async ({ token }: { token?: string }) => {
-  if (!token) throw new Error("Authorization token is required");
-
-  const response = await axios.get(`${BASE_URL}/api/Admin/users-with-roles`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return response.data;
+// POST /api/User
+export const registerUser = async (userData: Partial<User>) => {
+  const res = await axios.post(`${API_BASE}/api/User`, userData);
+  return res.data.data;
 };
 
-// Delete a user by ID with Authorization header
-export const deleteUser = async (
-  userId: string,
-  { token }: { token?: string }
-) => {
-  if (!token) throw new Error("Authorization token is required");
-
-  const response = await axios.delete(`${BASE_URL}/api/users/${userId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return response.data;
+// PUT /api/User/{id}
+export const updateUser = async (userId: string, userData: Partial<User>) => {
+  const res = await axios.put(`${API_BASE}/api/User/${userId}`, userData);
+  return res.data.data;
 };
 
-// Export userService object for convenience
-export const userService = {
-  registerUser,
-  updateUser,
-  getUsers,
-  deleteUser,
+// DELETE /api/User/{id}
+export const deleteUser = async (userId: string) => {
+  const res = await axios.delete(`${API_BASE}/api/User/${userId}`);
+  if (!res.data.success) throw new Error("Failed to delete user.");
+  return res.data;
 };
