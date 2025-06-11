@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { PrivilegePayload } from "@/types";
 import {
   createPrivilege,
   updatePrivilege,
@@ -9,46 +9,41 @@ import {
 } from "@/utils/privilegeApi";
 import { toast } from "react-toastify";
 
-interface PrivilegeFormData {
-  permissionName: string;
-  description: string;
-  action: string;
+interface AddPrivilegeProps {
+  id?: string;
+  onClose: () => void;
+  onCreate?: (data: PrivilegePayload) => void;
 }
 
-const AddPrivilege: React.FC = () => {
-  const [formData, setFormData] = useState<PrivilegeFormData>({
+const AddPrivilege: React.FC<AddPrivilegeProps> = ({
+  id,
+  onClose,
+  onCreate,
+}) => {
+  const [formData, setFormData] = useState<PrivilegePayload>({
     permissionName: "",
     description: "",
     action: "",
   });
-
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
 
   useEffect(() => {
     if (id) {
-      console.log("Fetching privilege with ID:", id);
       setLoading(true);
       fetchPrivilegeById(id)
-        .then((data) => {
-          console.log("Fetched data:", data); // Check this
+        .then((data) =>
           setFormData({
-            permissionName: data.permissionName ?? "",
-            description: data.description ?? "",
-            action: data.action ?? "",
-          });
-        })
-        .catch((error) => {
-          toast.error("Failed to load privilege.");
-          console.error("Error fetching privilege:", error);
-        })
+            permissionName: data.permissionName || "",
+            description: data.description || "",
+            action: data.action || "",
+          })
+        )
+        .catch(() => toast.error("Failed to load privilege."))
         .finally(() => setLoading(false));
     }
   }, [id]);
-  
 
+  // Single handler for all inputs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -67,91 +62,75 @@ const AddPrivilege: React.FC = () => {
       } else {
         await createPrivilege(formData);
         toast.success("Privilege created successfully!");
+        onCreate?.(formData);
       }
-      router.push("/dashboard/privileges/privilege_list");
-    } catch (error) {
+      onClose();
+    } catch {
       toast.error(
         id ? "Failed to update privilege." : "Failed to create privilege."
       );
-      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    router.back();
-  };
-
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-md mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
+      className="w-[500px] p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-        {id ? "Edit Privilege" : "Add Privilege"}
+        {id ? "Update Permission" : "Add Permission"}
       </h2>
 
-      <div className="mb-4">
-        <label
-          htmlFor="permissionName"
-          className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
+      <label className="block mb-4">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Permission Name
-        </label>
+        </span>
         <input
-          id="permissionName"
           name="permissionName"
           type="text"
           value={formData.permissionName}
           onChange={handleChange}
           required
           disabled={loading}
-          className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
-      </div>
+      </label>
 
-      <div className="mb-4">
-        <label
-          htmlFor="description"
-          className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
+      <label className="block mb-4">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Description
-        </label>
+        </span>
         <textarea
-          id="description"
           name="description"
           value={formData.description}
           onChange={handleChange}
           rows={4}
           disabled={loading}
-          className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
-      </div>
+      </label>
 
-      <div className="mb-4">
-        <label
-          htmlFor="action"
-          className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
+      <label className="block mb-4">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Action
-        </label>
+        </span>
         <input
-          id="action"
           name="action"
           type="text"
           value={formData.action}
           onChange={handleChange}
           disabled={loading}
           placeholder="e.g. create, read, update"
-          className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
-      </div>
+      </label>
 
       <div className="flex justify-between">
         <button
           type="button"
-          onClick={handleCancel}
+          onClick={onClose}
           disabled={loading}
           className="w-1/2 mr-2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
         >
@@ -167,8 +146,8 @@ const AddPrivilege: React.FC = () => {
               ? "Updating..."
               : "Creating..."
             : id
-            ? "Update Privilege"
-            : "Create Privilege"}
+            ? "Update"
+            : "Create"}
         </button>
       </div>
     </form>

@@ -13,10 +13,8 @@ interface AddUserProps {
 }
 
 const AddUser = ({ userId, onClose }: AddUserProps) => {
-  /* ────────────────────────────────────
-   * State
-   * ──────────────────────────────────── */
-  const isEdit = Boolean(userId);
+  const isEdit = !!userId;
+;
 
   const [formData, setFormData] = useState<CreateUserDto>({
     firstName: "",
@@ -29,24 +27,18 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
   const [roles, setRoles] = useState<RoleData[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  /* ────────────────────────────────────
-   * Data-fetching
-   * ──────────────────────────────────── */
   useEffect(() => {
     const loadData = async () => {
       try {
-        // roles
         const apiResponse = await fetchAllRoles();
-        const roleData: RoleData[] = apiResponse ?? [];
+        const roleData: RoleData[] = apiResponse.value || [];
         setRoles(roleData);
 
-        // existing user (edit mode)
         if (userId) {
           const user = await fetchUserById(userId);
           setFormData({
@@ -54,7 +46,7 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
             lastName: user.lastName,
             accountId: user.accountId,
             email: user.email,
-            roles: user.roles ?? [],
+            roles: user.roles || [],
           });
         }
       } catch {
@@ -65,22 +57,23 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
     };
 
     loadData();
-  }, [userId]);
+  }, [isEdit, userId]);
 
-  /* ────────────────────────────────────
-   * Handlers
-   * ──────────────────────────────────── */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev: CreateUserDto) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCancel = () => {
+    onClose();
   };
 
   const handleRoleChange = (roleName: string) => {
-    setFormData((prev: CreateUserDto) => ({
+    setFormData((prev) => ({
       ...prev,
       roles: prev.roles.includes(roleName)
-      ? prev.roles.filter((r: string) => r !== roleName)
-      : [...prev.roles, roleName],
+        ? prev.roles.filter((r) => r !== roleName)
+        : [...prev.roles, roleName],
     }));
   };
 
@@ -106,8 +99,8 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
         });
       }
     } catch (err: any) {
-      console.error(err);
-      setError(err?.response?.data?.message ?? "Operation failed.");
+      console.error("Error:", err);
+      setError(err.response?.data?.message || "Operation failed.");
     } finally {
       setSubmitting(false);
     }
@@ -121,9 +114,9 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
    * UI
    * ──────────────────────────────────── */
   return (
-    <div className="max-w-md mx-auto mt-10 p-4 border rounded shadow bg-white">
+    <div className="max-w-md mx-auto mt-10 p-4 border rounded shadow">
       <h2 className="text-xl font-semibold mb-4">
-        {isEdit ? "Update User" : "Add User"}
+        {userId ? "Update User" : "Add User"}
       </h2>
 
       {message && <p className="text-green-600 mb-2">{message}</p>}
@@ -165,15 +158,14 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
           placeholder="Email"
           className="w-full p-2 border rounded"
           required
-          disabled={isEdit}
+          disabled={!!userId}
         />
 
-        {/* ───── Role selector ───── */}
         <div className="relative">
           <label className="block font-medium mb-1">Assign Roles</label>
           <button
             type="button"
-            onClick={() => setDropdownOpen((o) => !o)}
+            onClick={() => setDropdownOpen(!dropdownOpen)}
             className="w-full border p-2 rounded text-left bg-white"
           >
             {formData.roles.length > 0
@@ -198,7 +190,7 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
 
               {filteredRoles.map((role) => (
                 <label
-                  key={role.id}
+                  key={role.roleId}
                   className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                 >
                   <input
@@ -220,11 +212,10 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
           )}
         </div>
 
-        {/* ───── Actions ───── */}
         <div className="flex justify-between">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleCancel}
             disabled={loading || submitting}
             className="w-1/2 mr-2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
           >
@@ -232,16 +223,9 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
           </button>
           <button
             type="submit"
-            disabled={loading || submitting}
-            className="w-1/2 ml-2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
+            className="w-1/2 py-3 rounded bg-green-600 hover:bg-green-700 text-white font-semibold transition-colors duration-300"
           >
-            {submitting
-              ? isEdit
-                ? "Updating..."
-                : "Creating..."
-              : isEdit
-              ? "Update User"
-              : "Create User"}
+            {isEdit ? "Update User" : "Register User"}
           </button>
         </div>
       </form>

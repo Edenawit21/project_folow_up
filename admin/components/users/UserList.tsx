@@ -7,20 +7,21 @@ import { useRouter } from "next/navigation";
 import { User } from "@/types";
 import { getUsers, deleteUser } from "@/utils/userApi";
 
+
+
 const UserList = () => {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
       try {
         const response = await getUsers();
+        console.log(response.data);
         setUsers(response.data);
       } catch (error: any) {
         console.error("Fetch error:", error);
-        toast.error("Failed to load users");
       } finally {
         setLoading(false);
       }
@@ -40,10 +41,7 @@ const UserList = () => {
       await deleteUser(userId);
       setUsers((prev) => prev.filter((u) => u.userId !== userId));
       toast.success("User deleted successfully");
-    } catch (error: any) {
-      toast.error("Failed to delete user");
-      console.error("Delete error:", error);
-    }
+    } catch (error: any) {}
   };
 
   return (
@@ -56,31 +54,31 @@ const UserList = () => {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
                 First Name
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
                 Last Name
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
                 Account ID
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
                 Email
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
                 Display Name
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
                 Avatar
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
                 Active
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
                 Source
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
+              <th className="px-4 py-2 text-right text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
                 Actions
               </th>
             </tr>
@@ -105,16 +103,16 @@ const UserList = () => {
                   className="hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
                   <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                    {user.firstName|| "—"}
+                    {user.firstName}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                    {user.lastName || "—"}
+                    {user.lastName}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                     {user.accountId || "—"}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
-                    {user.email || "—"}
+                    {user.email}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                     {user.displayName || "—"}
@@ -140,14 +138,14 @@ const UserList = () => {
                     <div className="flex gap-3 justify-end">
                       <button
                         onClick={() => handleEdit(user.userId)}
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        className="text-blue-600 hover:text-blue-800"
                         aria-label={`Edit user ${user.firstName} ${user.lastName}`}
                       >
                         <Pencil size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(user.userId)}
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                        className="text-red-600 hover:text-red-800"
                         aria-label={`Delete user ${user.firstName} ${user.lastName}`}
                       >
                         <Trash2 size={18} />

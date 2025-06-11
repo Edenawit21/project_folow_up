@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import Navbar from "@/components/NavBar";
-import { SideBar } from "@/components/SideBar"; // Fixed import (capital B)
+import { SideBar } from "@/components/SideBar"; 
 import StoreProvider, { useAppSelector } from "./redux";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {

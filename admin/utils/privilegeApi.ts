@@ -39,26 +39,15 @@ export const createPrivilege = async (
   
   return response.data.data;
 };
-
-// Update an existing privilege
+// Update a privilege
 export const updatePrivilege = async (
   id: string,
   data: PrivilegePayload
 ): Promise<PrivilegeResponse> => {
-  const response = await axios.put(`${API_URL}/api/Permission/${id}`, data); // Fixed the URL template literal
-  
-  if (!response.data.success) {
-    throw new Error('Failed to update privilege');
-  }
-  
-  return response.data.data;
+  const response = await axios.put(`${API_URL}/api/Permission/${id}`, data);
+  return response.data;
 };
-
 // Delete a privilege
 export const deletePrivilege = async (id: string): Promise<void> => {
-  const response = await axios.delete(`${API_URL}/api/Permission/${id}`); // Fixed the URL template literal
-  
-  if (!response.data.success) {
-    throw new Error('Failed to delete privilege');
-  }
+  await axios.delete(`${API_URL}/api/Permission/${id}`);
 };

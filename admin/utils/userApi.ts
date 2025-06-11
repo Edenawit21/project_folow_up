@@ -21,13 +21,13 @@ export const registerUser = async (userData: Partial<User>) => {
   return res.data.data;
 };
 
-// PUT /api/User/{id}
+//  PUT /api/User/{id}
 export const updateUser = async (userId: string, userData: Partial<User>) => {
   const res = await axios.put(`${API_BASE}/api/User/${userId}`, userData);
   return res.data.data;
 };
 
-// DELETE /api/User/{id}
+//  DELETE /api/User/{id}
 export const deleteUser = async (userId: string) => {
   const res = await axios.delete(`${API_BASE}/api/User/${userId}`);
   if (!res.data.success) throw new Error("Failed to delete user.");

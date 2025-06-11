@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { X, Menu } from "lucide-react"; // Icon library (optional)
-import { MenuContainer } from '@/components/Menu/menuRenderer/MenuContainer';
+import { MenuContainer } from "@/components/Menu/menuRenderer/MenuContainer";
 export const SideBar = () => {
   const [isOpen, setIsOpen] = useState(true);
 
@@ -18,7 +18,7 @@ export const SideBar = () => {
 
       {/* Sidebar */}
       {isOpen && (
-        <aside className="fixed md:flex flex-col h-screen w-64 border-r bg-white dark:bg-gray-900 dark:border-gray-800 overflow-y-auto z-10 hidden md:block">
+        <aside className="fixed  flex-col h-screen w-64 border-r bg-white dark:bg-gray-900 dark:border-gray-800 overflow-y-auto z-10 hidden md:block">
           <div className="p-4">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-xl font-bold">Navigation</h1>

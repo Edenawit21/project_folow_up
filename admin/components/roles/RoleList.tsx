@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { fetchAllRoles, deleteRole } from "@/utils/roleApi";
 
-const RoleList: React.FC = () => {
+const RoleList = () => {
   const router = useRouter();
   const [roles, setRoles] = useState<RoleData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +15,8 @@ const RoleList: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const roleData = await fetchAllRoles();
+        const apiResponse = await fetchAllRoles();
+        const roleData: RoleData[] = apiResponse.value || [];
         setRoles(roleData);
         console.log("Fetched roles:", roleData);
       } catch (error) {
@@ -29,7 +30,7 @@ const RoleList: React.FC = () => {
   }, []);
 
   const handleEdit = (role: RoleData) => {
-    router.push(`/dashboard/roles/create_role?id=${role.id}`);
+    router.push(`/dashboard/roles/create_role?id=${role.roleId}?id=${role.roleId}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -37,7 +38,7 @@ const RoleList: React.FC = () => {
 
     try {
       await deleteRole(id);
-      setRoles((prev) => prev.filter((r) => r.id !== id));
+      setRoles((prev) => prev.filter((r) => r.roleId !== id));
       toast.success("Role deleted successfully.");
     } catch (error) {
       toast.error("Failed to delete role.");
@@ -88,7 +89,7 @@ const RoleList: React.FC = () => {
               ) : roles.length > 0 ? (
                 roles.map((role) => (
                   <tr
-                    key={role.id}
+                    key={role.roleId}
                     className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -107,14 +108,14 @@ const RoleList: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1 max-w-[280px]">
-                        {Array.isArray(role.privileges) &&
-                        role.privileges.length > 0 ? (
-                          role.privileges.map((perm, i) => (
+                        {Array.isArray(role.permissions) &&
+                        role.permissions.length > 0 ? (
+                          role.permissions.map((perm, i) => (
                             <span
                               key={i}
                               className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
                             >
-                              {String(perm)}
+                              {perm}
                             </span>
                           ))
                         ) : (
@@ -143,7 +144,7 @@ const RoleList: React.FC = () => {
                           <Edit2 size={18} />
                         </button>
                         <button
-                          onClick={() => handleDelete(role.id)}
+                          onClick={() => handleDelete(role.roleId)}
                           className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                           aria-label={`Delete ${role.name}`}
                         >
