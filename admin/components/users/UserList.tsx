@@ -7,18 +7,16 @@ import { useRouter } from "next/navigation";
 import { User } from "@/types";
 import { getUsers, deleteUser } from "@/utils/userApi";
 
-
-
 const UserList = () => {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
       try {
         const response = await getUsers();
-        console.log(response.data);
         setUsers(response.data);
       } catch (error: any) {
         console.error("Fetch error:", error);
@@ -31,7 +29,7 @@ const UserList = () => {
   }, []);
 
   const handleEdit = (userId: string) => {
-    router.push(`/dashboard/users/add_user?id=${userId}`);
+    router.push(`/dashboard/users?id=${userId}`);
   };
 
   const handleDelete = async (userId: string) => {
@@ -41,7 +39,9 @@ const UserList = () => {
       await deleteUser(userId);
       setUsers((prev) => prev.filter((u) => u.userId !== userId));
       toast.success("User deleted successfully");
-    } catch (error: any) {}
+    } catch (error: any) {
+      toast.error("Failed to delete user");
+    }
   };
 
   return (
@@ -50,49 +50,36 @@ const UserList = () => {
         User List
       </h2>
 
-      <div className="overflow-x-auto rounded-lg shadow border border-gray-200 dark:border-gray-700">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-800">
+      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-md">
+        <table className="min-w-full table-auto">
+          <thead className="bg-gray-100 dark:bg-gray-800">
             <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
-                First Name
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
-                Last Name
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
-                Account ID
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
-                Email
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
-                Display Name
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
-                Avatar
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
-                Active
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
-                Source
-              </th>
-              <th className="px-4 py-2 text-right text-xs font-medium uppercase text-gray-600 dark:text-gray-300">
-                Actions
-              </th>
+              {["Name", "Email", "Active", "Actions"].map((header) => (
+                <th
+                  key={header}
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
+                >
+                  {header}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
             {loading ? (
               <tr>
-                <td colSpan={9} className="text-center px-4 py-8 text-gray-500">
+                <td
+                  colSpan={4}
+                  className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
+                >
                   Loading users...
                 </td>
               </tr>
             ) : users.length === 0 ? (
               <tr>
-                <td colSpan={9} className="text-center px-4 py-8 text-gray-500">
+                <td
+                  colSpan={4}
+                  className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
+                >
                   No users found.
                 </td>
               </tr>
@@ -102,51 +89,48 @@ const UserList = () => {
                   key={user.userId}
                   className="hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                    {user.firstName}
+                  {/* Display Name with Avatar */}
+                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      {user.avatarUrl ? (
+                        <img
+                          src={user.avatarUrl}
+                          alt="Avatar"
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-500">
+                          <span className="text-xs font-semibold">?</span>
+                        </div>
+                      )}
+                      <span>{user.displayName || "—"}</span>
+                    </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                    {user.lastName}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
-                    {user.accountId || "—"}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+
+                  {/* Email */}
+                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                     {user.email}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
-                    {user.displayName || "—"}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
-                    {user.avatarUrl ? (
-                      <img
-                        src={user.avatarUrl}
-                        alt="Avatar"
-                        className="w-6 h-6 rounded-full"
-                      />
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+
+                  {/* Active */}
+                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                     {user.active ? "Yes" : "No"}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
-                    {user.source || "—"}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-right">
-                    <div className="flex gap-3 justify-end">
+
+                  {/* Actions */}
+                  <td className="px-4 py-3 text-sm text-right whitespace-nowrap">
+                    <div className="flex items-center justify-end space-x-3">
                       <button
                         onClick={() => handleEdit(user.userId)}
-                        className="text-blue-600 hover:text-blue-800"
-                        aria-label={`Edit user ${user.firstName} ${user.lastName}`}
+                        aria-label={`Edit user ${user.displayName}`}
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                       >
                         <Pencil size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(user.userId)}
-                        className="text-red-600 hover:text-red-800"
-                        aria-label={`Delete user ${user.firstName} ${user.lastName}`}
+                        aria-label={`Delete user ${user.displayName}`}
+                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                       >
                         <Trash2 size={18} />
                       </button>

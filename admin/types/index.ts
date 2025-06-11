@@ -55,29 +55,6 @@ export interface Entity {
   id: string;
   name: string;
 }
-
-// Represents a user role with permissions
-export interface RoleData {
-  roleId: string;
-  name: string;
-  description?: string;
-  permissions: string[];
-  createdAt?: string;
-}
-
-
-//API response wrapper for role-related data
-export interface ApiResponse {
-  valueOrDefault: RoleData[];
-  value: RoleData[];
-  isFailed: boolean;
-  isSuccess: boolean;
-  reasons: any[];
-  errors: any[];
-  successes: any[];
-}
-
-
 // Represents a privilege/permission entity
 export interface Privilege {
   id: string;

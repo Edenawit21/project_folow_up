@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { PrivilegePayload } from "@/types";
+import { PrivilegePayload } from "@/types/privilege";
 import {
-  createPrivilege,
-  updatePrivilege,
-  fetchPrivilegeById,
+  createPermission,
+  updatePermission,
+  getPermissionById,
 } from "@/utils/privilegeApi";
 import { toast } from "react-toastify";
 
@@ -30,7 +30,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   useEffect(() => {
     if (id) {
       setLoading(true);
-      fetchPrivilegeById(id)
+      getPermissionById(id)
         .then((data) =>
           setFormData({
             permissionName: data.permissionName || "",
@@ -57,10 +57,10 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
 
     try {
       if (id) {
-        await updatePrivilege(id, formData);
+        await updatePermission(id, formData);
         toast.success("Privilege updated successfully!");
       } else {
-        await createPrivilege(formData);
+        await createPermission(formData);
         toast.success("Privilege created successfully!");
         onCreate?.(formData);
       }

@@ -3,8 +3,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { fetchRoleById, createRole, updateRole } from "@/utils/roleApi";
-import { fetchPrivileges } from "@/utils/privilegeApi";
-import { RoleData, Privilege } from "@/types";
+import { fetchAllPermissions } from "@/utils/privilegeApi";
+import { RoleData } from "@/types/role";
+import {Permission} from "@/types/privilege"
 import { Loader2, Search } from "lucide-react";
 
 interface RolePayload {
@@ -31,7 +32,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
   const [roleName, setRoleName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedPrivileges, setSelectedPrivileges] = useState<string[]>([]);
-  const [privileges, setPrivileges] = useState<Privilege[]>([]);
+  const [privileges, setPrivileges] = useState<Permission[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -58,7 +59,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
     const loadPrivileges = async () => {
       setLoading(true);
       try {
-        const data = await fetchPrivileges();
+        const data = await fetchAllPermissions();
         setPrivileges(
           data.map((priv) => ({ ...priv, action: priv.action ?? "" }))
         );
