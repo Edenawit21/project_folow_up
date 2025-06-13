@@ -3,16 +3,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { fetchRoleById, createRole, updateRole } from "@/utils/roleApi";
-import { fetchAllPermissions } from "@/utils/privilegeApi";
-import { RoleData } from "@/types/role";
-import {Permission} from "@/types/privilege"
+import { fetchPermissions } from "@/utils/privilegeApi";
+import { RoleData, RolePayload } from "@/types/role";
+import { Permission } from "@/types/privilege";
 import { Loader2, Search } from "lucide-react";
-
-interface RolePayload {
-  name: string;
-  description: string;
-  permissions: string[];
-}
 
 interface CreateRoleProps {
   id?: string;
@@ -31,8 +25,8 @@ const CreateRole: React.FC<CreateRoleProps> = ({
 
   const [roleName, setRoleName] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedPrivileges, setSelectedPrivileges] = useState<string[]>([]);
-  const [privileges, setPrivileges] = useState<Permission[]>([]);
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+  const [permissions, setPermissions] = useState<Permission[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -40,52 +34,51 @@ const CreateRole: React.FC<CreateRoleProps> = ({
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    const handleOutsideClick = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setDropdownOpen(false);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  // Load privileges
   useEffect(() => {
-    const loadPrivileges = async () => {
+    const loadPermissions = async () => {
       setLoading(true);
       try {
-        const data = await fetchAllPermissions();
-        setPrivileges(
-          data.map((priv) => ({ ...priv, action: priv.action ?? "" }))
+        const data = await fetchPermissions();
+        setPermissions(
+          data.map((perm) => ({ ...perm, action: perm.action || "" }))
         );
       } catch {
-        toast.error("Failed to load privileges.");
+        toast.error("Failed to load permissions.");
       } finally {
         setLoading(false);
       }
     };
-    loadPrivileges();
+
+    loadPermissions();
   }, []);
 
-  // Load role if editing
   useEffect(() => {
     if (isEdit && id) {
-      loadRole();
+      loadRole(id);
     }
   }, [isEdit, id]);
 
-  const loadRole = async () => {
+  const loadRole = async (roleId: string) => {
     setLoading(true);
     try {
-      const role: RoleData = await fetchRoleById(id!);
+      const role: RoleData = await fetchRoleById(roleId);
       setRoleName(role.name);
       setDescription(role.description || "");
-      setSelectedPrivileges(
+      setSelectedPermissions(
         Array.isArray(role.permissions) ? role.permissions : []
       );
     } catch {
@@ -96,47 +89,42 @@ const CreateRole: React.FC<CreateRoleProps> = ({
     }
   };
 
-  const togglePrivilege = (privId: string) => {
-    setSelectedPrivileges((prev) =>
-      prev.includes(privId)
-        ? prev.filter((p) => p !== privId)
-        : [...prev, privId]
+  const togglePermission = (permId: string) => {
+    setSelectedPermissions((prev) =>
+      prev.includes(permId)
+        ? prev.filter((id) => id !== permId)
+        : [...prev, permId]
     );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-
     if (!roleName.trim()) {
       toast.warning("Role name is required.");
-      setSubmitting(false);
       return;
     }
-
-    if (selectedPrivileges.length === 0) {
-      toast.warning("Please select at least one privilege.");
-      setSubmitting(false);
+    if (selectedPermissions.length === 0) {
+      toast.warning("Please select at least one permission.");
       return;
     }
 
     const payload: RolePayload = {
       name: roleName.trim(),
       description: description.trim(),
-      permissions: selectedPrivileges,
+      permissions: selectedPermissions,
     };
 
+    setSubmitting(true);
     try {
       if (isEdit && id) {
         await updateRole(id, payload);
         toast.success("Role updated successfully.");
-        if (onUpdate) onUpdate(payload);
+        onUpdate?.(payload);
       } else {
         await createRole(payload);
         toast.success("Role created successfully.");
-        if (onCreate) onCreate(payload);
+        onCreate?.(payload);
       }
-
       onClose();
     } catch {
       toast.error("Failed to save role.");
@@ -145,25 +133,19 @@ const CreateRole: React.FC<CreateRoleProps> = ({
     }
   };
 
-  const handleCancel = () => onClose();
-
-  // Reset search when dropdown opens
-  useEffect(() => {
-    if (dropdownOpen) setSearchTerm("");
-  }, [dropdownOpen]);
-
-  // Filter privileges based on search term
-  const filteredPrivileges = privileges.filter((priv) =>
-    priv.permissionName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPermissions = permissions.filter((perm) =>
+    perm.permissionName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
   return (
     <div className="px-4 py-8 w-[600px] ml-60">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
             {isEdit ? "Update Role" : "Create New Role"}
           </h2>
         </div>
+
         {loading ? (
           <div className="flex items-center justify-center h-48">
             <Loader2 className="animate-spin h-8 w-8 text-indigo-600" />
@@ -171,71 +153,62 @@ const CreateRole: React.FC<CreateRoleProps> = ({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            {/* Role Name */}
             <div>
-              <label
-                htmlFor="roleName"
-                className="block mb-2 font-medium text-gray-700 dark:text-gray-300"
-              >
+              <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
                 Role Name *
               </label>
               <input
-                id="roleName"
                 type="text"
                 value={roleName}
                 onChange={(e) => setRoleName(e.target.value)}
-                placeholder="e.g., Administrator, Manager"
+                placeholder="e.g., Administrator"
                 required
-                disabled={loading}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="description"
-                className="block mb-2 font-medium text-gray-700 dark:text-gray-300"
-              >
-                Description
-              </label>
-              <textarea
-                id="description"
-                rows={3}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe the purpose of this role..."
-                disabled={loading}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
+            {/* Description */}
+            <div>
+              <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
+                Description
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                placeholder="Describe the role..."
+                className="w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-indigo-500"
+              />
+            </div>
+
+            {/* Permissions Dropdown */}
             <div ref={dropdownRef} className="relative w-full">
               <button
                 type="button"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                disabled={loading}
-                aria-haspopup="listbox"
-                aria-expanded={dropdownOpen}
                 className={`w-full px-4 py-3 border ${
                   dropdownOpen
                     ? "border-indigo-500 ring-1 ring-indigo-500"
                     : "border-gray-300"
-                } rounded-sm bg-white dark:bg-gray-700 text-left text-gray-900 dark:text-white flex justify-between items-center transition-all`}
+                } rounded-sm bg-white dark:bg-gray-700 flex justify-between items-center`}
               >
                 <span
                   className={
-                    selectedPrivileges.length
+                    selectedPermissions.length
                       ? "text-gray-900 dark:text-gray-100"
-                      : "text-gray-500 dark:text-gray-400"
+                      : "text-gray-500"
                   }
                 >
-                  {selectedPrivileges.length > 0
-                    ? `${selectedPrivileges.length} permission${
-                        selectedPrivileges.length > 1 ? "s" : ""
+                  {selectedPermissions.length
+                    ? `${selectedPermissions.length} permission${
+                        selectedPermissions.length > 1 ? "s" : ""
                       } selected`
                     : "Select permissions..."}
                 </span>
                 <svg
                   className={`w-5 h-5 transition-transform ${
-                    dropdownOpen ? "rotate-180" : "rotate-0"
+                    dropdownOpen ? "rotate-180" : ""
                   }`}
                   fill="none"
                   stroke="currentColor"
@@ -251,8 +224,8 @@ const CreateRole: React.FC<CreateRoleProps> = ({
               </button>
 
               {dropdownOpen && (
-                <div className="absolute z-10 mt-2 w-full bg-white dark:bg-gray-800 border-[1px] border-gray-300 rounded-sm shadow-lg max-h-60 overflow-y-auto">
-                  <div className="sticky top-0 bg-white dark:bg-gray-800 p-2 border-b border-gray-200 dark:border-gray-700">
+                <div className="absolute z-10 mt-2 w-full bg-white dark:bg-gray-800 border border-gray-300 rounded-sm shadow-lg max-h-60 overflow-y-auto">
+                  <div className="sticky top-0 p-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <input
@@ -260,30 +233,27 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                         placeholder="Search permissions..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className="w-full pl-10 pr-4 py-2 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-indigo-500"
                       />
                     </div>
                   </div>
-
-                  {filteredPrivileges.length > 0 ? (
-                    filteredPrivileges.map((priv) => (
+                  {filteredPermissions.length > 0 ? (
+                    filteredPermissions.map((perm) => (
                       <label
-                        key={priv.id}
-                        htmlFor={`priv-${priv.id}`}
-                        className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        key={perm.id}
+                        htmlFor={`perm-${perm.id}`}
+                        className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <input
+                          id={`perm-${perm.id}`}
                           type="checkbox"
-                          id={`priv-${priv.id}`}
-                          checked={selectedPrivileges.includes(priv.id)}
-                          onChange={() => togglePrivilege(priv.id)}
-                          className="h-4 w-4 text-indigo-600 rounded-sm focus:ring-indigo-500"
+                          checked={selectedPermissions.includes(perm.id)}
+                          onChange={() => togglePermission(perm.id)}
+                          className="h-4 w-4 text-indigo-600"
                         />
-                        <div className="ml-3 flex flex-col">
-                          <span className="text-gray-900 dark:text-gray-100 font-medium">
-                            {priv.permissionName}
-                          </span>
-                        </div>
+                        <span className="ml-3 text-gray-900 dark:text-gray-100 font-medium">
+                          {perm.permissionName}
+                        </span>
                       </label>
                     ))
                   ) : (
@@ -295,19 +265,19 @@ const CreateRole: React.FC<CreateRoleProps> = ({
               )}
             </div>
 
+            {/* Footer Buttons */}
             <div className="flex justify-between">
               <button
                 type="button"
-                onClick={handleCancel}
-                disabled={loading}
-                className="w-1/2 mr-2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
+                onClick={onClose}
+                className="w-1/2 mr-2 py-2 px-4 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500 rounded"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                disabled={loading || submitting}
-                className="w-1/2 ml-2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
+                disabled={submitting}
+                className="w-1/2 ml-2 py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded"
               >
                 {submitting
                   ? isEdit

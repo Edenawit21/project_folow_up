@@ -1,19 +1,18 @@
-import axios from "axios";
 import { Permission, PermissionApiResponse } from "@/types/privilege";
+import axios from "axios";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-//  Fetch all permissions
-export const fetchAllPermissions = async (): Promise<Permission[]> => {
+export const fetchPermissions = async (): Promise<Permission[]> => {
   const response = await axios.get<PermissionApiResponse>(
     `${BASE_URL}/api/Permission`
   );
 
-  if (!response.data.isSuccess) {
+  if (!response.data.success) {
     throw new Error("Failed to fetch permissions");
   }
 
-  return response.data.value ?? [];
+  return response.data.data;
 };
 
 // Get permission by ID

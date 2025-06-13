@@ -32,7 +32,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="flex items-center justify-between px-4 py-3 shadow-sm bg-white text-gray-900  dark:bg-black dark:text-white dark:border-gray-700">
+    <header className="flex items-center justify-between px-4 py-3 shadow-sm text-gray-900  dark:bg-black dark:text-white dark:border-gray-700">
       {/* Left: Sidebar Toggle & Search */}
       <div className="flex items-center gap-6">
         {isSidebarCollapsed && (
@@ -54,7 +54,7 @@ const Navbar = () => {
           <input
             type="search"
             placeholder="Search..."
-            className="w-full rounded-md bg-gray-100 dark:bg-black text-gray-900 dark:text-white pl-8 pr-2 py-2 placeholder-gray-500 dark:placeholder-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white pl-8 pr-2 py-2 placeholder-gray-500 dark:placeholder-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>

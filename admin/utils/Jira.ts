@@ -4,7 +4,7 @@ import axios from "axios";
  * Base URL for the API
  */
 export const PROJECT_API_URL =
-  process.env.PROJECT_API_URL ?? "http://localhost:5106/api/Project";
+  process.env.PROJECT_API_URL ?? "https://localhost:7205/api/Project";
 
 /* ---------------------------------------------------------------------------
  * Backend contract

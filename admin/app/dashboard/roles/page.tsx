@@ -21,7 +21,7 @@ export default function RolesPage() {
       <div className="flex justify-end mb-6">
         <button
           onClick={handleCreateRole}
-          className="flex items-center gap-2 px-4 py-2 rounded-md shadow bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
+          className="flex items-center gap-2 px-4 py-2 rounded-full shadow bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
         >
           <Plus size={18} />
           Create Role
