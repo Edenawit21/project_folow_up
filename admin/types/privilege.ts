@@ -7,14 +7,10 @@ export interface Permission {
 }
 
 export interface PermissionApiResponse {
-  value: Permission[];
-  valueOrDefault: Permission[];
-  isFailed: boolean;
-  isSuccess: boolean;
-  reasons: any[];
-  errors: any[];
-  successes: any[];
+  success: boolean;
+  data: Permission[];
 }
+
 
 export interface PrivilegePayload {
   permissionName: string;

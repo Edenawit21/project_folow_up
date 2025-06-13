@@ -93,16 +93,6 @@ export interface Errors {
 }
 
 // Form state for login forms
-export interface FormState {
-  email: string;
-  password: string;
-}
-
-// Payload for login requests
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
 
 // Form data for creating/updating privileges
 export interface PrivilegeFormData {

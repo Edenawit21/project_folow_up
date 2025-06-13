@@ -16,6 +16,7 @@ const RoleList = () => {
     const loadData = async () => {
       try {
         const roles = await fetchAllRoles();
+        console.log("roles:" ,roles);
         setRoles(roles);
       } catch (error) {
         toast.error("Failed to load roles.");
@@ -23,7 +24,6 @@ const RoleList = () => {
         setLoading(false);
       }
     };
-
     loadData();
   }, []);
 
@@ -44,14 +44,14 @@ const RoleList = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
         Role List
       </h2>
 
-      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-md">
+      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
         <table className="min-w-full table-auto">
-          <thead className="bg-gray-100 dark:bg-gray-800">
+          <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
               {[
                 "Name",
@@ -62,19 +62,20 @@ const RoleList = () => {
               ].map((header) => (
                 <th
                   key={header}
-                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider"
                 >
                   {header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {loading ? (
               <tr>
                 <td
                   colSpan={5}
-                  className="px-4 py-12 text-center text-gray-500 dark:text-gray-400"
+                  className="px-4 py-12 text-center text-gray-500 dark:text-gray-300"
                 >
                   <div className="flex flex-col items-center justify-center gap-3">
                     <Loader2 className="h-6 w-6 animate-spin text-indigo-600" />
@@ -86,7 +87,7 @@ const RoleList = () => {
               roles.map((role) => (
                 <tr
                   key={role.roleId}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
                     {role.name}
@@ -100,21 +101,21 @@ const RoleList = () => {
                     )}
                   </td>
 
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap max-w-[280px]">
+                  <td className="px-4 py-3 text-sm whitespace-nowrap max-w-[280px]">
                     {Array.isArray(role.permissions) &&
                     role.permissions.length > 0 ? (
                       <div className="flex flex-wrap gap-1">
                         {role.permissions.map((perm, i) => (
                           <span
                             key={i}
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium   dark:bg-blue-900/30 dark:text-blue-300"
+                            className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium    dark:text-green-300"
                           >
                             {perm}
                           </span>
                         ))}
                       </div>
                     ) : (
-                      <span className="text-sm italic text-gray-500">
+                      <span className="text-sm italic text-gray-500 dark:text-gray-400">
                         No permissions
                       </span>
                     )}
@@ -134,14 +135,14 @@ const RoleList = () => {
                     <div className="flex items-center justify-end space-x-3">
                       <button
                         onClick={() => handleEdit(role)}
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-white transition-colors"
                         aria-label={`Edit ${role.name}`}
                       >
                         <Edit2 size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(role.roleId)}
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 transition-colors"
                         aria-label={`Delete ${role.name}`}
                       >
                         <Trash2 size={18} />

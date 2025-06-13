@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { RoleData, CreateUserDto } from "@/types";
+import { RoleData } from "@/types/role";
 import { fetchAllRoles } from "@/utils/roleApi";
 import { registerUser, fetchUserById, updateUser } from "@/utils/userApi";
 import { toast } from "react-toastify";
 import { Search } from "lucide-react";
+import { CreateUserDto } from "@/types";
 
 interface AddUserProps {
   userId?: string;
@@ -14,8 +15,6 @@ interface AddUserProps {
 
 const AddUser = ({ userId, onClose }: AddUserProps) => {
   const isEdit = !!userId;
-;
-
   const [formData, setFormData] = useState<CreateUserDto>({
     firstName: "",
     lastName: "",
@@ -35,9 +34,8 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const apiResponse = await fetchAllRoles();
-        const roleData: RoleData[] = apiResponse.value || [];
-        setRoles(roleData);
+        const role = await fetchAllRoles();
+        setRoles(role);
 
         if (userId) {
           const user = await fetchUserById(userId);
@@ -68,14 +66,14 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
     onClose();
   };
 
-  const handleRoleChange = (roleName: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      roles: prev.roles.includes(roleName)
-        ? prev.roles.filter((r) => r !== roleName)
-        : [...prev.roles, roleName],
-    }));
-  };
+  // const handleRoleChange = (roleName: string) => {
+  //   setFormData((prev: { roles: string[] }) => ({
+  //     ...prev,
+  //     roles: prev.roles.includes(roleName)
+  //       ? prev.roles.filter((r) => r !== roleName)
+  //       : [...prev.roles, roleName],
+  //   }));
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,9 +108,6 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
     role.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  /* ────────────────────────────────────
-   * UI
-   * ──────────────────────────────────── */
   return (
     <div className="max-w-md mx-auto mt-10 p-4 border rounded shadow">
       <h2 className="text-xl font-semibold mb-4">
@@ -196,7 +191,7 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
                   <input
                     type="checkbox"
                     checked={formData.roles.includes(role.name)}
-                    onChange={() => handleRoleChange(role.name)}
+                    //onChange={() => handleRoleChange(role.name)}
                     className="mr-2"
                   />
                   {role.name}

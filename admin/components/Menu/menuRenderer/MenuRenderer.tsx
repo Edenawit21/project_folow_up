@@ -2,7 +2,7 @@
 'use client';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { MenuItem } from '../../../types/menuTypes';
+import { MenuItem } from '@/types/menuTypes';
 
 interface MenuRendererProps {
   items: MenuItem[];
@@ -64,7 +64,7 @@ export const MenuRenderer = ({
 
             {hasChildren && isExpanded && item.children && (
               <MenuRenderer
-                items={item.children} // TypeScript now knows item.children exists
+                items={item.children} 
                 isActive={isActive}
                 expandedItems={expandedItems}
                 onToggleExpand={onToggleExpand}

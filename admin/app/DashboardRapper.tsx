@@ -1,9 +1,8 @@
 "use client";
 
-
 import React, { useEffect } from "react";
 import Navbar from "@/components/NavBar";
-import { SideBar } from "@/components/SideBar"; // Fixed import (capital B)
+import { SideBar } from "@/components/SideBar";
 import StoreProvider, { useAppSelector } from "./redux";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -12,39 +11,33 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
+  // Automatically toggle dark mode class
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    document.documentElement.classList.toggle("dark", isDarkMode);
   }, [isDarkMode]);
 
-  
   return (
-    <div className="flex min-h-screen w-full bg-gray-50 text-gray-900 dark:bg-black dark:text-white">
-      {/* Only show SideBar when not collapsed */}
+    <div className="flex min-h-screen w-full bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-white transition-colors duration-300">
+      {/* Sidebar */}
       {!isSidebarCollapsed && <SideBar />}
+
+      {/* Main content area */}
       <main
-        className={`flex w-full flex-col bg-white dark:bg-black ${
+        className={`flex flex-col w-full transition-all duration-300 ${
           isSidebarCollapsed ? "" : "md:ml-64"
-        } transition-all duration-300`}
+        }`}
       >
         <Navbar />
-        {children}
+        <div className="p-4">{children}</div>
       </main>
     </div>
   );
 };
 
-
-const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <StoreProvider>
-      <DashboardLayout>{children}</DashboardLayout>
-    </StoreProvider>
-  );
-};
-
+const DashboardWrapper = ({ children }: { children: React.ReactNode }) => (
+  <StoreProvider>
+    <DashboardLayout>{children}</DashboardLayout>
+  </StoreProvider>
+);
 
 export default DashboardWrapper;

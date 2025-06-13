@@ -1,5 +1,5 @@
-// components/Menu/types/menuTypes.ts
-// types/menuTypes.ts
+import React from "react";
+
 export interface MenuItem {
   id: string;
   name: string;
@@ -8,10 +8,16 @@ export interface MenuItem {
   requiredPrivilege?: string;
   parentId: string | number;
   order?: number;
-  children?: MenuItem[]; // Now properly typed as optional array
+  children?: MenuItem[]; 
 }
 
 export interface MenuResponse {
   items: MenuItem[];
   version: string;
+}
+
+export interface CreateMenuProps {
+  onCreate: (item: MenuItem) => void;
+  onCancel?: () => void;
+  parentId?: string | number;
 }

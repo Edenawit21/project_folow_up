@@ -13,7 +13,7 @@ export default function UsersPage() {
       <div className="flex justify-end mb-6">
         <button
           onClick={() => setIsCreating(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-md shadow bg-green-600 text-white "
+          className="flex items-center gap-2 px-4 py-2 rounded-full shadow bg-green-600 text-white "
         >
           <UserPlus size={18} />
           Create User

@@ -45,31 +45,32 @@ const UserList = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
         User List
       </h2>
 
-      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-md">
+      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
         <table className="min-w-full table-auto">
-          <thead className="bg-gray-100 dark:bg-gray-800">
+          <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
               {["Name", "Email", "Active", "Actions"].map((header) => (
                 <th
                   key={header}
-                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider"
                 >
                   {header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {loading ? (
               <tr>
                 <td
                   colSpan={4}
-                  className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
+                  className="px-4 py-8 text-center text-gray-500 dark:text-gray-300"
                 >
                   Loading users...
                 </td>
@@ -87,10 +88,10 @@ const UserList = () => {
               users.map((user) => (
                 <tr
                   key={user.userId}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  {/* Display Name with Avatar */}
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  {/* Name + Avatar */}
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">
                     <div className="flex items-center gap-3">
                       {user.avatarUrl ? (
                         <img
@@ -99,7 +100,7 @@ const UserList = () => {
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-500">
+                        <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-500 dark:text-gray-200">
                           <span className="text-xs font-semibold">?</span>
                         </div>
                       )}
@@ -118,19 +119,19 @@ const UserList = () => {
                   </td>
 
                   {/* Actions */}
-                  <td className="px-4 py-3 text-sm text-right whitespace-nowrap">
-                    <div className="flex items-center justify-end space-x-3">
+                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <div className="flex items-center space-x-3">
                       <button
                         onClick={() => handleEdit(user.userId)}
                         aria-label={`Edit user ${user.displayName}`}
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-white transition-colors"
                       >
                         <Pencil size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(user.userId)}
                         aria-label={`Delete user ${user.displayName}`}
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 transition-colors"
                       >
                         <Trash2 size={18} />
                       </button>

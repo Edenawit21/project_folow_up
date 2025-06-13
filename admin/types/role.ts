@@ -7,10 +7,11 @@ export interface RoleData {
 }
 
 export interface RoleApiResponse {
-  value: RoleData[];
-  valueOrDefault: RoleData[];
-  isFailed: boolean;
-  isSuccess: boolean;
-  errors: any[];
-  successes: any[];
+  success: boolean;
+  data: RoleData[];
+}
+export interface RolePayload {
+  name: string;
+  description?: string;
+  permissions: string[];
 }

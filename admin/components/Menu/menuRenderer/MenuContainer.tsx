@@ -12,14 +12,6 @@ export const MenuContainer = ({
 }) => {
   const { menuData, loading, error, isActive, expandedItems, toggleExpand } =
     useMenu(initialData);
-
-  // console.log("MenuContainer state:", {
-  //   loading,
-  //   error,
-  //   menuData,
-  //   hasInitialData: !!initialData,
-  // });
-
   if (loading) return <LoadingSpinner className="my-8" />;
   if (error)
     return (
@@ -28,9 +20,6 @@ export const MenuContainer = ({
         retry={() => window.location.reload()}
       />
     );
-
-  // console.log("Rendering menu with items:", menuData);
-
   return (
     <MenuRenderer
       items={menuData}

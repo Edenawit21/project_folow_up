@@ -1,12 +1,7 @@
 import axios from "axios";
-import { LoginRequest } from "@/types";
+import { LoginRequest, LoginResponse } from "@/types/login";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-export interface LoginResponse {
-  message: string;
-  token: string;
-}
 
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   try {
