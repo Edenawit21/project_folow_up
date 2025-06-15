@@ -1,24 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { PrivilegePayload } from "@/types/privilege";
+import { PrivilegePayload, AddPrivilegeProps } from "@/types/privilege";
 import {
   createPermission,
   updatePermission,
   getPermissionById,
 } from "@/utils/privilegeApi";
 import { toast } from "react-toastify";
-
-interface AddPrivilegeProps {
-  id?: string;
-  onClose: () => void;
-  onCreate?: (data: PrivilegePayload) => void;
-}
+import { Loader2 } from "lucide-react";
 
 const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   id,
   onClose,
   onCreate,
+  onUpdate,
 }) => {
   const [formData, setFormData] = useState<PrivilegePayload>({
     permissionName: "",
@@ -26,24 +22,26 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
     action: "",
   });
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
     if (id) {
-      setLoading(true);
+      setFetching(true);
       getPermissionById(id)
-        .then((data) =>
+        .then((data) => {
           setFormData({
             permissionName: data.permissionName || "",
             description: data.description || "",
             action: data.action || "",
-          })
-        )
-        .catch(() => toast.error("Failed to load privilege."))
-        .finally(() => setLoading(false));
+          });
+        })
+        .catch(() => {
+          toast.error("Failed to load privilege.");
+        })
+        .finally(() => setFetching(false));
     }
   }, [id]);
 
-  // Single handler for all inputs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -57,12 +55,13 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
 
     try {
       if (id) {
-        await updatePermission(id, formData);
+        const updatedPermission = await updatePermission(id, formData);
         toast.success("Privilege updated successfully!");
+        onUpdate?.(updatedPermission);
       } else {
-        await createPermission(formData);
+        const createdPermission = await createPermission(formData);
         toast.success("Privilege created successfully!");
-        onCreate?.(formData);
+        onCreate?.(createdPermission);
       }
       onClose();
     } catch {
@@ -74,15 +73,27 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
     }
   };
 
+  if (id && fetching) {
+    return (
+      <div className="w-[500px] p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600 flex items-center justify-center">
+        <Loader2 className="animate-spin text-indigo-600 w-6 h-6" />
+        <span className="ml-2 text-gray-700 dark:text-white">
+          Loading privilege...
+        </span>
+      </div>
+    );
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-[500px] p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
+      className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-300 dark:border-gray-600"
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-        {id ? "Update Permission" : "Add Permission"}
+        {id ? "Update Privilege" : "Add Privilege"}
       </h2>
 
+      {/* Permission Name */}
       <label className="block mb-4">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Permission Name
@@ -98,6 +109,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
         />
       </label>
 
+      {/* Description */}
       <label className="block mb-4">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Description
@@ -112,6 +124,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
         />
       </label>
 
+      {/* Action */}
       <label className="block mb-4">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Action
@@ -127,6 +140,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
         />
       </label>
 
+      {/* Buttons */}
       <div className="flex justify-between">
         <button
           type="button"

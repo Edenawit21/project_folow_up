@@ -4,13 +4,16 @@ import React, { useEffect, useState } from "react";
 import { Trash2, Pencil } from "lucide-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { User } from "@/types";
+import { User, UserForm } from "@/types/user";
 import { getUsers, deleteUser } from "@/utils/userApi";
+import AddUser from "./AddUser";
 
 const UserList = () => {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -28,8 +31,15 @@ const UserList = () => {
     fetchUsers();
   }, []);
 
-  const handleEdit = (userId: string) => {
-    router.push(`/dashboard/users?id=${userId}`);
+  const handleEdit = (id: string) => {
+    setEditingId(id);
+    setModalOpen(true);
+  };
+  const handleUpdate = () => {
+    loadUsers();
+  };
+  const handleCreate = (data: UserForm) => {
+    loadUsers();
   };
 
   const handleDelete = async (userId: string) => {
@@ -143,8 +153,24 @@ const UserList = () => {
           </tbody>
         </table>
       </div>
+      {modalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <AddUser
+            userId={editingId}
+            onClose={() => {
+              setModalOpen(false);
+              setEditingId(undefined);
+            }}
+            onUpdate={handleUpdate}
+            onCreate={handleCreate}
+          />
+        </div>
+      )}
     </div>
   );
 };
 
 export default UserList;
+function loadUsers() {
+  throw new Error("Function not implemented.");
+}

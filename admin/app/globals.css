@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  body {
-    font-family: "Inter", sans-serif;
-  }
-}
-
 /* LIGHT THEME */
 :root {
   --background: 0 0% 100%;

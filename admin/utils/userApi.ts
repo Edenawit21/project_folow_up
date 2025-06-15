@@ -1,5 +1,5 @@
 import axios from "axios";
-import { User } from "@/types"; // Optional: if you're using typed data
+import { User } from "@/types/user";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 

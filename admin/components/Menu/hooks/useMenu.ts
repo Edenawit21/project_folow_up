@@ -7,7 +7,7 @@ export const useMenu = (initialData?: MenuItem[]) => {
   const { menuData, loading, error } = useMenuData(initialData);
   const { isActive, expandedItems, toggleExpand } = useMenuInteraction();
 
-  console.log('useMenu state:', { menuData, loading, error });
+ // console.log('useMenu state:', { menuData, loading, error });
 
   return {
     menuData,

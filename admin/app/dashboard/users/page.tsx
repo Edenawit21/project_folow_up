@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { UserPlus } from "lucide-react";
 import UserList from "@/components/users/UserList";
 import AddUser from "@/components/users/AddUser";
+import { UserForm } from "@/types/user";
 
 export default function UsersPage() {
   const [isCreating, setIsCreating] = useState(false);
@@ -24,9 +25,11 @@ export default function UsersPage() {
 
       {isCreating && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4 py-10">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-xl w-full relative overflow-y-auto max-h-[90vh] p-6">
-            <AddUser onClose={() => setIsCreating(false)} />
-          </div>
+          <AddUser onClose={() => setIsCreating(false)} onCreate={function (data: UserForm): void {
+            throw new Error("Function not implemented.");
+          } } onUpdate={function (): void {
+            throw new Error("Function not implemented.");
+          } } />
         </div>
       )}
     </div>

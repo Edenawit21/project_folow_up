@@ -6,11 +6,13 @@ import { fetchAllRoles } from "@/utils/roleApi";
 import { registerUser, fetchUserById, updateUser } from "@/utils/userApi";
 import { toast } from "react-toastify";
 import { Search } from "lucide-react";
-import { CreateUserDto } from "@/types";
+import { CreateUserDto, UserForm } from "@/types/user";
 
 interface AddUserProps {
   userId?: string;
   onClose: () => void;
+  onCreate: (data: UserForm) => void;
+  onUpdate: () => void;
 }
 
 const AddUser = ({ userId, onClose }: AddUserProps) => {
@@ -66,15 +68,6 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
     onClose();
   };
 
-  // const handleRoleChange = (roleName: string) => {
-  //   setFormData((prev: { roles: string[] }) => ({
-  //     ...prev,
-  //     roles: prev.roles.includes(roleName)
-  //       ? prev.roles.filter((r) => r !== roleName)
-  //       : [...prev.roles, roleName],
-  //   }));
-  // };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
@@ -109,22 +102,24 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
   );
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-4 border rounded shadow">
-      <h2 className="text-xl font-semibold mb-4">
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg transition-colors">
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
         {userId ? "Update User" : "Add User"}
       </h2>
 
-      {message && <p className="text-green-600 mb-2">{message}</p>}
-      {error && <p className="text-red-600 mb-2">{error}</p>}
+      {message && (
+        <p className="text-green-600 dark:text-green-400 mb-2">{message}</p>
+      )}
+      {error && <p className="text-red-600 dark:text-red-400 mb-2">{error}</p>}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <input
           type="text"
           name="firstName"
           value={formData.firstName}
           onChange={handleChange}
           placeholder="First Name"
-          className="w-full p-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           required
         />
         <input
@@ -133,7 +128,7 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
           value={formData.lastName}
           onChange={handleChange}
           placeholder="Last Name"
-          className="w-full p-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           required
         />
         <input
@@ -142,7 +137,7 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
           value={formData.accountId}
           onChange={handleChange}
           placeholder="Account ID"
-          className="w-full p-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           required
         />
         <input
@@ -151,17 +146,19 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
           value={formData.email}
           onChange={handleChange}
           placeholder="Email"
-          className="w-full p-2 border rounded"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           required
           disabled={!!userId}
         />
 
         <div className="relative">
-          <label className="block font-medium mb-1">Assign Roles</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Assign Roles
+          </label>
           <button
             type="button"
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="w-full border p-2 rounded text-left bg-white"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-left hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             {formData.roles.length > 0
               ? formData.roles.join(", ")
@@ -169,8 +166,8 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute z-10 w-full bg-white border rounded mt-1 max-h-60 overflow-y-auto shadow-lg">
-              <div className="sticky top-0 bg-white p-2 border-b">
+            <div className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-xl">
+              <div className="sticky top-0 bg-white dark:bg-gray-900 p-2 border-b border-gray-200 dark:border-gray-700">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
@@ -178,7 +175,7 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
                     placeholder="Search roles..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2 border rounded focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -186,20 +183,20 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
               {filteredRoles.map((role) => (
                 <label
                   key={role.roleId}
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  className="flex items-center px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                 >
                   <input
                     type="checkbox"
                     checked={formData.roles.includes(role.name)}
-                    //onChange={() => handleRoleChange(role.name)}
-                    className="mr-2"
+                    className="mr-2 accent-indigo-600"
+                    // onChange={() => handleRoleChange(role.name)}
                   />
                   {role.name}
                 </label>
               ))}
 
               {filteredRoles.length === 0 && (
-                <div className="px-4 py-3 text-center text-gray-500">
+                <div className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
                   No roles found
                 </div>
               )}
@@ -207,18 +204,19 @@ const AddUser = ({ userId, onClose }: AddUserProps) => {
           )}
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex justify-between pt-2">
           <button
             type="button"
             onClick={handleCancel}
             disabled={loading || submitting}
-            className="w-1/2 mr-2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
+            className="w-1/2 mr-2 py-2 px-4 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="w-1/2 py-3 rounded bg-green-600 hover:bg-green-700 text-white font-semibold transition-colors duration-300"
+            disabled={submitting}
+            className="w-1/2 py-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold transition-all"
           >
             {isEdit ? "Update User" : "Register User"}
           </button>
