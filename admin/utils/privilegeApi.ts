@@ -1,4 +1,9 @@
-import { Permission, PermissionApiResponse } from "@/types/privilege";
+import {
+  Permission,
+  PermissionApiResponse,
+  SinglePermissionApiResponse,
+  CreatePermissionRequest,
+} from "@/types/privilege";
 import axios from "axios";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -11,29 +16,33 @@ export const fetchPermissions = async (): Promise<Permission[]> => {
   if (!response.data.success) {
     throw new Error("Failed to fetch permissions");
   }
-
+  console.log(response.data);
   return response.data.data;
 };
 
 // Get permission by ID
-export const getPermissionById = async (id: string): Promise<Permission> => {
-  const response = await axios.get(`${BASE_URL}/api/Permission/${id}`);
 
-  if (!response.data.isSuccess) {
+export const getPermissionById = async (id: string): Promise<Permission> => {
+  const response = await axios.get<SinglePermissionApiResponse>(
+    `${BASE_URL}/api/Permission/${id}`
+  );
+
+  if (!response.data.success) {
     throw new Error("Failed to fetch permission by ID");
   }
+  console.log(id);
 
-  return response.data.value;
+  return response.data.data;
 };
 
 // Create a new permission
 export const createPermission = async (
-  permission: Omit<Permission, "id">
+  permission: CreatePermissionRequest
 ): Promise<Permission> => {
   const response = await axios.post(`${BASE_URL}/api/Permission`, permission);
 
   if (!response.data.isSuccess) {
-    throw new Error("Failed to create permission");
+    throw new Error(response.data.message || "Failed to create permission");
   }
 
   return response.data.value;
@@ -49,7 +58,7 @@ export const updatePermission = async (
     permission
   );
 
-  if (!response.data.isSuccess) {
+  if (!response.data.success) {
     throw new Error("Failed to update permission");
   }
 
@@ -60,7 +69,7 @@ export const updatePermission = async (
 export const deletePermission = async (id: string): Promise<void> => {
   const response = await axios.delete(`${BASE_URL}/api/Permission/${id}`);
 
-  if (!response.data.isSuccess) {
+  if (!response.data.success) {
     throw new Error("Failed to delete permission");
   }
 };

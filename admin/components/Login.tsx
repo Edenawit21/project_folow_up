@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { login } from "@/utils/auth";
-import { Errors, FormState } from "@/types";
+import { FormState } from "@/types/login";
+import { Errors } from "@/types/user";
 
 const Login = () => {
   const router = useRouter();
@@ -12,7 +13,6 @@ const Login = () => {
   const [errors, setErrors] = useState<Errors>({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));

@@ -40,7 +40,7 @@ export const useMenuData = (initialData?: MenuItem[]) => {
           setMenuData(JSON.parse(stored));
         }
       } catch (parseError) {
-        console.error('Failed to parse stored menu:', parseError);
+       // console.error('Failed to parse stored menu:', parseError);
       }
     } finally {
       setLoading(false);
@@ -49,7 +49,7 @@ export const useMenuData = (initialData?: MenuItem[]) => {
   };
 
   useEffect(() => {
-    console.log('Initializing useMenuData');
+   // console.log('Initializing useMenuData');
     if (!initialData) {
       fetchMenuData();
     }

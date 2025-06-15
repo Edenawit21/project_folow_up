@@ -2,33 +2,44 @@
 
 import React, { useEffect, useState } from "react";
 import { Trash2, Edit2, Loader2 } from "lucide-react";
-import { RoleData } from "@/types/role";
-import { useRouter } from "next/navigation";
+import { RoleData, RolePayload } from "@/types/role";
 import { toast } from "react-toastify";
 import { fetchAllRoles, deleteRole } from "@/utils/roleApi";
+import CreateRole from "./CreateRole";
 
 const RoleList = () => {
-  const router = useRouter();
   const [roles, setRoles] = useState<RoleData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | undefined>(undefined);
+
+  const loadRoles = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchAllRoles();
+      setRoles(data);
+    } catch (error) {
+      toast.error("Failed to load roles.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const roles = await fetchAllRoles();
-        console.log("roles:" ,roles);
-        setRoles(roles);
-      } catch (error) {
-        toast.error("Failed to load roles.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
+    loadRoles();
   }, []);
 
-  const handleEdit = (role: RoleData) => {
-    router.push(`/dashboard/roles?id=${role.roleId}`);
+  const handleEdit = (id: string) => {
+    setEditingId(id);
+    setModalOpen(true);
+  };
+
+  const handleUpdate = () => {
+    loadRoles();
+  };
+
+  const handleCreate = (data: RolePayload) => {
+    loadRoles();
   };
 
   const handleDelete = async (id: string) => {
@@ -92,7 +103,6 @@ const RoleList = () => {
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
                     {role.name}
                   </td>
-
                   <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap max-w-[280px] truncate">
                     {role.description || (
                       <span className="italic text-gray-400">
@@ -100,7 +110,6 @@ const RoleList = () => {
                       </span>
                     )}
                   </td>
-
                   <td className="px-4 py-3 text-sm whitespace-nowrap max-w-[280px]">
                     {Array.isArray(role.permissions) &&
                     role.permissions.length > 0 ? (
@@ -108,7 +117,7 @@ const RoleList = () => {
                         {role.permissions.map((perm, i) => (
                           <span
                             key={i}
-                            className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium    dark:text-green-300"
+                            className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium dark:text-green-300"
                           >
                             {perm}
                           </span>
@@ -120,7 +129,6 @@ const RoleList = () => {
                       </span>
                     )}
                   </td>
-
                   <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                     {role.createdAt
                       ? new Date(role.createdAt).toLocaleDateString("en-US", {
@@ -130,11 +138,10 @@ const RoleList = () => {
                         })
                       : "N/A"}
                   </td>
-
                   <td className="px-4 py-3 text-sm text-right whitespace-nowrap">
                     <div className="flex items-center justify-end space-x-3">
                       <button
-                        onClick={() => handleEdit(role)}
+                        onClick={() => handleEdit(role.roleId)}
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-white transition-colors"
                         aria-label={`Edit ${role.name}`}
                       >
@@ -164,6 +171,20 @@ const RoleList = () => {
           </tbody>
         </table>
       </div>
+
+      {modalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <CreateRole
+            id={editingId}
+            onClose={() => {
+              setModalOpen(false);
+              setEditingId(undefined);
+            }}
+            onUpdate={handleUpdate}
+            onCreate={handleCreate}
+          />
+        </div>
+      )}
     </div>
   );
 };

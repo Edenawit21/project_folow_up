@@ -17,7 +17,7 @@ export default function PrivilegeListPage() {
           aria-label="Create new privilege"
           title="Create new privilege"
           className="flex items-center gap-2 px-2 py-2  shadow bg-green-600 text-white hover:bg-gray rounded-full"
-          >
+        >
           <Plus size={18} />
           Create Permission
         </button>

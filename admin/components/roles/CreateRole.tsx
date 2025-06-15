@@ -4,16 +4,9 @@ import React, { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { fetchRoleById, createRole, updateRole } from "@/utils/roleApi";
 import { fetchPermissions } from "@/utils/privilegeApi";
-import { RoleData, RolePayload } from "@/types/role";
+import { RoleData, RolePayload, CreateRoleProps } from "@/types/role";
 import { Permission } from "@/types/privilege";
 import { Loader2, Search } from "lucide-react";
-
-interface CreateRoleProps {
-  id?: string;
-  onClose: () => void;
-  onCreate?: (data: RolePayload) => void;
-  onUpdate?: (data: RolePayload) => void;
-}
 
 const CreateRole: React.FC<CreateRoleProps> = ({
   id,
@@ -53,9 +46,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
       setLoading(true);
       try {
         const data = await fetchPermissions();
-        setPermissions(
-          data.map((perm) => ({ ...perm, action: perm.action || "" }))
-        );
+        setPermissions(data);
       } catch {
         toast.error("Failed to load permissions.");
       } finally {
@@ -70,7 +61,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
     if (isEdit && id) {
       loadRole(id);
     }
-  }, [isEdit, id]);
+  }, [isEdit, id, permissions]);
 
   const loadRole = async (roleId: string) => {
     setLoading(true);
@@ -78,9 +69,19 @@ const CreateRole: React.FC<CreateRoleProps> = ({
       const role: RoleData = await fetchRoleById(roleId);
       setRoleName(role.name);
       setDescription(role.description || "");
-      setSelectedPermissions(
-        Array.isArray(role.permissions) ? role.permissions : []
-      );
+
+      const permIds = Array.isArray(role.permissions)
+        ? (role.permissions
+            .map((permName: string) => {
+              const found = permissions.find(
+                (p) => p.permissionName === permName
+              );
+              return found?.id;
+            })
+            .filter(Boolean) as string[])
+        : [];
+
+      setSelectedPermissions(permIds);
     } catch {
       toast.error("Failed to load role.");
       onClose();
@@ -99,6 +100,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!roleName.trim()) {
       toast.warning("Role name is required.");
       return;
@@ -108,22 +110,26 @@ const CreateRole: React.FC<CreateRoleProps> = ({
       return;
     }
 
-    const payload: RolePayload = {
-      name: roleName.trim(),
-      description: description.trim(),
-      permissions: selectedPermissions,
-    };
-
     setSubmitting(true);
     try {
       if (isEdit && id) {
-        await updateRole(id, payload);
+        const updatePayload: RolePayload = {
+          name: roleName.trim(),
+          description: description.trim(),
+          permissionIds: selectedPermissions,
+        };
+        await updateRole(id, updatePayload);
         toast.success("Role updated successfully.");
-        onUpdate?.(payload);
+        onUpdate?.(updatePayload);
       } else {
-        await createRole(payload);
+        const createPayload: RolePayload = {
+          name: roleName.trim(),
+          description: description.trim(),
+          permissionIds: selectedPermissions,
+        };
+        await createRole(createPayload);
         toast.success("Role created successfully.");
-        onCreate?.(payload);
+        onCreate?.(createPayload);
       }
       onClose();
     } catch {
@@ -153,7 +159,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {/* Role Name */}
             <div>
               <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
                 Role Name *
@@ -168,7 +173,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
               />
             </div>
 
-            {/* Description */}
             <div>
               <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
                 Description
@@ -182,7 +186,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
               />
             </div>
 
-            {/* Permissions Dropdown */}
             <div ref={dropdownRef} className="relative w-full">
               <button
                 type="button"
@@ -201,9 +204,10 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                   }
                 >
                   {selectedPermissions.length
-                    ? `${selectedPermissions.length} permission${
-                        selectedPermissions.length > 1 ? "s" : ""
-                      } selected`
+                    ? permissions
+                        .filter((perm) => selectedPermissions.includes(perm.id))
+                        .map((perm) => perm.permissionName)
+                        .join(", ")
                     : "Select permissions..."}
                 </span>
                 <svg
@@ -265,7 +269,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
               )}
             </div>
 
-            {/* Footer Buttons */}
             <div className="flex justify-between">
               <button
                 type="button"
