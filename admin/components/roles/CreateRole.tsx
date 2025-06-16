@@ -3,8 +3,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { fetchRoleById, createRole, updateRole } from "@/utils/roleApi";
-import { fetchPermissions } from "@/utils/privilegeApi";
-import { RoleData, RolePayload, CreateRoleProps } from "@/types/role";
+import { fetchAllPermissions } from "@/utils/privilegeApi";
+import {
+  RoleData,
+  RolePayload,
+  CreateRoleProps,
+  RoleUpdatePayload,
+} from "@/types/role";
 import { Permission } from "@/types/privilege";
 import { Loader2, Search } from "lucide-react";
 
@@ -45,10 +50,10 @@ const CreateRole: React.FC<CreateRoleProps> = ({
     const loadPermissions = async () => {
       setLoading(true);
       try {
-        const data = await fetchPermissions();
+        const data = await fetchAllPermissions();
         setPermissions(data);
       } catch {
-        toast.error("Failed to load permissions.");
+        toast.error("Failed to load Privileges.");
       } finally {
         setLoading(false);
       }
@@ -61,6 +66,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
     if (isEdit && id) {
       loadRole(id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, id, permissions]);
 
   const loadRole = async (roleId: string) => {
@@ -113,10 +119,10 @@ const CreateRole: React.FC<CreateRoleProps> = ({
     setSubmitting(true);
     try {
       if (isEdit && id) {
-        const updatePayload: RolePayload = {
+        const updatePayload: RoleUpdatePayload = {
           name: roleName.trim(),
           description: description.trim(),
-          permissionIds: selectedPermissions,
+          permissionsToAdd: selectedPermissions,
         };
         await updateRole(id, updatePayload);
         toast.success("Role updated successfully.");
@@ -226,9 +232,8 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                   />
                 </svg>
               </button>
-
               {dropdownOpen && (
-                <div className="absolute z-10 mt-2 w-full bg-white dark:bg-gray-800 border border-gray-300 rounded-sm shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-10 bottom-full mb-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 rounded-sm shadow-lg max-h-60 overflow-y-auto w-1/2 items-center">
                   <div className="sticky top-0 p-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />

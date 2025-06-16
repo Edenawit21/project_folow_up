@@ -8,7 +8,7 @@ import axios from "axios";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export const fetchPermissions = async (): Promise<Permission[]> => {
+export const fetchAllPermissions = async (): Promise<Permission[]> => {
   const response = await axios.get<PermissionApiResponse>(
     `${BASE_URL}/api/Permission`
   );
@@ -41,7 +41,7 @@ export const createPermission = async (
 ): Promise<Permission> => {
   const response = await axios.post(`${BASE_URL}/api/Permission`, permission);
 
-  if (!response.data.isSuccess) {
+  if (!response.data.success) {
     throw new Error(response.data.message || "Failed to create permission");
   }
 

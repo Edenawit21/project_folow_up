@@ -4,40 +4,43 @@ import React, { useEffect, useState } from "react";
 import { Trash2, Pencil } from "lucide-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { User, UserForm } from "@/types/user";
+import { UserData, UserForm } from "@/types/user";
 import { getUsers, deleteUser } from "@/utils/userApi";
 import AddUser from "./AddUser";
 
 const UserList = () => {
   const router = useRouter();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const response = await getUsers();
-        setUsers(response.data);
-      } catch (error: any) {
-        console.error("Fetch error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await getUsers();
+      setUsers(response.data);
+    } catch (error: any) {
+      console.error("Fetch error:", error);
+      toast.error("Failed to fetch users");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchUsers();
+  useEffect(() => {
+    loadUsers();
   }, []);
 
   const handleEdit = (id: string) => {
     setEditingId(id);
     setModalOpen(true);
   };
+
   const handleUpdate = () => {
     loadUsers();
   };
+
   const handleCreate = (data: UserForm) => {
     loadUsers();
   };
@@ -153,6 +156,7 @@ const UserList = () => {
           </tbody>
         </table>
       </div>
+
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
           <AddUser
@@ -171,6 +175,3 @@ const UserList = () => {
 };
 
 export default UserList;
-function loadUsers() {
-  throw new Error("Function not implemented.");
-}

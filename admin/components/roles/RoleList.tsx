@@ -52,6 +52,7 @@ const RoleList = () => {
     } catch (error) {
       toast.error("Failed to delete role.");
     }
+    loadRoles();
   };
 
   return (
