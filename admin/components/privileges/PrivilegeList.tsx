@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Pencil, Trash2, Loader2 } from "lucide-react";
 import { Permission, PrivilegePayload } from "@/types/privilege";
-import { fetchPermissions, deletePermission } from "@/utils/privilegeApi";
+import { fetchAllPermissions, deletePermission } from "@/utils/privilegeApi";
 import AddPrivilege from "./AddPrivilege";
 
 const PrivilegeList: React.FC = () => {
@@ -17,7 +17,7 @@ const PrivilegeList: React.FC = () => {
   const loadPermissions = async () => {
     setLoading(true);
     try {
-      const data = await fetchPermissions();
+      const data = await fetchAllPermissions();
       setPrivileges(data);
     } catch {
       toast.error("Failed to load privileges.");

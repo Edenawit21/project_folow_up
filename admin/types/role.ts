@@ -10,7 +10,6 @@ export interface RoleApiResponse {
   success: boolean;
   data: RoleData[];
 }
-// types/role.ts
 
 export interface RolePayload {
   name: string;
@@ -18,16 +17,15 @@ export interface RolePayload {
   permissionIds: string[];
 }
 
+export interface RoleUpdatePayload {
+  name: string;
+  description: string;
+  permissionsToAdd: string[];
+}
+
 export interface CreateRoleProps {
   id?: string;
   onClose: () => void;
   onCreate?: (data: RolePayload) => void;
-  onUpdate?: (data: RolePayload) => void;
+  onUpdate?: (data: RoleUpdatePayload) => void;
 }
-
-export interface RoleUpdatePayload {
-  name: string;
-  description: string;
-  permissionsToAdd: string[]; 
-}
-

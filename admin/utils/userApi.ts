@@ -1,5 +1,5 @@
 import axios from "axios";
-import { User } from "@/types/user";
+import { UserData } from "@/types/user";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -15,14 +15,14 @@ export const fetchUserById = async (userId: string) => {
   return res.data.data;
 };
 
-// POST /api/User
-export const registerUser = async (userData: Partial<User>) => {
+// POST /api/UserData
+export const registerUser = async (userData: Partial<UserData>) => {
   const res = await axios.post(`${API_BASE}/api/User`, userData);
   return res.data.data;
 };
 
 //  PUT /api/User/{id}
-export const updateUser = async (userId: string, userData: Partial<User>) => {
+export const updateUser = async (userId: string, userData: Partial<UserData>) => {
   const res = await axios.put(`${API_BASE}/api/User/${userId}`, userData);
   return res.data.data;
 };
