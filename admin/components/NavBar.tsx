@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/utils";
 import Image from "next/image";
+import { logout } from "@/utils/logout";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
@@ -108,9 +109,7 @@ const Navbar = () => {
                 Profile
               </Link>
               <button
-                onClick={() => {
-                  alert("Logging out...");
-                }}
+                onClick={logout}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Logout

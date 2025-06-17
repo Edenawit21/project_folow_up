@@ -199,7 +199,7 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
         {/* Role Dropdown */}
         <div className="relative">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-center">
-            Assign Roles
+            {isEdit ? "Assigned Roles" : "Assign Roles"}
           </label>
           <button
             type="button"
