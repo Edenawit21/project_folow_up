@@ -4,31 +4,50 @@ import React, { useEffect, useState } from "react";
 import { Trash2, Pencil } from "lucide-react";
 import { toast } from "react-toastify";
 import { UserData, UserForm } from "@/types/user";
+import { RoleData } from "@/types/role";
 import { getUsers, deleteUser } from "@/utils/userApi";
+import { fetchAllRoles } from "@/utils/roleApi";
 import AddUser from "./AddUser";
 
 const UserList = () => {
   const [users, setUsers] = useState<UserData[]>([]);
+  const [roles, setRoles] = useState<RoleData[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | undefined>(undefined);
+  const [editingId, setEditingId] = useState<string | undefined>();
+
+  useEffect(() => {
+    loadUsers();
+    loadRoles();
+  }, []);
 
   const loadUsers = async () => {
     setLoading(true);
     try {
       const response = await getUsers();
       setUsers(response);
-    } catch (error: any) {
-      console.error("Fetch error:", error);
+    } catch (error) {
       toast.error("Failed to fetch users");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadUsers();
-  }, []);
+  const loadRoles = async () => {
+    try {
+      const roleData = await fetchAllRoles();
+      setRoles(roleData);
+    } catch (error) {
+      console.error("Role fetch error:", error);
+      toast.error("Failed to fetch roles");
+    }
+  };
+
+  const getRoleNames = (roleIds: string[]) => {
+    return roleIds
+      .map((id) => roles.find((role) => role.roleId === id)?.name || "Unknown")
+      .join(", ");
+  };
 
   const handleEdit = (id: string) => {
     setEditingId(id);
@@ -39,18 +58,17 @@ const UserList = () => {
     loadUsers();
   };
 
-  const handleCreate = (data: UserForm) => {
+  const handleCreate = () => {
     loadUsers();
   };
 
   const handleDelete = async (userId: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
-
     try {
       await deleteUser(userId);
       setUsers((prev) => prev.filter((u) => u.userId !== userId));
       toast.success("User deleted successfully");
-    } catch (error: any) {
+    } catch (error) {
       toast.error("Failed to delete user");
     }
     loadUsers();
@@ -66,7 +84,7 @@ const UserList = () => {
         <table className="min-w-full table-auto">
           <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
-              {["Name", "Email", "Active", "Actions"].map((header) => (
+              {["Name", "Email", "Roles", "Active", "Actions"].map((header) => (
                 <th
                   key={header}
                   className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider"
@@ -76,12 +94,11 @@ const UserList = () => {
               ))}
             </tr>
           </thead>
-
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {loading ? (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={5}
                   className="px-4 py-8 text-center text-gray-500 dark:text-gray-300"
                 >
                   Loading users...
@@ -90,7 +107,7 @@ const UserList = () => {
             ) : users.length === 0 ? (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={5}
                   className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
                 >
                   No users found.
@@ -116,13 +133,20 @@ const UserList = () => {
                           <span className="text-xs font-semibold">?</span>
                         </div>
                       )}
-                      <span>{user.displayName || "—"}</span>
+                      <span>
+                        {user.firstName} {user.lastName || user.displayName}
+                      </span>
                     </div>
                   </td>
 
                   {/* Email */}
                   <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                     {user.email}
+                  </td>
+
+                  {/* Roles */}
+                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    {getRoleNames(user.roles || [])}
                   </td>
 
                   {/* Active */}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Trash2, Edit2, Loader2 } from "lucide-react";
+import { Trash2, Edit2, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { RoleData, RolePayload } from "@/types/role";
 import { toast } from "react-toastify";
 import { fetchAllRoles, deleteRole } from "@/utils/roleApi";
@@ -12,6 +12,7 @@ const RoleList = () => {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | undefined>(undefined);
+  const [expandedRole, setExpandedRole] = useState<string | null>(null);
 
   const loadRoles = async () => {
     setLoading(true);
@@ -29,30 +30,36 @@ const RoleList = () => {
     loadRoles();
   }, []);
 
-  const handleEdit = (id: string) => {
+  const toggleExpand = (roleId: string) => {
+    setExpandedRole(expandedRole === roleId ? null : roleId);
+  };
+
+  const handleEdit = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     setEditingId(id);
     setModalOpen(true);
   };
 
   const handleUpdate = () => {
     loadRoles();
+    setExpandedRole(null);
   };
 
   const handleCreate = (data: RolePayload) => {
     loadRoles();
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!confirm("Are you sure you want to delete this role?")) return;
 
     try {
       await deleteRole(id);
-      setRoles((prev) => prev.filter((r) => r.roleId !== id));
       toast.success("Role deleted successfully.");
+      loadRoles();
     } catch (error) {
       toast.error("Failed to delete role.");
     }
-    loadRoles();
   };
 
   return (
@@ -97,67 +104,98 @@ const RoleList = () => {
               </tr>
             ) : roles.length > 0 ? (
               roles.map((role) => (
-                <tr
-                  key={role.roleId}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                    {role.name}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap max-w-[280px] truncate">
-                    {role.description || (
-                      <span className="italic text-gray-400">
-                        No description
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm whitespace-nowrap max-w-[280px]">
-                    {Array.isArray(role.permissions) &&
-                    role.permissions.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {role.permissions.map((perm, i) => (
-                          <span
-                            key={i}
-                            className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium dark:text-green-300"
-                          >
-                            {perm}
-                          </span>
-                        ))}
+                <React.Fragment key={role.roleId}>
+                  <tr
+                    className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer ${
+                      expandedRole === role.roleId
+                        ? "bg-gray-50 dark:bg-gray-700"
+                        : ""
+                    }`}
+                    onClick={() => toggleExpand(role.roleId)}
+                  >
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap flex items-center">
+                      {expandedRole === role.roleId ? (
+                        <ChevronUp className="mr-2 h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="mr-2 h-4 w-4" />
+                      )}
+                      {role.name}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap max-w-[280px] truncate">
+                      {role.description || (
+                        <span className="italic text-gray-400">
+                          No description
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-sm whitespace-nowrap">
+                      <div className="flex items-center">
+                        <span className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded text-xs">
+                          {role.permissions.length} permissions
+                        </span>
+                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                          {expandedRole === role.roleId
+                            ? "Click to collapse"
+                            : "Click to expand"}
+                        </span>
                       </div>
-                    ) : (
-                      <span className="text-sm italic text-gray-500 dark:text-gray-400">
-                        No permissions
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                    {role.createdAt
-                      ? new Date(role.createdAt).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })
-                      : "N/A"}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-right whitespace-nowrap">
-                    <div className="flex items-center justify-end space-x-3">
-                      <button
-                        onClick={() => handleEdit(role.roleId)}
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-white transition-colors"
-                        aria-label={`Edit ${role.name}`}
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(role.roleId)}
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 transition-colors"
-                        aria-label={`Delete ${role.name}`}
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                      {role.createdAt
+                        ? new Date(role.createdAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })
+                        : "N/A"}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end space-x-3">
+                        <button
+                          onClick={(e) => handleEdit(role.roleId, e)}
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-white transition-colors"
+                          aria-label={`Edit ${role.name}`}
+                        >
+                          <Edit2 size={18} />
+                        </button>
+                        <button
+                          onClick={(e) => handleDelete(role.roleId, e)}
+                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 transition-colors"
+                          aria-label={`Delete ${role.name}`}
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  {expandedRole === role.roleId && (
+                    <tr className="bg-gray-50 dark:bg-gray-750 border-t border-gray-200 dark:border-gray-700">
+                      <td colSpan={5} className="px-4 py-3">
+                        <div className="mb-2 font-medium text-gray-700 dark:text-gray-300">
+                          Permissions:
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {Array.isArray(role.permissions) &&
+                          role.permissions.length > 0 ? (
+                            role.permissions.map((perm, i) => (
+                              <span
+                                key={i}
+                                className="inline-block bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200 px-3 py-1 rounded-full text-xs"
+                              >
+                                {perm}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-sm italic text-gray-500 dark:text-gray-400">
+                              No permissions
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <tr>
