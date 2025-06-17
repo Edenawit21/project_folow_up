@@ -26,7 +26,7 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
           fetchTasksByProject(projectId),
         ]);
         console.log("Project Data:", projectData);
-        
+
         setProject(projectData);
         setTasks(tasksData);
       } catch (error) {
@@ -41,13 +41,13 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
 
   if (isLoading || !project) {
     return (
-      <div className="grid grid-cols-1 gap-6 p-6">
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 animate-pulse h-32"></div>
+      <div className="grid grid-cols-1 gap-6 p-6 bg-white dark:bg-gray-900">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse h-32"></div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 animate-pulse h-48"
+              className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse h-48"
             ></div>
           ))}
         </div>
@@ -71,7 +71,7 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 p-6">
+    <div className="grid grid-cols-1 gap-6 p-6 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <ProjectHeader
         project={project}
         onBack={handleBack}
@@ -86,7 +86,6 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
             completedTasks: project.Progress.CompletedTasks,
             storyPointsCompleted: project.Progress.StoryPointsCompleted,
             storyPointsTotal: project.Progress.StoryPointsTotal,
-            // Omit activeBlockers and recentUpdates since they're not needed
           }}
           isLoading={isLoading}
         />

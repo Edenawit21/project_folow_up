@@ -48,7 +48,7 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
             roles: user.roles || [],
           });
         }
-      } catch {
+      } catch (err) {
         toast.error("Failed to load data.");
       } finally {
         setLoading(false);
@@ -75,11 +75,45 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+
+    // Validation
+    if (!formData.firstName.trim()) {
+      toast.error("First name is required.");
+      setSubmitting(false);
+      return;
+    }
+    if (!formData.lastName.trim()) {
+      toast.error("Last name is required.");
+      setSubmitting(false);
+      return;
+    }
+    if (!formData.accountId.trim()) {
+      toast.error("Account ID is required.");
+      setSubmitting(false);
+      return;
+    }
+    if (!formData.email.trim()) {
+      toast.error("Email is required.");
+      setSubmitting(false);
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
+      setSubmitting(false);
+      return;
+    }
+    if (formData.roles.length === 0) {
+      toast.error("Please assign at least one role.");
+      setSubmitting(false);
+      return;
+    }
+
     try {
       if (isEdit && userId) {
         await updateUser(userId, formData);
         toast.success("User updated successfully!");
-        onUpdate();
+        onUpdate(); // should refetch users or update UI
       } else {
         await registerUser(formData);
         toast.success("User created successfully!");
@@ -97,9 +131,10 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
           roles: [],
         });
       }
-      onClose(); // Make sure this runs
+      onClose();
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || "Operation failed.";
+      const errorMsg =
+        err?.response?.data?.message || err?.message || "Operation failed.";
       toast.error(errorMsg);
     } finally {
       setSubmitting(false);
@@ -178,7 +213,7 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute z-10 bottom-full  bg-gray-100 dark:bg-gray-800 border  rounded-xl shadow-2xl max-h-60 overflow-y-auto w-full  mb-2">
+            <div className="absolute z-10 bottom-full bg-gray-100 dark:bg-gray-800 border rounded-xl shadow-2xl max-h-60 overflow-y-auto w-full mb-2">
               <div className="sticky top-0 bg-white dark:bg-gray-900 p-2 border-b">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
