@@ -30,11 +30,11 @@ export const SideBar = () => {
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-full transition-all duration-300 ease-in-out z-30
-          ${isCollapsed ? "w-20" : "w-64"}
-          transform ${
-            isOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 md:block
-          bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm`}
+    transform ${
+      isOpen ? "translate-x-0" : "-translate-x-full"
+    } md:translate-x-0 md:block
+    bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden`}
+        style={{ width: isCollapsed ? 0 : 256 }}
       >
         <div className="flex flex-col h-full relative px-3 py-4">
           {/* Header: Logo + Collapse/Close */}

@@ -48,7 +48,7 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
             roles: user.roles || [],
           });
         }
-      } catch {
+      } catch (err) {
         toast.error("Failed to load data.");
       } finally {
         setLoading(false);
@@ -75,11 +75,45 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+
+    // Validation
+    if (!formData.firstName.trim()) {
+      toast.error("First name is required.");
+      setSubmitting(false);
+      return;
+    }
+    if (!formData.lastName.trim()) {
+      toast.error("Last name is required.");
+      setSubmitting(false);
+      return;
+    }
+    if (!formData.accountId.trim()) {
+      toast.error("Account ID is required.");
+      setSubmitting(false);
+      return;
+    }
+    if (!formData.email.trim()) {
+      toast.error("Email is required.");
+      setSubmitting(false);
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
+      setSubmitting(false);
+      return;
+    }
+    if (formData.roles.length === 0) {
+      toast.error("Please assign at least one role.");
+      setSubmitting(false);
+      return;
+    }
+
     try {
       if (isEdit && userId) {
         await updateUser(userId, formData);
         toast.success("User updated successfully!");
-        onUpdate();
+        onUpdate(); // should refetch users or update UI
       } else {
         await registerUser(formData);
         toast.success("User created successfully!");
@@ -97,9 +131,10 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
           roles: [],
         });
       }
-      onClose(); // Make sure this runs
+      onClose();
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || "Operation failed.";
+      const errorMsg =
+        err?.response?.data?.message || err?.message || "Operation failed.";
       toast.error(errorMsg);
     } finally {
       setSubmitting(false);
@@ -111,7 +146,7 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
   );
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg">
+    <div className="max-w-xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
         {isEdit ? "Update User" : "Add User"}
       </h2>
@@ -124,7 +159,7 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
           onChange={handleChange}
           placeholder="First Name"
           required
-          className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
           disabled={loading || submitting}
         />
 
@@ -135,7 +170,7 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
           onChange={handleChange}
           placeholder="Last Name"
           required
-          className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
           disabled={loading || submitting}
         />
 
@@ -146,7 +181,7 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
           onChange={handleChange}
           placeholder="Account ID"
           required
-          className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
           disabled={loading || submitting}
         />
 
@@ -158,19 +193,19 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
           placeholder="Email"
           required
           disabled={!!userId || loading || submitting}
-          className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
 
         {/* Role Dropdown */}
         <div className="relative">
-          {/* <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-center">
             Assign Roles
-          </label> */}
+          </label>
           <button
             type="button"
             onClick={() => setDropdownOpen(!dropdownOpen)}
             disabled={loading || submitting}
-            className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-left"
+            className="w-full px-4 py-2 border-[1px] rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-left"
           >
             {formData.roles.length > 0
               ? formData.roles.join(", ")
@@ -178,7 +213,7 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute z-10 bottom-full mb-2 w-full bg-white dark:bg-gray-800 border rounded-lg shadow-xl max-h-60 overflow-y-auto">
+            <div className="absolute z-10 bottom-full bg-gray-100 dark:bg-gray-800 border rounded-xl shadow-2xl max-h-60 overflow-y-auto w-full mb-2">
               <div className="sticky top-0 bg-white dark:bg-gray-900 p-2 border-b">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />

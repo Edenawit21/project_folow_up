@@ -3,13 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { Trash2, Pencil } from "lucide-react";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import { UserData, UserForm } from "@/types/user";
 import { getUsers, deleteUser } from "@/utils/userApi";
 import AddUser from "./AddUser";
 
 const UserList = () => {
-  const router = useRouter();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -19,7 +17,7 @@ const UserList = () => {
     setLoading(true);
     try {
       const response = await getUsers();
-      setUsers(response.data);
+      setUsers(response);
     } catch (error: any) {
       console.error("Fetch error:", error);
       toast.error("Failed to fetch users");
@@ -55,10 +53,11 @@ const UserList = () => {
     } catch (error: any) {
       toast.error("Failed to delete user");
     }
+    loadUsers();
   };
 
   return (
-    <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+    <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
         User List
       </h2>

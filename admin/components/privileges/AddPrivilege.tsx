@@ -75,7 +75,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
 
   if (id && fetching) {
     return (
-      <div className="w-[500px] p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600 flex items-center justify-center">
+      <div className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-300 dark:border-gray-600">
         <Loader2 className="animate-spin text-indigo-600 w-6 h-6" />
         <span className="ml-2 text-gray-700 dark:text-white">
           Loading privilege...
@@ -87,7 +87,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-300 dark:border-gray-600"
+      className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xlhadow-2xl border border-gray-300 dark:border-gray-600"
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
         {id ? "Update Privilege" : "Add Privilege"}
