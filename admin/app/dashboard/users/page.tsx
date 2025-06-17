@@ -10,7 +10,7 @@ export default function UsersPage() {
   const [isCreating, setIsCreating] = useState(false);
 
   return (
-    <div className="p-6 bg-white text-black dark:bg-gray-900 dark:text-white min-h-screen">
+    <div className="p-6 bg-white text-black dark:bg-gray-800 dark:text-white min-h-screen">
       <div className="flex justify-end mb-6">
         <button
           onClick={() => setIsCreating(true)}

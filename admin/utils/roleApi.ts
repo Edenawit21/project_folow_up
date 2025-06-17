@@ -36,5 +36,5 @@ export const updateRole = async (
 
 export const deleteRole = async (id: string): Promise<void> => {
   const response = await axios.delete(`${BASE_URL}/api/Role/${id}`);
-  if (!response.data.success) throw new Error("Failed to delete role");
+  if (!response.data.isSuccess) throw new Error("Failed to delete role");
 };

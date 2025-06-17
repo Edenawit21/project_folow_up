@@ -16,21 +16,25 @@ export default function PrivilegeListPage() {
           onClick={() => setIsAddOpen(true)}
           aria-label="Create new privilege"
           title="Create new privilege"
-          className="flex items-center gap-2 px-2 py-2  shadow bg-green-600 text-white hover:bg-gray rounded-full"
+          className="flex items-center gap-2 px-4 py-2 shadow bg-green-600 text-white hover:bg-green-700 rounded-full"
         >
           <Plus size={18} />
           Create Permission
         </button>
       </div>
+
       <PrivilegeList key={refreshKey} />
 
       {isAddOpen && (
         <>
+          {/* Modal Overlay */}
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-40"
             onClick={() => setIsAddOpen(false)}
-          ></div>
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          />
+
+          {/* Modal Content */}
+          <div className="fixed top-1/2 left-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-2xl overflow-hidden bg-white dark:bg-gray-800">
             <AddPrivilege onClose={() => setIsAddOpen(false)} />
           </div>
         </>
