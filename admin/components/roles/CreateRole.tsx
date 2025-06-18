@@ -151,8 +151,8 @@ const CreateRole: React.FC<CreateRoleProps> = ({
 
   return (
     <div className="px-4 py-8 w-[600px] ml-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+      <div className="p-2 border-b border-gray-200 dark:border-gray-700 text-center">
+        <h2 className="text-xl font-bold text-gray-800 dark:text-white">
           {isEdit ? "Update Role" : "Create New Role"}
         </h2>
       </div>
@@ -186,6 +186,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
+              required
               placeholder="Describe the role..."
               className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
@@ -240,6 +241,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                       type="text"
                       placeholder="Search permissions..."
                       value={searchTerm}
+                      required
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 rounded-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-indigo-500"
                     />

@@ -87,7 +87,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xlhadow-2xl border border-gray-300 dark:border-gray-600"
+      className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xlhadow-2xl border border-gray-300 dark:border-gray-600 rounded-xl"
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
         {id ? "Update Privilege" : "Add Privilege"}
