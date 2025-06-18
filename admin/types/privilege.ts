@@ -12,9 +12,8 @@ export interface PermissionApiResponse {
 }
 export interface SinglePermissionApiResponse {
   success: boolean;
-  data: Permission; 
+  data: Permission;
 }
-
 
 export interface PrivilegePayload {
   permissionName: string;
@@ -22,11 +21,11 @@ export interface PrivilegePayload {
   action: string;
 }
 
-export  interface CreatePermissionRequest {
+export interface CreatePermissionRequest {
   permissionName: string;
   description?: string;
   action: string;
-};
+}
 
 export interface AddPrivilegeProps {
   id?: string;

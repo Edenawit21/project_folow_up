@@ -44,8 +44,8 @@ export const createPermission = async (
   if (!response.data.success) {
     throw new Error(response.data.message || "Failed to create permission");
   }
-
-  return response.data.value;
+  debugger;
+  return response.data;
 };
 
 // Update an existing permission
