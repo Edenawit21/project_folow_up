@@ -150,7 +150,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
   );
 
   return (
-    <div className="w-[600px] p-6 bg-gray-400 dark:bg-gray-800 rounded-xlhadow-2xl border border-gray-300 dark:border-gray-600 rounded-xl">
+    <div className="px-4 py-8 w-[600px] ml-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
       <div className="p-2 border-b border-gray-200 dark:border-gray-700 text-center">
         <h2 className="text-xl font-bold text-gray-800 dark:text-white">
           {isEdit ? "Update Role" : "Create New Role"}
