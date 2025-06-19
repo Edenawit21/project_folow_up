@@ -1,14 +1,9 @@
 import axios from "axios";
 
-/**
- * Base URL for the API
- */
-export const PROJECT_API_URL =
-  process.env.PROJECT_API_URL ?? "http://localhost:5106/api/Project";
+/* Base URL for the API */
+export const PROJECT_API_URL = process.env.BASE_API_URL ;
 
-/* ---------------------------------------------------------------------------
- * Backend contract
- * ------------------------------------------------------------------------- */
+/*  Backend contract */
 export interface ApiProject {
   id: string;
   key: string;
@@ -32,30 +27,22 @@ export interface ApiProject {
   critical: boolean;
 }
 
-/**
- * Response returned by GET /public — list of projects
- */
+/* Response returned by GET /public — list of projects */
 export interface ApiProjectsResponse {
   success: boolean;
   data: ApiProject | ApiProject[];
 }
 
-/**
- * Wrapped response that _may_ be returned by GET /:id
- */
+/* Wrapped response that _may_ be returned by GET /:id */
 export interface ApiProjectByIdWrapped {
   success: boolean;
   data: ApiProject;
 }
 
-/**
- * GET /:id can return _either_ a wrapped or a raw project object
- */
+/* GET /:id can return _either_ a wrapped or a raw project object */
 export type ApiProjectByIdResponse = ApiProject | ApiProjectByIdWrapped;
 
-/* ---------------------------------------------------------------------------
- * UI contract
- * ------------------------------------------------------------------------- */
+/* UI contract */
 export type ProjectDto = {
   Id: string;
   Key: string;
@@ -79,9 +66,7 @@ export type ProjectDto = {
   Critical: boolean;
 };
 
-/* ---------------------------------------------------------------------------
- * Mapper
- * ------------------------------------------------------------------------- */
+/* Mapper */
 const mapApiToProjectDto = (api: ApiProject): ProjectDto => ({
   Id: api.id,
   Key: api.key,
@@ -105,17 +90,12 @@ const mapApiToProjectDto = (api: ApiProject): ProjectDto => ({
   Critical: api.critical,
 });
 
-/* ---------------------------------------------------------------------------
- * Public API functions
- * ------------------------------------------------------------------------- */
 
-/**
- * Fetch **all** projects (public list)
- */
+/* Fetch **all** projects (public list) */
 export const fetchProjects = async (): Promise<ProjectDto[]> => {
   try {
     const { data, status } = await axios.get<ApiProjectsResponse>(
-      `${PROJECT_API_URL}/public`
+      `http://10.0.229.9:2025/api/Project/public`
     );
 
     if (status !== 200 || !data.success) {
@@ -131,14 +111,7 @@ export const fetchProjects = async (): Promise<ProjectDto[]> => {
   }
 };
 
-/**
- * Fetch **one** project by its identifier.
- *
- * This endpoint is inconsistent: sometimes the backend returns
- * `{ success: true, data: { ...project } }`, other times it returns the
- * raw project object.  We normalise that here so the rest of the UI
- * doesn’t have to care.
- */
+/* Fetch **one** project by its identifier. */
 export const fetchProjectById = async (
   projectId: string
 ): Promise<ProjectDto> => {

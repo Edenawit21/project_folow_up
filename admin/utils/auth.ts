@@ -1,7 +1,7 @@
 import axios from "axios";
 import { LoginRequest } from "@/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 
 export interface LoginResponse {
   message: string;
@@ -11,7 +11,7 @@ export interface LoginResponse {
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   try {
     const response = await axios.post<LoginResponse>(
-      `${API_URL}/api/Account/login`,
+      `${API_URL}/api/Account/api/account/login`,
       data,
       {
         headers: {

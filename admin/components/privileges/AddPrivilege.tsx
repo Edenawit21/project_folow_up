@@ -1,25 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { PrivilegePayload } from "@/types/privilege";
-import {
-  createPermission,
-  updatePermission,
-  getPermissionById,
-} from "@/utils/privilegeApi";
+import { createPermission } from "@/utils/privilegeApi";
 import { toast } from "react-toastify";
 
 interface AddPrivilegeProps {
-  id?: string;
   onClose: () => void;
   onCreate?: (data: PrivilegePayload) => void;
 }
 
-const AddPrivilege: React.FC<AddPrivilegeProps> = ({
-  id,
-  onClose,
-  onCreate,
-}) => {
+const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
   const [formData, setFormData] = useState<PrivilegePayload>({
     permissionName: "",
     description: "",
@@ -27,23 +18,6 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (id) {
-      setLoading(true);
-      getPermissionById(id)
-        .then((data) =>
-          setFormData({
-            permissionName: data.permissionName || "",
-            description: data.description || "",
-            action: data.action || "",
-          })
-        )
-        .catch(() => toast.error("Failed to load privilege."))
-        .finally(() => setLoading(false));
-    }
-  }, [id]);
-
-  // Single handler for all inputs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -56,19 +30,12 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
     setLoading(true);
 
     try {
-      if (id) {
-        await updatePermission(id, formData);
-        toast.success("Privilege updated successfully!");
-      } else {
-        await createPermission(formData);
-        toast.success("Privilege created successfully!");
-        onCreate?.(formData);
-      }
+      await createPermission(formData);
+      toast.success("Privilege created successfully!");
+      onCreate?.(formData);
       onClose();
     } catch {
-      toast.error(
-        id ? "Failed to update privilege." : "Failed to create privilege."
-      );
+      toast.error("Failed to create privilege.");
     } finally {
       setLoading(false);
     }
@@ -80,7 +47,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
       className="w-[500px] p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-        {id ? "Update Permission" : "Add Permission"}
+        Add Permission
       </h2>
 
       <label className="block mb-4">
@@ -141,13 +108,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           disabled={loading}
           className="w-1/2 ml-2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
         >
-          {loading
-            ? id
-              ? "Updating..."
-              : "Creating..."
-            : id
-            ? "Update"
-            : "Create"}
+          {loading ? "Creating..." : "Create"}
         </button>
       </div>
     </form>

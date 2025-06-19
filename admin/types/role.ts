@@ -1,3 +1,11 @@
+export interface Role {
+  createdAt?: string;
+  name: string;
+  description?: string;
+  permissions: string[];
+ 
+}
+
 export interface RoleData {
   roleId: string;
   name: string;
@@ -7,10 +15,7 @@ export interface RoleData {
 }
 
 export interface RoleApiResponse {
-  value: RoleData[];
-  valueOrDefault: RoleData[];
-  isFailed: boolean;
-  isSuccess: boolean;
-  errors: any[];
-  successes: any[];
+ success:boolean;
+ data:Role | Role[];
 }
+

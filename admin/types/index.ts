@@ -72,7 +72,7 @@ export interface User {
   userId: string;
 }
 
-export interface UserResponse {
+export interface UserApiResponse {
   success: boolean;
   data: User[];
 }

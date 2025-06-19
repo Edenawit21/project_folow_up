@@ -1,24 +1,26 @@
 import axios from "axios";
 import { Permission, PermissionApiResponse } from "@/types/privilege";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const PERMISSION_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 
 //  Fetch all permissions
 export const fetchAllPermissions = async (): Promise<Permission[]> => {
-  const response = await axios.get<PermissionApiResponse>(
-    `${BASE_URL}/api/Permission`
+  const {data,status} = await axios.get<PermissionApiResponse>(
+    `${PERMISSION_API_URL}/api/Permission`
   );
 
-  if (!response.data.isSuccess) {
-    throw new Error("Failed to fetch permissions");
-  }
+    if (status !== 200 || !data.success) {
+      throw new Error("Failed to fetch permission");
+    }
 
-  return response.data.value ?? [];
+ // Handle both single project and array responses
+    const permission = Array.isArray(data.data) ? data.data : [data.data];
+    return permission;
 };
 
 // Get permission by ID
 export const getPermissionById = async (id: string): Promise<Permission> => {
-  const response = await axios.get(`${BASE_URL}/api/Permission/${id}`);
+  const response = await axios.get(`${PERMISSION_API_URL}/api/Permission/${id}`);
 
   if (!response.data.isSuccess) {
     throw new Error("Failed to fetch permission by ID");
@@ -31,7 +33,7 @@ export const getPermissionById = async (id: string): Promise<Permission> => {
 export const createPermission = async (
   permission: Omit<Permission, "id">
 ): Promise<Permission> => {
-  const response = await axios.post(`${BASE_URL}/api/Permission`, permission);
+  const response = await axios.post(`${PERMISSION_API_URL}/api/Permission`, permission);
 
   if (!response.data.isSuccess) {
     throw new Error("Failed to create permission");
@@ -45,10 +47,7 @@ export const updatePermission = async (
   id: string,
   permission: Partial<Permission>
 ): Promise<Permission> => {
-  const response = await axios.put(
-    `${BASE_URL}/api/Permission/${id}`,
-    permission
-  );
+  const response = await axios.put(`${PERMISSION_API_URL}/api/Permission/${id}`,permission);
 
   if (!response.data.isSuccess) {
     throw new Error("Failed to update permission");
@@ -59,7 +58,7 @@ export const updatePermission = async (
 
 // Delete a permission
 export const deletePermission = async (id: string): Promise<void> => {
-  const response = await axios.delete(`${BASE_URL}/api/Permission/${id}`);
+  const response = await axios.delete(`${PERMISSION_API_URL}/api/Permission/${id}`);
 
   if (!response.data.isSuccess) {
     throw new Error("Failed to delete permission");

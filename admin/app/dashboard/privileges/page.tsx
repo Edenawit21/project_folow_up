@@ -22,7 +22,7 @@ export default function PrivilegeListPage() {
           Create Permission
         </button>
       </div>
-      <PrivilegeList key={refreshKey} />
+      <PrivilegeList />
 
       {isAddOpen && (
         <>
