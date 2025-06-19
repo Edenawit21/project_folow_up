@@ -1,22 +1,23 @@
+import { RoleData } from "./role";
+
 export interface UserData {
-  data: any;
-  roles: string[];
-  accountId: string;
-  lastName: string;
-  firstName: string;
   id: string;
-  username: string;
   email: string;
   displayName: string;
-  avatarUrl: string;
-  active: boolean;
   source: string;
-  userId: string;
+  isActive: boolean;
+  firstName: string;
+  lastName: string;
+  accountId: string;
+  avatarUrl: string;
+  timeZone: string;
+  location: string;
+  roles: string[];
 }
 
 export interface UserResponse {
   success: boolean;
-  data: UserData[];
+  data: UserData;
 }
 
 export interface UserForm {
@@ -24,7 +25,6 @@ export interface UserForm {
   email?: string;
   password?: string;
   role: string;
-  value: string;
 }
 
 export interface Errors {
@@ -32,27 +32,33 @@ export interface Errors {
   password?: string;
   general?: string;
 }
-
 export interface CreateUserDto {
+  email: string;
   firstName: string;
   lastName: string;
-  accountId: string;
-  email: string;
   roles: string[];
 }
 
 export interface SingleUserResponse {
-  success: boolean;
+  isSuccess: boolean;
   data: UserData;
 }
+
 export interface UpdateUserDto {
   firstName: string;
   lastName: string;
-  isActive: boolean;
-  accountId: string;
   displayName: string;
-  avatarUrl: string;
+  isActive: boolean;
+  email: string;
+  roles: string[];
   timeZone: string;
-  currentWorkload: number;
   location: string;
+}
+
+export interface AddUserProps {
+  id?: string;
+  onClose: () => void;
+  onCreate: (data: UserForm) => void;
+  onUpdate: () => void;
+  roles?: RoleData[];
 }
