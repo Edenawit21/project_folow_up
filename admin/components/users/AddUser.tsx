@@ -6,26 +6,25 @@ import { fetchAllRoles } from "@/utils/roleApi";
 import { registerUser, fetchUserById, updateUser } from "@/utils/userApi";
 import { toast } from "react-toastify";
 import { Search } from "lucide-react";
-import { CreateUserDto, UserForm } from "@/types/user";
+import {
+  CreateUserDto,
+  UserForm,
+  UpdateUserDto,
+  AddUserProps,
+} from "@/types/user";
 
-interface AddUserProps {
-  userId?: string;
-  onClose: () => void;
-  onCreate: (data: UserForm) => void;
-  onUpdate: () => void;
-}
-
-const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
-  const isEdit = !!userId;
+const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
+  const isEdit = Boolean(id);
 
   const [formData, setFormData] = useState<CreateUserDto>({
     firstName: "",
     lastName: "",
-    accountId: "",
     email: "",
     roles: [],
   });
 
+  const [existingUserData, setExistingUserData] =
+    useState<UpdateUserDto | null>(null);
   const [roles, setRoles] = useState<RoleData[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -33,30 +32,37 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
     const loadData = async () => {
       try {
         const allRoles = await fetchAllRoles();
+        if (!isMounted) return;
         setRoles(allRoles);
 
-        if (userId) {
-          const user = await fetchUserById(userId);
+        if (id) {
+          const user = await fetchUserById(id);
+          if (!isMounted) return;
           setFormData({
             firstName: user.firstName,
             lastName: user.lastName,
-            accountId: user.accountId,
             email: user.email || "",
             roles: user.roles || [],
           });
+          setExistingUserData(user);
         }
       } catch {
-        toast.error("Failed to load data.");
+        if (isMounted) toast.error("Failed to load data.");
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     loadData();
-  }, [userId]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,34 +78,61 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
     });
   };
 
+  const toastError = (msg: string) => {
+    toast.error(msg);
+    setSubmitting(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+
+    const { firstName, lastName, email, roles } = formData;
+
+    if (!firstName.trim()) return toastError("First name is required.");
+    if (!lastName.trim()) return toastError("Last name is required.");
+    if (!email.trim()) return toastError("Email is required.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return toastError("Please enter a valid email.");
+    if (roles.length === 0)
+      return toastError("Please assign at least one role.");
+
     try {
-      if (isEdit && userId) {
-        await updateUser(userId, formData);
+      if (isEdit && id && existingUserData) {
+        const updatePayload: UpdateUserDto = {
+          firstName,
+          lastName,
+          email,
+          roles,
+          displayName: `${firstName} ${lastName}`,
+          timeZone: existingUserData.timeZone || "UTC",
+          isActive: existingUserData.isActive ?? true,
+          location: existingUserData.location || "",
+        };
+
+        await updateUser(id, updatePayload);
         toast.success("User updated successfully!");
         onUpdate();
       } else {
         await registerUser(formData);
         toast.success("User created successfully!");
         onCreate({
-          username: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          role: formData.roles.join(", "),
-          value: formData.accountId,
+          username: `${firstName} ${lastName}`,
+          email,
+          role: roles.join(", "),
         });
         setFormData({
           firstName: "",
           lastName: "",
-          accountId: "",
           email: "",
           roles: [],
         });
       }
-      onClose(); // Make sure this runs
+      setDropdownOpen(false);
+      onClose();
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || "Operation failed.";
+      const errorMsg =
+        err?.response?.data?.message || err?.message || "Operation failed.";
       toast.error(errorMsg);
     } finally {
       setSubmitting(false);
@@ -111,66 +144,42 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
   );
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg">
+    <div className="max-w-xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
         {isEdit ? "Update User" : "Add User"}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <input
-          type="text"
-          name="firstName"
-          value={formData.firstName}
-          onChange={handleChange}
-          placeholder="First Name"
-          required
-          className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-          disabled={loading || submitting}
-        />
+        {(["firstName", "lastName", "email"] as const).map((field) => (
+          <input
+            key={field}
+            type={field === "email" ? "email" : "text"}
+            name={field}
+            value={formData[field]}
+            onChange={handleChange}
+            placeholder={field.replace(/([A-Z])/g, " $1")}
+            required
+            disabled={(field === "email" && isEdit) || loading || submitting}
+            className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+            aria-label={field}
+          />
+        ))}
 
-        <input
-          type="text"
-          name="lastName"
-          value={formData.lastName}
-          onChange={handleChange}
-          placeholder="Last Name"
-          required
-          className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-          disabled={loading || submitting}
-        />
-
-        <input
-          type="text"
-          name="accountId"
-          value={formData.accountId}
-          onChange={handleChange}
-          placeholder="Account ID"
-          required
-          className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-          disabled={loading || submitting}
-        />
-
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Email"
-          required
-          disabled={!!userId || loading || submitting}
-          className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-        />
-
-        {/* Role Dropdown */}
         <div className="relative">
-          {/* <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Assign Roles
-          </label> */}
+          <label
+            htmlFor="rolesDropdown"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-center"
+          >
+            {isEdit ? "Assigned Roles" : "Assign Roles"}
+          </label>
           <button
+            id="rolesDropdown"
             type="button"
-            onClick={() => setDropdownOpen(!dropdownOpen)}
+            onClick={() => setDropdownOpen((open) => !open)}
             disabled={loading || submitting}
-            className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-left"
+            className="w-full px-4 py-2 border-[1px] rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-left"
+            aria-haspopup="listbox"
+            aria-expanded={dropdownOpen}
           >
             {formData.roles.length > 0
               ? formData.roles.join(", ")
@@ -178,7 +187,11 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute z-10 bottom-full mb-2 w-full bg-white dark:bg-gray-800 border rounded-lg shadow-xl max-h-60 overflow-y-auto">
+            <div
+              className="absolute z-10 bottom-full bg-gray-100 dark:bg-gray-800 border rounded-xl shadow-2xl max-h-60 overflow-y-auto w-full mb-2"
+              role="listbox"
+              aria-multiselectable="true"
+            >
               <div className="sticky top-0 bg-white dark:bg-gray-900 p-2 border-b">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -188,6 +201,7 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search roles..."
                     className="w-full pl-10 pr-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    aria-label="Search roles"
                   />
                 </div>
               </div>
@@ -204,6 +218,8 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
                       onChange={() => handleRoleChange(role.name)}
                       className="mr-2"
                       disabled={loading || submitting}
+                      aria-checked={formData.roles.includes(role.name)}
+                      role="checkbox"
                     />
                     {role.name}
                   </label>
@@ -217,7 +233,6 @@ const AddUser = ({ userId, onClose, onCreate, onUpdate }: AddUserProps) => {
           )}
         </div>
 
-        {/* Buttons */}
         <div className="flex justify-between pt-2">
           <button
             type="button"

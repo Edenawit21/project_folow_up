@@ -1,9 +1,9 @@
 export interface RoleData {
-  createdAt: string;
+  roleId: string;
   name: string;
   description: string;
   permissions: string[];
-  roleId: string;
+  createdAt?: string;
 }
 
 export interface RoleApiResponse {
@@ -28,4 +28,6 @@ export interface CreateRoleProps {
   onClose: () => void;
   onCreate?: (data: RolePayload) => void;
   onUpdate?: (data: RoleUpdatePayload) => void;
+  success: boolean;
+  data: RoleData[];
 }

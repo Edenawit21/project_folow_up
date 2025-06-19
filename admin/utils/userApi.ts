@@ -1,35 +1,58 @@
 import axios from "axios";
-import { UserData } from "@/types/user";
+import {
+  UserData,
+  SingleUserResponse,
+  CreateUserDto,
+  UpdateUserDto,
+} from "@/types/user";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE = process.env.BASE_API_URL;
 
-// GET /api/User
-export const getUsers = async () => {
-  const response = await axios.get(`${API_BASE}/api/User`);
+// GET /api/User - fetch all users
+export const getUsers = async (): Promise<UserData[]> => {
+  const response = await axios.get<UserData[]>(`${API_BASE}/api/User`);
+  if (!response.data) {
+    throw new Error("Failed to fetch users");
+  }
   return response.data;
 };
 
-// GET /api/User/{id}
-export const fetchUserById = async (userId: string) => {
-  const res = await axios.get(`${API_BASE}/api/User/${userId}`);
-  return res.data.data;
+// GET /api/User/{id} - fetch a single user
+export const fetchUserById = async (id: string): Promise<UserData> => {
+  const response = await axios.get<SingleUserResponse>(
+    `${API_BASE}/api/User/${id}`
+  );
+
+  return response.data.data;
 };
 
-// POST /api/UserData
-export const registerUser = async (userData: Partial<UserData>) => {
-  const res = await axios.post(`${API_BASE}/api/User`, userData);
-  return res.data.data;
+// POST /api/User - create new user
+export const registerUser = async (
+  userData: CreateUserDto
+): Promise<UserData> => {
+  const { data } = await axios.post<UserData>(
+    `${API_BASE}/api/User/local`,
+    userData
+  );
+  return data;
 };
 
-//  PUT /api/User/{id}
-export const updateUser = async (userId: string, userData: Partial<UserData>) => {
-  const res = await axios.put(`${API_BASE}/api/User/${userId}`, userData);
-  return res.data.data;
+// PUT /api/User/{id} - update user
+export const updateUser = async (
+  id: string,
+  userData: UpdateUserDto
+): Promise<UserData> => {
+  const response = await axios.put<SingleUserResponse>(
+    `${API_BASE}/api/User/${id}`,
+    userData
+  );
+  if (!response.data.isSuccess) {
+    throw new Error("Failed to update user");
+  }
+  return response.data.data;
 };
 
-//  DELETE /api/User/{id}
-export const deleteUser = async (userId: string) => {
-  const res = await axios.delete(`${API_BASE}/api/User/${userId}`);
-  if (!res.data.success) throw new Error("Failed to delete user.");
-  return res.data;
+// DELETE /api/User/{id} - delete user
+export const deleteUser = async (id: string): Promise<void> => {
+  await axios.delete(`${API_BASE}/api/User/${id}`);
 };

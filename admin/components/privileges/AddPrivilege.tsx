@@ -65,9 +65,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
       }
       onClose();
     } catch {
-      toast.error(
-        id ? "Failed to update privilege." : "Failed to create privilege."
-      );
+      toast.error("Failed to create privilege.");
     } finally {
       setLoading(false);
     }
@@ -75,7 +73,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
 
   if (id && fetching) {
     return (
-      <div className="w-[500px] p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600 flex items-center justify-center">
+      <div className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-300 dark:border-gray-600">
         <Loader2 className="animate-spin text-indigo-600 w-6 h-6" />
         <span className="ml-2 text-gray-700 dark:text-white">
           Loading privilege...
@@ -87,7 +85,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-300 dark:border-gray-600"
+      className="w-[600px] p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-600 dark:border-gray-600 "
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
         {id ? "Update Privilege" : "Add Privilege"}
@@ -105,7 +103,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           onChange={handleChange}
           required
           disabled={loading}
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
       </label>
 
@@ -120,7 +118,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           onChange={handleChange}
           rows={4}
           disabled={loading}
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
       </label>
 
@@ -136,7 +134,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           onChange={handleChange}
           disabled={loading}
           placeholder="e.g. create, read, update"
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
       </label>
 
@@ -155,13 +153,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           disabled={loading}
           className="w-1/2 ml-2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
         >
-          {loading
-            ? id
-              ? "Updating..."
-              : "Creating..."
-            : id
-            ? "Update"
-            : "Create"}
+          {loading ? "Creating..." : "Create"}
         </button>
       </div>
     </form>
