@@ -49,7 +49,7 @@ const ErrorMessage = ({
     {retry && (
       <button
         onClick={retry}
-        className="mt-2 text-sm text-blue-600 hover:underline dark:text-blue-400"
+        className="mt-2 text-sm text-blue-600 hover:underline dark:text-white"
       >
         Retry
       </button>

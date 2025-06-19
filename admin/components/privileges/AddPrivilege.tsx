@@ -87,7 +87,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xlhadow-2xl border border-gray-300 dark:border-gray-600 rounded-xl"
+      className="w-[600px] p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-600 dark:border-gray-600 "
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
         {id ? "Update Privilege" : "Add Privilege"}
@@ -105,7 +105,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           onChange={handleChange}
           required
           disabled={loading}
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
       </label>
 
@@ -120,7 +120,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           onChange={handleChange}
           rows={4}
           disabled={loading}
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
       </label>
 
@@ -136,7 +136,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           onChange={handleChange}
           disabled={loading}
           placeholder="e.g. create, read, update"
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
       </label>
 

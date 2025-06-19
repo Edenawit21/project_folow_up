@@ -30,7 +30,7 @@ export const SideBar = () => {
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-full transition-all duration-300 ease-in-out z-30
-    transform ${
+    transform dark:shadow-2xl ${
       isOpen ? "translate-x-0" : "-translate-x-full"
     } md:translate-x-0 md:block
     bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden`}
@@ -50,10 +50,10 @@ export const SideBar = () => {
             {/* Collapse toggle (desktop only) */}
             <button
               onClick={() => dispatch(setIsSidebarCollapsed(!isCollapsed))}
-              className="hidden md:inline-flex p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+              className="hidden md:inline-flex p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition"
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <Menu className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              <Menu className="w-5 h-5 text-gray-900 dark:text-gray-300 font-medium" />
             </button>
 
             {/* Close button (mobile only, top right) */}
