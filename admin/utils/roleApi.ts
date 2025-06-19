@@ -6,7 +6,7 @@ import {
   RoleUpdatePayload,
 } from "@/types/role";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const ROLE_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 
 export const fetchAllRoles = async (): Promise<RoleData[]> => {
   const response = await axios.get<RoleApiResponse>(`${BASE_URL}/api/Role`);

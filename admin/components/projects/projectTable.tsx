@@ -255,7 +255,7 @@ export const ProjectTable = () => {
                     )}
                   </td>
                   <td className="p-4 text-right">
-                    <ViewProjectButton projectId={project.Id} />
+                    <ViewProjectButton projectKey={project.Key} />
                   </td>
                 </tr>
               ))

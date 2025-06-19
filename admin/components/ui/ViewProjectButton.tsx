@@ -4,14 +4,14 @@ import { useRouter } from "next/navigation";
 import Button from "./Button"; // Adjust the path to your Button component
 
 type ViewProjectButtonProps = {
-  projectId: string;
+  projectKey: string;
 };
 
-export default function ViewProjectButton({ projectId }: ViewProjectButtonProps) {
+export default function ViewProjectButton({ projectKey }: ViewProjectButtonProps) {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/dashboard/${projectId}`);
+    router.push(`/dashboard/${projectKey}`);
   };
 
   return (

@@ -19,7 +19,7 @@ export const useMenuData = (initialData?: MenuItem[]) => {
       const token = localStorage.getItem('token');
       // console.log('Using token:', token);
       
-      const response = await axios.get("https://localhost:7205/api/Menu", {
+      const response = await axios.get('http://10.0.229.9:2025/api/Menu', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
