@@ -12,9 +12,7 @@ export const fetchAllMenus = async (): Promise<MenuItem[]> => {
   try {
     const response = await axios.get<MenuItemApiResponse>(`${API_BASE_URL}/api/Menu/all`);
 
-    if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.message || "Failed to fetch menus.");
-    }
+    
     if (Array.isArray(response.data.data)) {
       return response.data.data;
     } else {
@@ -36,16 +34,12 @@ export const fetchMenuById = async (id: number): Promise<MenuItem> => {
       `${API_BASE_URL}/api/Menu/${id}`
     );
 
-    if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.message || `Menu item with ID ${id} not found.`);
-    }
+    
 
     let menuData: MenuItem;
 
     if (Array.isArray(response.data.data)) {
-      if (response.data.data.length === 0) {
-        throw new Error(response.data.message || `Menu item with ID ${id} not found.`);
-      }
+      
       menuData = response.data.data[0];
     } else {
       menuData = response.data.data;
@@ -81,9 +75,7 @@ export const createMenuItem = async (menuData: CreateMenuItem): Promise<void> =>
     };
 
     const response = await axios.post<MenuItemApiResponse>(`${API_BASE_URL}/api/Menu`, payloadToSend);
-    if (!response.data.success) {
-      throw new Error(response.data.message || "Failed to create menu.");
-    }
+    
   } catch (error) {
     console.error("Error creating menu:", error);
     throw new Error(
@@ -108,9 +100,7 @@ export const updateMenu = async (id: number, menuData: UpdateMenuItemPayload): P
     };
 
     const response = await axios.put<MenuItemApiResponse>(`${API_BASE_URL}/api/Menu/${id}`, payloadToSend);
-    if (!response.data.success) {
-      throw new Error(response.data.message || `Failed to update menu ${id}.`);
-    }
+    
   } catch (error) {
     console.error(`Error updating menu ${id}:`, error);
     throw new Error(
@@ -127,9 +117,7 @@ export const deleteMenuItem = async (id: number): Promise<void> => {
   try {
     const response = await axios.delete<MenuItemApiResponse>(`${API_BASE_URL}/api/Menu/${id}`);
 
-    if (!response.data.success) {
-      throw new Error(response.data.message || `Failed to delete menu ${id}.`);
-    }
+    
   } catch (error) {
     console.error(`Error deleting menu ${id}:`, error);
     throw new Error(

@@ -25,7 +25,7 @@ export const MenuRenderer = ({
   const sortedItems = [...items].sort((a, b) => (a.order || 0) - (b.order || 0));
 
   return (
-    <ul className={`space-y-1 ${level > 0 ? 'pl-4 mt-1' : ''}`}>
+    <ul className={`space-y-1 ${level > 0 ? "pl-4 mt-1" : ""}`}>
       {sortedItems.map((item) => {
         const hasChildren = item.children && item.children.length > 0;
         const isExpanded = hasChildren && expandedItems.has(item.id);
@@ -62,7 +62,11 @@ export const MenuRenderer = ({
                   className="p-1 ml-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
                   aria-expanded={isExpanded}
                 >
-                  {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  {isExpanded ? (
+                    <ChevronDown size={16} />
+                  ) : (
+                    <ChevronRight size={16} />
+                  )}
                 </button>
               )}
             </div>

@@ -11,13 +11,13 @@ export const useMenuData = (initialData?: MenuItem[]) => {
   const [error, setError] = useState<Error | null>(null);
 
   const fetchMenuData = async () => {
-    console.log('Starting menu fetch...');
+    // console.log('Starting menu fetch...');
     setLoading(true);
     setError(null);
     
     try {
       const token = localStorage.getItem('token');
-      console.log('Using token:', token);
+      // console.log('Using token:', token);
       
       const response = await axios.get('http://10.0.229.9:2025/api/Menu', {
         headers: {
@@ -25,31 +25,31 @@ export const useMenuData = (initialData?: MenuItem[]) => {
         },
       });
 
-      console.log('Menu response:', response);
+      // console.log('Menu response:', response);
       setMenuData(response.data);
       localStorage.setItem('menu', JSON.stringify(response.data));
     } catch (err) {
-      console.error('Menu fetch error:', err);
+      // console.error('Menu fetch error:', err);
       setError(err instanceof Error ? err : new Error('Menu fetch failed'));
       
       // Try to fallback to localStorage
       try {
         const stored = localStorage.getItem('menu');
         if (stored) {
-          console.log('Using stored menu data');
+          // console.log('Using stored menu data');
           setMenuData(JSON.parse(stored));
         }
       } catch (parseError) {
-        console.error('Failed to parse stored menu:', parseError);
+       // console.error('Failed to parse stored menu:', parseError);
       }
     } finally {
       setLoading(false);
-      console.log('Fetch completed');
+      // console.log('Fetch completed');
     }
   };
 
   useEffect(() => {
-    console.log('Initializing useMenuData');
+   // console.log('Initializing useMenuData');
     if (!initialData) {
       fetchMenuData();
     }

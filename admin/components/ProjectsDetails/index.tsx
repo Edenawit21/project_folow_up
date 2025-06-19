@@ -39,6 +39,7 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
       setError(null); // Clear previous errors
 
       try {
+<<<<<<< HEAD
         // Fetch the entire project overview response
         const projectOverviewData: ProjectSprintOverviewResponse = await fetchApi(projectKey);
 
@@ -77,6 +78,19 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
         console.error("Error fetching project sprint overview:", err);
         setError(err.message || "An unknown error occurred while fetching sprint data.");
         setSprintReport(null); // Reset report on error
+=======
+        setIsLoading(true);
+        const [projectData, tasksData] = await Promise.all([
+          fetchProjectById(projectId),
+          fetchTasksByProject(projectId),
+        ]);
+        console.log("Project Data:", projectData);
+
+        setProject(projectData);
+        setTasks(tasksData);
+      } catch (error) {
+        console.error("Error fetching project data:", error);
+>>>>>>> 8971ad81437610fe5c6592e2110e1f782bc0faa3
       } finally {
         setLoading(false);
       }
@@ -85,6 +99,7 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
     fetchData();
   }, [projectKey]); // Re-run effect if projectKey changes
 
+<<<<<<< HEAD
   // Optional: Display project name/key in the header
   const projectName =  ProjectName || projectKey; // Use boardName if available, else sprint name, else projectKey
 
@@ -129,6 +144,64 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
             </div>
           )}
         </main>
+=======
+  if (isLoading || !project) {
+    return (
+      <div className="grid grid-cols-1 gap-6 p-6 bg-white dark:bg-gray-900">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse h-32"></div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 animate-pulse h-48"
+            ></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate metrics from tasks
+  const statusCounts = calculateStatusDistribution(tasks);
+  const priorityCounts = calculatePriorityDistribution(tasks);
+  const completionPercentage = calculateCompletion(tasks);
+  const activeTasksCount = statusCounts["InProgress"] || 0;
+  const overdueTasksCount = countOverdueTasks(tasks);
+
+  const handleBack = () => {
+    // Navigation logic
+  };
+
+  const handleEdit = () => {
+    // Edit logic
+  };
+
+  return (
+    <div className="grid grid-cols-1 gap-6 p-6 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <ProjectHeader
+        project={project}
+        onBack={handleBack}
+        onEdit={handleEdit}
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <HealthCard health={project.Health} isLoading={isLoading} />
+        <ProgressCard
+          progress={{
+            totalTasks: project.Progress.TotalTasks,
+            completedTasks: project.Progress.CompletedTasks,
+            storyPointsCompleted: project.Progress.StoryPointsCompleted,
+            storyPointsTotal: project.Progress.StoryPointsTotal,
+          }}
+          isLoading={isLoading}
+        />
+        <BlockersCard
+          activeBlockers={project.Progress.ActiveBlockers}
+          recentUpdates={project.Progress.RecentUpdates}
+          overdueTasks={overdueTasksCount}
+          isLoading={isLoading}
+        />
+>>>>>>> 8971ad81437610fe5c6592e2110e1f782bc0faa3
       </div>
     </div>
   );

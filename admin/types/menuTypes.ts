@@ -30,15 +30,37 @@ export interface UpdateMenuItemPayload {
   ParentId: number | null;
   Order: number | null;
   
+  url?: string;
+  icon?: string | React.ReactNode;
+  requiredPrivilege?: string;
+  order?: number;
+  children?: MenuItem[]; 
 }
 
 export interface MenuItemApiResponse {
-  success: boolean;
-  message: string;
-  data: MenuItem[] | MenuItem;
+  success: string;
+  data: MenuItem[]
 }
 
-export interface MenuListProps {
-  onAddMenu: () => void; // A function that takes no arguments and returns nothing
-  onEditMenu: (id: number) => void;
+export interface CreateMenuProps {
+  onCreate: (item: MenuItem) => void;
+  onCancel?: () => void;
+  parentId?: string | number;
+}
+
+
+export interface payloadToSend{
+   Id: number; 
+  Name: string | null; 
+  Url: string | null;
+  Icon: string | null;
+  RequiredPrivilege: string | null;
+  ParentId: number | null;
+  Order: number | null;
+  url?: string;
+  icon?: string | React.ReactNode;
+  requiredPrivilege?: string;
+  parentId: string | number;
+  order?: number;
+  children?: MenuItem[]; 
 }

@@ -1,22 +1,46 @@
 "use client";
 
-import React, { useState } from "react";
-import { PrivilegePayload } from "@/types/privilege";
-import { createPermission } from "@/utils/privilegeApi";
+import React, { useState, useEffect } from "react";
+import { PrivilegePayload, AddPrivilegeProps } from "@/types/privilege";
+import {
+  createPermission,
+  updatePermission,
+  getPermissionById,
+} from "@/utils/privilegeApi";
 import { toast } from "react-toastify";
+import { Loader2 } from "lucide-react";
 
-interface AddPrivilegeProps {
-  onClose: () => void;
-  onCreate?: (data: PrivilegePayload) => void;
-}
-
-const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
+const AddPrivilege: React.FC<AddPrivilegeProps> = ({
+  id,
+  onClose,
+  onCreate,
+  onUpdate,
+}) => {
   const [formData, setFormData] = useState<PrivilegePayload>({
     permissionName: "",
     description: "",
     action: "",
   });
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      setFetching(true);
+      getPermissionById(id)
+        .then((data) => {
+          setFormData({
+            permissionName: data.permissionName || "",
+            description: data.description || "",
+            action: data.action || "",
+          });
+        })
+        .catch(() => {
+          toast.error("Failed to load privilege.");
+        })
+        .finally(() => setFetching(false));
+    }
+  }, [id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -30,9 +54,15 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
     setLoading(true);
 
     try {
-      await createPermission(formData);
-      toast.success("Privilege created successfully!");
-      onCreate?.(formData);
+      if (id) {
+        const updatedPermission = await updatePermission(id, formData);
+        toast.success("Privilege updated successfully!");
+        onUpdate?.(updatedPermission);
+      } else {
+        const createdPermission = await createPermission(formData);
+        toast.success("Privilege created successfully!");
+        onCreate?.(createdPermission);
+      }
       onClose();
     } catch {
       toast.error("Failed to create privilege.");
@@ -41,15 +71,27 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
     }
   };
 
+  if (id && fetching) {
+    return (
+      <div className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-300 dark:border-gray-600">
+        <Loader2 className="animate-spin text-indigo-600 w-6 h-6" />
+        <span className="ml-2 text-gray-700 dark:text-white">
+          Loading privilege...
+        </span>
+      </div>
+    );
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-[500px] p-6 bg-white dark:bg-gray-800 rounded shadow border border-gray-300 dark:border-gray-600"
+      className="w-[600px] p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-600 dark:border-gray-600 "
     >
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-        Add Permission
+        {id ? "Update Privilege" : "Add Privilege"}
       </h2>
 
+      {/* Permission Name */}
       <label className="block mb-4">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Permission Name
@@ -61,10 +103,11 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
           onChange={handleChange}
           required
           disabled={loading}
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
       </label>
 
+      {/* Description */}
       <label className="block mb-4">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Description
@@ -75,10 +118,11 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
           onChange={handleChange}
           rows={4}
           disabled={loading}
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
       </label>
 
+      {/* Action */}
       <label className="block mb-4">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Action
@@ -90,10 +134,11 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({ onClose, onCreate }) => {
           onChange={handleChange}
           disabled={loading}
           placeholder="e.g. create, read, update"
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
         />
       </label>
 
+      {/* Buttons */}
       <div className="flex justify-between">
         <button
           type="button"

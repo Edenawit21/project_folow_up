@@ -1,14 +1,12 @@
-// src/components/Menu/MenuList.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Pencil, Trash2, Loader2, Plus } from "lucide-react";
-import { MenuItem } from "@/types/menuTypes";
-import { fetchAllMenus, deleteMenuItem, updateMenu } from "@/utils/menuApi";
-import PaginationFooter from "@/components/footer/PaginationFooter";
-import AddMenu from "./AddMenu"; // Ensure this is the latest version of AddMenu.tsx
+import { MenuItem } from "@/types/menuTypes"; 
+import { deleteMenuItem, fetchAllMenus } from "@/utils/menuApi"; 
+import PaginationFooter from "@/components/footer/PaginationFooter"; 
+import AddMenu from "./AddMenu"; 
 
-// MenuList does not receive props in this setup
 const MenuList: React.FC = () => {
   const [menus, setMenus] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -210,24 +208,24 @@ const MenuList: React.FC = () => {
         onPageChange={setCurrentPage}
         onRowsPerPageChange={(rows) => {
           setRowsPerPage(rows);
-          setCurrentPage(1);
+          setCurrentPage(1); 
         }}
       />
 
-      {/* Add/Edit Menu Modal - CORRECTED WRAPPER */}
+      {/* Add/Edit Menu Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 p-4">
-          {/* REMOVED max-h-[90vh] and overflow-y-auto FROM THIS WRAPPER */}
-          {/* AddMenu component itself handles its own max-h and scrolling */}
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 p-4 overflow-y-auto">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           <AddMenu
-            id={editingId ?? 0}
+            id={editingId ?? 0} 
             onClose={() => {
               setModalOpen(false);
-              setEditingId(undefined);
+              setEditingId(undefined); 
             }}
-            onCreate={handleSubmit}
-            onUpdate={handleSubmit}
+            onCreate={handleSubmit} 
+            onUpdate={handleSubmit} 
           />
+          </div>
         </div>
       )}
     </div>

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LoginRequest } from "@/types";
+import { LoginRequest } from "@/types/login";
 
 const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 
