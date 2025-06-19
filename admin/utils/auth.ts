@@ -7,7 +7,7 @@ const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   try {
     const response = await axios.post<LoginResponse>(
-      `${API_URL}/api/Account/api/account/login`,
+      `${API_URL}/api/Account/login`,
       data,
       {
         headers: {
