@@ -1,7 +1,7 @@
 import axios from "axios";
 import { UserData } from "@/types/user";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+const USER_API_URL = process.env.BASE_API_URL;
 
 // GET /api/User
 export const getUsers = async (): Promise<UserData[]> => {
@@ -13,12 +13,9 @@ export const getUsers = async (): Promise<UserData[]> => {
 };
 
 // GET /api/User/{id}
-export const fetchUserById = async (userId: string): Promise<UserData> => {
-  const response = await axios.get(`${API_BASE}/api/User/${userId}`);
-  if (!response.data.success) {
-    throw new Error(response.data.message || "Failed to fetch user");
-  }
-  return response.data.data;
+export const fetchUserById = async (userId: string) => {
+  const res = await axios.get(`${USER_API_URL}/api/User/${userId}`);
+  return res.data.data;
 };
 
 // POST /api/User

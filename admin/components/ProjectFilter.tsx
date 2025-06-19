@@ -8,8 +8,8 @@ interface ProjectFilterProps {
     projectHealth: string;
   };
   setFilters: (filters: { projectHealth: string }) => void;
-  view: "table" | "board";
-  setView: (view: "table" | "board") => void;
+  view: "table";
+  setView: (view: "table") => void;
 }
 
 const ProjectFilter: React.FC<ProjectFilterProps> = ({
@@ -28,7 +28,7 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
   };
 
   const handleViewChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setView(e.target.value as "table" | "board");
+    setView(e.target.value as "table");
   };
 
   const clearFilter = () => {
@@ -112,7 +112,7 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
               className={filterItemClasses}
             >
               <option value="table">Table</option>
-              <option value="board">Board</option>
+              
             </select>
 
             <button

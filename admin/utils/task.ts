@@ -6,9 +6,6 @@ import axios from "axios";
 export const TASK_API_URL =
   process.env.TASK_API_URL ?? "https://localhost:7205/api/Project/task";
 
-/* ---------------------------------------------------------------------------
- * Backend contract (API response format)
- * ------------------------------------------------------------------------- */
 export interface ApiTask {
   key: string;
   title: string;

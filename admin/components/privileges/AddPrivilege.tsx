@@ -65,9 +65,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
       }
       onClose();
     } catch {
-      toast.error(
-        id ? "Failed to update privilege." : "Failed to create privilege."
-      );
+      toast.error("Failed to create privilege.");
     } finally {
       setLoading(false);
     }
@@ -155,13 +153,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           disabled={loading}
           className="w-1/2 ml-2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
         >
-          {loading
-            ? id
-              ? "Updating..."
-              : "Creating..."
-            : id
-            ? "Update"
-            : "Create"}
+          {loading ? "Creating..." : "Create"}
         </button>
       </div>
     </form>
