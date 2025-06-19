@@ -11,7 +11,7 @@ export interface LoginResponse {
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   try {
     const response = await axios.post<LoginResponse>(
-      `${API_URL}/api/Account/api/account/login`,
+      `${API_URL}/api/Account/login`,
       data,
       {
         headers: {
