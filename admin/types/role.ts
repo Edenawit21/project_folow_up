@@ -1,4 +1,5 @@
 export interface RoleData {
+  roleId: string;
   name: string;
   description: string;
   permissions: string[];
@@ -27,7 +28,6 @@ export interface CreateRoleProps {
   onClose: () => void;
   onCreate?: (data: RolePayload) => void;
   onUpdate?: (data: RoleUpdatePayload) => void;
- success:boolean;
- data: RoleData[];
+  success: boolean;
+  data: RoleData[];
 }
-

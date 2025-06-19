@@ -1,13 +1,12 @@
 import axios from "axios";
 import {
   UserData,
-  UserResponse,
   SingleUserResponse,
   CreateUserDto,
   UpdateUserDto,
 } from "@/types/user";
 
-const USER_API_URL = process.env.BASE_API_URL;
+const API_BASE = process.env.BASE_API_URL;
 
 // GET /api/User - fetch all users
 export const getUsers = async (): Promise<UserData[]> => {
@@ -18,7 +17,6 @@ export const getUsers = async (): Promise<UserData[]> => {
   return response.data;
 };
 
-
 // GET /api/User/{id} - fetch a single user
 export const fetchUserById = async (id: string): Promise<UserData> => {
   const response = await axios.get<SingleUserResponse>(
@@ -26,7 +24,7 @@ export const fetchUserById = async (id: string): Promise<UserData> => {
   );
 
   return response.data.data;
-
+};
 
 // POST /api/User - create new user
 export const registerUser = async (
