@@ -1,3 +1,4 @@
+import { UserData } from "./user";
 export interface FormState {
   email: string;
   password: string;
@@ -9,6 +10,15 @@ export interface LoginRequest {
   password: string;
 }
 export interface LoginResponse {
+  userId: string;
+  requiresPasswordChange: any;
   message: string;
   token: string;
+}
+export interface ChangePasswordPayload {
+  userId: string;
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+  isFirstLoginChange: boolean;
 }

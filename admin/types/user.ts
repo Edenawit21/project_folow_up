@@ -32,11 +32,16 @@ export interface Errors {
   password?: string;
   general?: string;
 }
+
 export interface CreateUserDto {
   email: string;
   firstName: string;
   lastName: string;
   roles: string[];
+}
+
+export interface RegisterUserResponse extends UserData {
+  generatedPassword: string;
 }
 
 export interface SingleUserResponse {
