@@ -2,10 +2,10 @@
 import React from 'react';
 import { Gauge, CheckCircle, ClipboardList, AlertCircle, Clock, Flame, Activity } from 'lucide-react';
 import Card from '@/components/ProjectsDetails/Card';
-import { SprintReport } from '@/types/sprint';
+import { SprintReport, SprintReportDetail } from '@/types/sprint';
 
 interface SprintMetricsCardProps {
-  report: SprintReport;
+  report: SprintReportDetail;
 }
 
 const SprintMetricsCard: React.FC<SprintMetricsCardProps> = ({ report }) => {

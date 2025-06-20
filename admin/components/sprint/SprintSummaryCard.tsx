@@ -3,10 +3,10 @@ import React from 'react';
 import { LayoutDashboard, Calendar, Goal } from 'lucide-react';
 import Card from '@/components/ProjectsDetails/Card';
 import { formatDate, getProgressColor } from '@/utils/sprintApi';
-import { SprintReport } from '@/types/sprint';
+import { SprintReport, SprintReportDetail } from '@/types/sprint';
 
 interface SprintSummaryCardProps {
-  report: SprintReport;
+  report: SprintReportDetail;
 }
 
 const SprintSummaryCard: React.FC<SprintSummaryCardProps> = ({ report }) => {

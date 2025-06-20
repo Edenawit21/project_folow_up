@@ -1,8 +1,6 @@
 import axios from "axios";
 
-/**
- * Base URL for the API. You can override this with an environment variable.
- */
+/* Base URL for the API. You can override this with an environment variable. */
 export const TASK_API_URL =
   process.env.NEXT_PUBLIC_BASE_API_URL ??
   "http://localhost:5106/api/Project/task";
@@ -21,9 +19,7 @@ export interface ApiTask {
   priority?: string;
 }
 
-/**
- * UI contract (what your React components consume)
- */
+/* UI contract (what your React components consume) */
 export type TaskDto = {
   Key: string;
   Title: string;
