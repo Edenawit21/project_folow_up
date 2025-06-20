@@ -4,7 +4,8 @@ import axios from "axios";
  * Base URL for the API. You can override this with an environment variable.
  */
 export const TASK_API_URL =
-  process.env.TASK_API_URL ?? "https://localhost:7205/api/Project/task";
+  process.env.NEXT_PUBLIC_BASE_API_URL ??
+  "http://localhost:5106/api/Project/task";
 
 export interface ApiTask {
   key: string;

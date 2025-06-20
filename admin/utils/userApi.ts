@@ -6,7 +6,7 @@ import {
   UpdateUserDto,
 } from "@/types/user";
 
-const API_BASE = process.env.BASE_API_URL;
+const API_BASE = process.env.NEXT_PUBLIC_BASE_API_URL;
 
 // GET /api/User - fetch all users
 export const getUsers = async (): Promise<UserData[]> => {

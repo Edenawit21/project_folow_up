@@ -8,44 +8,46 @@ import axios from "axios";
 
 const PERMISSION_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 
+if (!PERMISSION_API_URL) {
+  throw new Error("Base API URL is not defined");
+}
+
+// Fetch all permissions
 export const fetchAllPermissions = async (): Promise<Permission[]> => {
-  const {data,status} = await axios.get<PermissionApiResponse>(
+  const { data } = await axios.get<PermissionApiResponse>(
     `${PERMISSION_API_URL}/api/Permission`
   );
 
-  if (!response.data.success) {
+  if (!data.success) {
     throw new Error("Failed to fetch permissions");
   }
-  console.log(response.data);
-  return response.data.data;
+
+  return data.data;
 };
 
 // Get permission by ID
-
 export const getPermissionById = async (id: string): Promise<Permission> => {
-  const response = await axios.get<SinglePermissionApiResponse>(
-    `${BASE_URL}/api/Permission/${id}`
+  const { data } = await axios.get<SinglePermissionApiResponse>(
+    `${PERMISSION_API_URL}/api/Permission/${id}`
   );
 
-  if (!response.data.success) {
+  if (!data.success) {
     throw new Error("Failed to fetch permission by ID");
   }
-  console.log(id);
 
-  return response.data.data;
+  return data.data;
 };
 
 // Create a new permission
 export const createPermission = async (
   permission: CreatePermissionRequest
 ): Promise<Permission> => {
-  const response = await axios.post(`${PERMISSION_API_URL}/api/Permission`, permission);
+  const { data } = await axios.post<SinglePermissionApiResponse>(
+    `${PERMISSION_API_URL}/api/Permission`,
+    permission
+  );
 
-  if (!response.data.success) {
-    throw new Error(response.data.message || "Failed to create permission");
-  }
-  debugger;
-  return response.data;
+  return data.data;
 };
 
 // Update an existing permission
@@ -53,20 +55,25 @@ export const updatePermission = async (
   id: string,
   permission: Partial<Permission>
 ): Promise<Permission> => {
-  const response = await axios.put(`${PERMISSION_API_URL}/api/Permission/${id}`,permission);
+  const { data } = await axios.put<SinglePermissionApiResponse>(
+    `${PERMISSION_API_URL}/api/Permission/${id}`,
+    permission
+  );
 
-  if (!response.data.success) {
+  if (!data.success) {
     throw new Error("Failed to update permission");
   }
 
-  return response.data.value;
+  return data.data;
 };
 
 // Delete a permission
 export const deletePermission = async (id: string): Promise<void> => {
-  const response = await axios.delete(`${PERMISSION_API_URL}/api/Permission/${id}`);
+  const { data } = await axios.delete<SinglePermissionApiResponse>(
+    `${PERMISSION_API_URL}/api/Permission/${id}`
+  );
 
-  if (!response.data.success) {
+  if (!data.success) {
     throw new Error("Failed to delete permission");
   }
 };
