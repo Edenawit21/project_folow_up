@@ -11,7 +11,7 @@ import { RoleData } from "@/types/role";
 
 const UserList = () => {
   const [users, setUsers] = useState<UserData[]>([]);
-  const [roles, setRoles] = useState<RoleData[]>([]); 
+  const [roles, setRoles] = useState<RoleData[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | undefined>();
@@ -73,7 +73,6 @@ const UserList = () => {
       toast.error("Failed to delete user");
     }
   };
-  
 
   return (
     <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
@@ -94,23 +93,16 @@ const UserList = () => {
         <table className="min-w-full table-auto">
           <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
-              {[
-                "Name",
-                "Email",
-                "Roles",
-                "Source",
-                "Active",
-                "Time Zone",
-                "Location",
-                "Actions",
-              ].map((header) => (
-                <th
-                  key={header}
-                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider"
-                >
-                  {header}
-                </th>
-              ))}
+              {["Name", "Email", "Roles", "Source", "Active", "Actions"].map(
+                (header) => (
+                  <th
+                    key={header}
+                    className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider"
+                  >
+                    {header}
+                  </th>
+                )
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -152,12 +144,6 @@ const UserList = () => {
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                     {user.isActive ? "Yes" : "No"}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                    {user.timeZone}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                    {user.location}
                   </td>
 
                   <td className="px-4 py-3 text-sm whitespace-nowrap">

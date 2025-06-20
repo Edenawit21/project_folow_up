@@ -1,7 +1,6 @@
 import axios from "axios";
 import {
   UserData,
-  SingleUserResponse,
   CreateUserDto,
   UpdateUserDto,
   RegisterUserResponse,
@@ -18,10 +17,8 @@ export const getUsers = async (): Promise<UserData[]> => {
 };
 
 export const fetchUserById = async (id: string): Promise<UserData> => {
-  const response = await axios.get<SingleUserResponse>(
-    `${API_BASE}/api/User/${id}`
-  );
-  return response.data.data;
+  const response = await axios.get<UserData>(`${API_BASE}/api/User/${id}`);
+  return response.data;
 };
 
 export const registerUser = async (
@@ -37,17 +34,14 @@ export const registerUser = async (
 export const updateUser = async (
   id: string,
   userData: UpdateUserDto
-): Promise<UserData> => {
-  const response = await axios.put<SingleUserResponse>(
-    `${API_BASE}/api/User/${id}`,
-    userData
-  );
-  if (!response.data.isSuccess) {
-    throw new Error("Failed to update user");
-  }
-  return response.data.data;
-};
+): Promise<UserData | null> => {
+  const response = await axios.put(`${API_BASE}/api/User/${id}`, userData);
 
+  if (response.status === 204) {
+    return null;
+  }
+  return response.data;
+};
 export const deleteUser = async (id: string): Promise<void> => {
   await axios.delete(`${API_BASE}/api/User/${id}`);
 };

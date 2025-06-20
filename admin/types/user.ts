@@ -44,12 +44,7 @@ export interface RegisterUserResponse extends UserData {
   generatedPassword: string;
 }
 
-export interface SingleUserResponse {
-  isSuccess: boolean;
-  data: UserData;
-}
-
-export interface UpdateUserDto {
+export type UpdateUserDto = {
   firstName: string;
   lastName: string;
   displayName: string;
@@ -58,7 +53,9 @@ export interface UpdateUserDto {
   roles: string[];
   timeZone: string;
   location: string;
-}
+};
+
+
 
 export interface AddUserProps {
   id?: string;

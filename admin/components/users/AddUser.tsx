@@ -118,12 +118,12 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
         };
 
         await updateUser(id, updatePayload);
-        toast.success("User updated successfully!");
+        toast("User updated successfully!");
         onUpdate();
         onClose();
       } else {
         const createdUser = await registerUser(formData);
-        toast.success("User created successfully!");
+        toast("User created successfully!");
 
         // Show password dialog instead of auto copy
         setGeneratedPassword(createdUser.generatedPassword);
