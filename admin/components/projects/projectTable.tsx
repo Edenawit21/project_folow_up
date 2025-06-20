@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react"; // Added useMemo
 import { ChevronDown, Search } from "lucide-react";
 import { fetchProjects, ProjectDto } from "../../utils/Jira";
 import ViewProjectButton from "../ui/ViewProjectButton";
+import PaginationFooter from "@/components/footer/PaginationFooter"; // Import the PaginationFooter
 
 const Progress = ({ value }: { value: number }) => (
   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -85,9 +86,13 @@ export const ProjectTable = () => {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     healthLevel: "",
-    status: "",
+    status: "", // This filter is present but not used in `filteredProjects` logic. Consider adding it if needed.
     search: "",
   });
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10); // Default to 10 rows per page
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -105,37 +110,59 @@ export const ProjectTable = () => {
 
   const getHealthBadge = (level: number) => {
     switch (level) {
-      case 1:
+      case 0:
         return <Badge variant="success">On Track</Badge>;
-      case 2:
+      case 1:
         return <Badge variant="warning">Needs Attention</Badge>;
-      case 3:
+      case 2:
         return <Badge variant="destructive">Critical</Badge>;
       default:
         return <Badge>Unknown</Badge>;
     }
   };
 
-  const getHealthLevel = (reason: string) => {
-    const lower = reason.toLowerCase();
-    if (lower.includes("on track")) return 1;
-    if (lower.includes("attention")) return 2;
-    if (lower.includes("critical")) return 3;
-    return 0;
+  const getHealthLevel = (level: number) => {
+    // This mapping seems to change 0->1, 1->2, 2->3. Ensure this is intentional for filtering.
+    if (level === 0) return 1;
+    if (level === 1) return 2;
+    if (level === 2) return 3;
+    return 0; // Default or unknown level
   };
 
-  const filteredProjects = projects.filter((project) => {
-    const healthLevel = getHealthLevel(project.Health.Reason);
-    return (
-      (filters.healthLevel === "" ||
-        healthLevel.toString() === filters.healthLevel) &&
-      (filters.search === "" ||
-        project.Name.toLowerCase().includes(filters.search.toLowerCase()) ||
-        project.Key.toLowerCase().includes(filters.search.toLowerCase()) ||
-        (project.Lead &&
-          project.Lead.toLowerCase().includes(filters.search.toLowerCase())))
-    );
-  });
+  // Memoize filtered projects
+  const filteredProjects = useMemo(() => {
+    setCurrentPage(1); // Reset to first page whenever filters change
+    return projects.filter((project) => {
+      const healthLevel = getHealthLevel(project.Health.Level);
+      return (
+        (filters.healthLevel === "" ||
+          healthLevel.toString() === filters.healthLevel) &&
+        (filters.search === "" ||
+          project.Name.toLowerCase().includes(filters.search.toLowerCase()) ||
+          project.Key.toLowerCase().includes(filters.search.toLowerCase()) ||
+          (project.Lead &&
+            project.Lead.toLowerCase().includes(filters.search.toLowerCase())))
+      );
+    });
+  }, [projects, filters]); // Re-filter when projects or filters change
+
+  // Calculate paginated projects
+  const paginatedProjects = useMemo(() => {
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    return filteredProjects.slice(startIndex, endIndex);
+  }, [filteredProjects, currentPage, rowsPerPage]);
+
+  const totalItems = filteredProjects.length;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleRowsPerPageChange = (rows: number) => {
+    setRowsPerPage(rows);
+    setCurrentPage(1); // Reset to first page when rows per page changes
+  };
 
   if (loading)
     return (
@@ -169,23 +196,25 @@ export const ProjectTable = () => {
             onValueChange={(value) =>
               setFilters({ ...filters, healthLevel: value })
             }
-            placeholder="Health Status"
+            placeholder="All Health Status"
             options={[
               { value: "1", label: "On Track" },
               { value: "2", label: "Needs Attention" },
               { value: "3", label: "Critical" },
             ]}
           />
-          <Select
+          {/* If you plan to use a "status" filter, uncomment and implement it here */}
+          {/* <Select
             value={filters.status}
-            onValueChange={(value) => setFilters({ ...filters, status: value })}
+            onValueChange={(value) =>
+              setFilters({ ...filters, status: value })
+            }
             placeholder="Project Status"
             options={[
-              { value: "todo", label: "To Do" },
-              { value: "on_progress", label: "In Progress" },
-              { value: "completed", label: "Completed" },
+              { value: "active", label: "Active" },
+              { value: "archived", label: "Archived" },
             ]}
-          />
+          /> */}
         </div>
       </div>
 
@@ -203,8 +232,8 @@ export const ProjectTable = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredProjects.length > 0 ? (
-              filteredProjects.map((project) => (
+            {paginatedProjects.length > 0 ? ( // Use paginatedProjects here
+              paginatedProjects.map((project) => (
                 <tr
                   key={project.Id}
                   className="border-t dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -272,6 +301,16 @@ export const ProjectTable = () => {
           </tbody>
         </table>
       </div>
+      {/* Add Pagination Footer */}
+      {totalItems > 0 && ( // Only show pagination if there are items to paginate
+        <PaginationFooter
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          totalItems={totalItems}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
+      )}
     </div>
   );
 };

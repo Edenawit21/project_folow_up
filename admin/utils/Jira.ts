@@ -4,7 +4,7 @@ import axios from "axios";
  * Base URL for the API
  */
 export const PROJECT_API_URL =
-  process.env.PROJECT_API_URL ?? "https://localhost:7205/api/Project";
+  process.env.NEXT_PUBLIC_BASE_API_URL ?? "https://localhost:7205/api/Project";
 
 /*  Backend contract */
 export interface ApiProject {
@@ -98,7 +98,7 @@ const mapApiToProjectDto = (api: ApiProject): ProjectDto => ({
 export const fetchProjects = async (): Promise<ProjectDto[]> => {
   try {
     const { data, status } = await axios.get<ApiProjectsResponse>(
-      `http://10.0.229.9:2025/api/Project/public`
+      `${PROJECT_API_URL}/api/Project/public`
     );
 
     if (status !== 200 || !data.success) {

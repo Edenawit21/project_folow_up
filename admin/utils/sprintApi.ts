@@ -1,4 +1,4 @@
-import { SprintReport, ProjectSprintOverviewResponse } from "@/types/sprint";
+import { SprintReport, ProjectSprintOverviewResponse , SprintReportDetail } from "@/types/sprint";
 
 const GLOBAL_BASE_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 
@@ -92,3 +92,37 @@ export const getProgressColor = (percentage: number): string => {
   }
   return 'bg-red-500';
 };
+
+export const fetchSprint = async  (sprintId : string) : Promise<SprintReportDetail> => {
+      if (!GLOBAL_BASE_API_URL) {
+    throw new Error("API base URL is not configured. Please set NEXT_PUBLIC_BASE_API_URL in your .env.local file.");
+  }
+  const url = `${GLOBAL_BASE_API_URL}/api/Reports/sprints/${sprintId}`;
+
+  try {
+    const response = await fetch(url);
+    const responseBody = await response.text();
+
+    if (!response.ok) {
+      let errorDetail = `Status: ${response.status}`;
+      try {
+        const parsedError = JSON.parse(responseBody);
+        errorDetail += ` - ${parsedError.message || JSON.stringify(parsedError)}`;
+      } catch {
+        errorDetail += ` - ${responseBody.substring(0, 100)}${responseBody.length > 100 ? '...' : ''}`;
+      }
+      throw new Error(`Failed to fetch sprint overview: ${errorDetail}`);
+    }
+
+    try {
+      return JSON.parse(responseBody) as SprintReportDetail;
+    } catch (jsonError) {
+      console.error(`Failed to parse successful response as JSON from ${url}:`, responseBody, jsonError);
+      throw new Error(`Invalid JSON response from API: ${jsonError instanceof Error ? jsonError.message : String(jsonError)}`);
+    }
+
+  } catch (error) {
+    console.error(`Network or unexpected error in fetchApi for project ${sprintId} at ${url}:`, error);
+    throw error; 
+  }
+}

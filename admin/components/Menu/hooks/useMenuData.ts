@@ -10,6 +10,7 @@ export const useMenuData = (initialData?: MenuItem[]) => {
   const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<Error | null>(null);
 
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
   const fetchMenuData = async () => {
     // console.log('Starting menu fetch...');
     setLoading(true);
@@ -19,7 +20,7 @@ export const useMenuData = (initialData?: MenuItem[]) => {
       const token = localStorage.getItem('token');
       // console.log('Using token:', token);
       
-      const response = await axios.get('http://10.0.229.9:2025/api/Menu', {
+      const response = await axios.get(`${BASE_URL}/api/Menu`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
