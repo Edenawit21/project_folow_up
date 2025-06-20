@@ -6,12 +6,7 @@ import { fetchAllRoles } from "@/utils/roleApi";
 import { registerUser, fetchUserById, updateUser } from "@/utils/userApi";
 import { toast } from "react-toastify";
 import { Search } from "lucide-react";
-import {
-  CreateUserDto,
-  UserForm,
-  UpdateUserDto,
-  AddUserProps,
-} from "@/types/user";
+import { CreateUserDto, UpdateUserDto, AddUserProps } from "@/types/user";
 
 const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
   const isEdit = Boolean(id);
@@ -30,6 +25,9 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -83,6 +81,15 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
     setSubmitting(false);
   };
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Password copied to clipboard!");
+    } catch {
+      toast.error("Failed to copy password.");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -113,14 +120,20 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
         await updateUser(id, updatePayload);
         toast.success("User updated successfully!");
         onUpdate();
+        onClose();
       } else {
-        await registerUser(formData);
+        const createdUser = await registerUser(formData);
         toast.success("User created successfully!");
+
+        // Show password dialog instead of auto copy
+        setGeneratedPassword(createdUser.generatedPassword);
+
         onCreate({
           username: `${firstName} ${lastName}`,
           email,
           role: roles.join(", "),
         });
+
         setFormData({
           firstName: "",
           lastName: "",
@@ -128,8 +141,8 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
           roles: [],
         });
       }
+
       setDropdownOpen(false);
-      onClose();
     } catch (err: any) {
       const errorMsg =
         err?.response?.data?.message || err?.message || "Operation failed.";
@@ -144,114 +157,148 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
   );
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-        {isEdit ? "Update User" : "Add User"}
-      </h2>
+    <>
+      <div className="max-w-xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+          {isEdit ? "Update User" : "Add User"}
+        </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {(["firstName", "lastName", "email"] as const).map((field) => (
-          <input
-            key={field}
-            type={field === "email" ? "email" : "text"}
-            name={field}
-            value={formData[field]}
-            onChange={handleChange}
-            placeholder={field.replace(/([A-Z])/g, " $1")}
-            required
-            disabled={(field === "email" && isEdit) || loading || submitting}
-            className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-            aria-label={field}
-          />
-        ))}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {(["firstName", "lastName", "email"] as const).map((field) => (
+            <input
+              key={field}
+              type={field === "email" ? "email" : "text"}
+              name={field}
+              value={formData[field]}
+              onChange={handleChange}
+              placeholder={field.replace(/([A-Z])/g, " $1")}
+              required
+              disabled={(field === "email" && isEdit) || loading || submitting}
+              className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+              aria-label={field}
+            />
+          ))}
 
-        <div className="relative">
-          <label
-            htmlFor="rolesDropdown"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-center"
-          >
-            {isEdit ? "Assigned Roles" : "Assign Roles"}
-          </label>
-          <button
-            id="rolesDropdown"
-            type="button"
-            onClick={() => setDropdownOpen((open) => !open)}
-            disabled={loading || submitting}
-            className="w-full px-4 py-2 border-[1px] rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-left"
-            aria-haspopup="listbox"
-            aria-expanded={dropdownOpen}
-          >
-            {formData.roles.length > 0
-              ? formData.roles.join(", ")
-              : "Select roles"}
-          </button>
-
-          {dropdownOpen && (
-            <div
-              className="absolute z-10 bottom-full bg-gray-100 dark:bg-gray-800 border rounded-xl shadow-2xl max-h-60 overflow-y-auto w-full mb-2"
-              role="listbox"
-              aria-multiselectable="true"
+          <div className="relative">
+            <label
+              htmlFor="rolesDropdown"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-center"
             >
-              <div className="sticky top-0 bg-white dark:bg-gray-900 p-2 border-b">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search roles..."
-                    className="w-full pl-10 pr-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                    aria-label="Search roles"
-                  />
-                </div>
-              </div>
+              {isEdit ? "Assigned Roles" : "Assign Roles"}
+            </label>
+            <button
+              id="rolesDropdown"
+              type="button"
+              onClick={() => setDropdownOpen((open) => !open)}
+              disabled={loading || submitting}
+              className="w-full px-4 py-2 border-[1px] rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-left"
+              aria-haspopup="listbox"
+              aria-expanded={dropdownOpen}
+            >
+              {formData.roles.length > 0
+                ? formData.roles.join(", ")
+                : "Select roles"}
+            </button>
 
-              {filteredRoles.length > 0 ? (
-                filteredRoles.map((role) => (
-                  <label
-                    key={role.roleId}
-                    className="flex items-center px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                  >
+            {dropdownOpen && (
+              <div
+                className="absolute z-10 bottom-full bg-gray-100 dark:bg-gray-800 border rounded-xl shadow-2xl max-h-60 overflow-y-auto w-full mb-2"
+                role="listbox"
+                aria-multiselectable="true"
+              >
+                <div className="sticky top-0 bg-white dark:bg-gray-900 p-2 border-b">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <input
-                      type="checkbox"
-                      checked={formData.roles.includes(role.name)}
-                      onChange={() => handleRoleChange(role.name)}
-                      className="mr-2"
-                      disabled={loading || submitting}
-                      aria-checked={formData.roles.includes(role.name)}
-                      role="checkbox"
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Search roles..."
+                      className="w-full pl-10 pr-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      aria-label="Search roles"
                     />
-                    {role.name}
-                  </label>
-                ))
-              ) : (
-                <div className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
-                  No roles found
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
 
-        <div className="flex justify-between pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={loading || submitting}
-            className="w-1/2 mr-2 py-2 px-4 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={submitting || loading}
-            className="w-1/2 py-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold"
-          >
-            {isEdit ? "Update User" : "Register User"}
-          </button>
+                {filteredRoles.length > 0 ? (
+                  filteredRoles.map((role) => (
+                    <label
+                      key={role.roleId}
+                      className="flex items-center px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.roles.includes(role.name)}
+                        onChange={() => handleRoleChange(role.name)}
+                        className="mr-2"
+                        disabled={loading || submitting}
+                        aria-checked={formData.roles.includes(role.name)}
+                        role="checkbox"
+                      />
+                      {role.name}
+                    </label>
+                  ))
+                ) : (
+                  <div className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
+                    No roles found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-between pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading || submitting}
+              className="w-1/2 mr-2 py-2 px-4 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting || loading}
+              className="w-1/2 py-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold"
+            >
+              {isEdit ? "Update User" : "Register User"}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Modal dialog for generated password */}
+      {generatedPassword && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl text-center max-w-sm w-full">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              Generated Password
+            </h3>
+            <div className="flex items-center justify-center mb-4">
+              <input
+                type="text"
+                readOnly
+                value={generatedPassword}
+                className="w-full px-3 py-2 border rounded text-center text-gray-800 dark:text-white dark:bg-gray-700"
+              />
+              <button
+                onClick={() => copyToClipboard(generatedPassword)}
+                className="ml-2 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                aria-label="Copy password"
+              >
+                Copy
+              </button>
+            </div>
+            <button
+              onClick={() => setGeneratedPassword(null)}
+              className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded hover:bg-gray-400"
+            >
+              Close
+            </button>
+          </div>
         </div>
-      </form>
-    </div>
+      )}
+    </>
   );
 };
 

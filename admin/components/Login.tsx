@@ -25,7 +25,11 @@ const Login = () => {
     setErrors((prev) => ({ ...prev, [name]: "", general: "" }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const newErrors: Errors = {};
@@ -40,17 +44,18 @@ const Login = () => {
       setLoading(true);
       const response = await login(form);
 
-      localStorage.setItem("token", response.token);
-      router.push("/dashboard");
+      if (response.requiresPasswordChange) {
+        // Redirect to change password page with user id as a query param or via state
+        router.push(`/change_password?userId=${response.userId}`);
+      } else {
+        localStorage.setItem("token", response.token);
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       setErrors({ general: err.message || "Login failed." });
     } finally {
       setLoading(false);
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
   };
 
   return (
@@ -68,7 +73,7 @@ const Login = () => {
           Please sign in to your account
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
+        <form onSubmit={handleLogin} className="space-y-6" autoComplete="off">
           {errors.general && (
             <p className="text-red-600 text-sm text-center">{errors.general}</p>
           )}
