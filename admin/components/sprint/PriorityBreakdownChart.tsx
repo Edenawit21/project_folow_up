@@ -1,5 +1,5 @@
 import Card from "@/components/ProjectsDetails/Card"
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts'; // Import Cell
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts'; 
 import {Sigma} from  "lucide-react";
 
 interface PriorityBreakdownChartProps {
@@ -15,22 +15,22 @@ const PriorityBreakdownChart: React.FC<PriorityBreakdownChartProps> = ({ priorit
   const data = priorityOrder
     .map(orderKey => ({
       name: orderKey,
-      count: priorityCounts[orderKey] || 0 // Use 0 if priority not found
+      count: priorityCounts[orderKey] || 0 
     }))
-    .filter(item => item.count > 0); // Only show priorities that actually have tasks
+    .filter(item => item.count > 0); 
 
   // Define colors for consistency, mapping to priority levels
   const COLORS: { [key: string]: string } = {
-    'Highest': '#EF4444', // Red
-    'High': '#F97316',    // Orange
-    'Medium': '#F59E0B',   // Amber
-    'Low': '#22C55E',     // Green
-    'Lowest': '#3B82F6',    // Blue
-    'None': '#6B7280',    // Gray
-    'N/A': '#9CA3AF'      // Lighter Gray for "Not Available"
+    'Highest': '#EF4444', 
+    'High': '#F97316',    
+    'Medium': '#F59E0B',   
+    'Low': '#22C55E',     
+    'Lowest': '#3B82F6',    
+    'None': '#6B7280',    
+    'N/A': '#9CA3AF'      
   };
 
-  const getBarColor = (priorityName: string) => COLORS[priorityName] || '#E5E7EB'; // Default gray if color not defined
+  const getBarColor = (priorityName: string) => COLORS[priorityName] || '#E5E7EB';
 
   return (
     <Card title="Task Priority Breakdown" icon={Sigma}>
@@ -57,4 +57,4 @@ const PriorityBreakdownChart: React.FC<PriorityBreakdownChartProps> = ({ priorit
   );
 };
 
-export default PriorityBreakdownChart; // Assuming this is the only export or you'll use named export
+export default PriorityBreakdownChart; 

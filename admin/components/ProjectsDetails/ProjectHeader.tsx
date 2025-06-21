@@ -22,8 +22,8 @@ interface ProjectHeaderProps {
 
 const ProjectHeader = ({ project, onBack, onEdit }: ProjectHeaderProps) => {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-      <div className="flex items-start justify-between">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border border-gray-200 dark:border-gray-700 transition-all">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div className="flex items-start gap-4">
           <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
             <FolderKanban
@@ -32,8 +32,8 @@ const ProjectHeader = ({ project, onBack, onEdit }: ProjectHeaderProps) => {
             />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
                 {project.Name}
               </h1>
               <Badge variant="outline" className="text-sm">
@@ -42,28 +42,34 @@ const ProjectHeader = ({ project, onBack, onEdit }: ProjectHeaderProps) => {
               {project.Critical && (
                 <Badge
                   variant="destructive"
-                  className="flex items-center gap-1"
+                  className="flex items-center gap-1 text-xs"
                 >
                   <AlertTriangle size={14} /> Critical
                 </Badge>
               )}
             </div>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
               {project.Description}
             </p>
-            <div className="flex gap-4 mt-3">
-              <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                <Users className="mr-1" size={14} /> Lead: {project.Lead}
+            <div className="flex items-center gap-2 mt-3 text-sm text-gray-500 dark:text-gray-400">
+              <Users size={14} className="mr-1" />
+              <span>
+                Lead:{" "}
+                <strong className="text-gray-700 dark:text-gray-200">
+                  {project.Lead}
+                </strong>
               </span>
             </div>
           </div>
         </div>
-        <div className="flex gap-2">
+
+        <div className="flex items-center gap-2 mt-4 md:mt-0">
           <button
             onClick={onBack}
-            className="flex items-center text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+            className="flex items-center text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
           >
-            <ChevronLeft size={16} className="mr-1" /> Back to Projects
+            <ChevronLeft size={16} className="mr-1" />
+            Back to Projects
           </button>
           <Button
             variant="outline"

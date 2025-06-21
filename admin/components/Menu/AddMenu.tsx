@@ -1,10 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MenuItem, CreateMenuItem, UpdateMenuItemPayload } from "@/types/menuTypes";
-import { createMenuItem, fetchAllMenus, fetchMenuById, updateMenu } from "@/utils/menuApi";
+import {
+  MenuItem,
+  CreateMenuItem,
+  UpdateMenuItemPayload,
+} from "@/types/menuTypes";
+import {
+  createMenuItem,
+  fetchAllMenus,
+  fetchMenuById,
+  updateMenu,
+} from "@/utils/menuApi";
 import { toast } from "react-toastify";
-import { Loader2} from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface AddMenuProps {
   id: number;
@@ -18,7 +27,12 @@ interface MenuOption {
   name: string;
 }
 
-const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) => {
+const AddMenu: React.FC<AddMenuProps> = ({
+  id,
+  onClose,
+  onCreate,
+  onUpdate,
+}) => {
   const isEditing = id !== 0;
 
   const [formData, setFormData] = useState<UpdateMenuItemPayload>({
@@ -92,7 +106,9 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
   }, [id, isEditing, onClose]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
 
@@ -140,14 +156,17 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
       onClose();
     } catch (error) {
       toast.error(`Failed to ${isEditing ? "update" : "create"} menu.`);
-      console.error(`Error ${isEditing ? "updating" : "creating"} menu:`, error);
+      console.error(
+        `Error ${isEditing ? "updating" : "creating"} menu:`,
+        error
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="w-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-300 dark:border-gray-600 flex flex-col max-h-[90vh] overflow-hidden">
+    <div className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-600 dark:border-gray-600 ">
       {/* Header - Always fixed at the top */}
       <div className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700 relative flex-shrink-0">
         <button
@@ -156,8 +175,7 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 z-10"
           aria-label="Close modal"
           disabled={isSubmitting}
-        >
-        </button>
+        ></button>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
           {isEditing ? "Edit Menu" : "Add New Menu"}
         </h2>
@@ -167,12 +185,16 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
       {loadingInitialData ? (
         <div className="flex-1 flex flex-col items-center justify-center p-6">
           <Loader2 className="animate-spin h-8 w-8 text-indigo-600" />
-          <p className="mt-3 text-gray-600 dark:text-gray-400">Loading menu data...</p>
+          <p className="mt-3 text-gray-600 dark:text-gray-400">
+            Loading menu data...
+          </p>
         </div>
       ) : (
         // Scrollable Body - This div takes all available space and its content scrolls
         <div className="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar min-h-0">
-          <form id="menu-form" onSubmit={handleSubmit} className="space-y-4"> {/* Added id="menu-form", form wraps only fields */}
+          <form id="menu-form" onSubmit={handleSubmit} className="space-y-4">
+            {" "}
+            {/* Added id="menu-form", form wraps only fields */}
             {/* All form fields here, including Order and Parent Menu */}
             <label className="block">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -188,7 +210,6 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
                 className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
               />
             </label>
-
             <label className="block">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Required Privilege
@@ -203,7 +224,6 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
                 className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
               />
             </label>
-
             <label className="block">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 URL
@@ -218,7 +238,6 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
                 className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
               />
             </label>
-
             <label className="block">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Icon
@@ -233,7 +252,6 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
                 className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
               />
             </label>
-
             <label className="block">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Order
@@ -248,7 +266,6 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
                 className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
               />
             </label>
-
             <label className="block">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Parent Menu
@@ -269,7 +286,8 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
               </select>
               {fetchingParentMenus && (
                 <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
-                  <Loader2 className="animate-spin h-3 w-3 mr-1" /> Loading parent options...
+                  <Loader2 className="animate-spin h-3 w-3 mr-1" /> Loading
+                  parent options...
                 </span>
               )}
             </label>
@@ -285,7 +303,7 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium rounded-md bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-500"
+              className="w-1/2 mr-2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
             >
               Cancel
             </button>
@@ -293,7 +311,7 @@ const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) =>
               type="submit"
               form="menu-form"
               disabled={isSubmitting || loadingInitialData}
-              className="px-4 py-2 text-sm font-medium rounded-md bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              className="w-1/2 ml-2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
             >
               {isSubmitting && (
                 <Loader2 className="animate-spin mr-2 h-4 w-4" />

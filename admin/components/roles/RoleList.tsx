@@ -6,6 +6,7 @@ import { RoleData } from "@/types/role";
 import { toast } from "react-toastify";
 import { fetchAllRoles, deleteRole } from "@/utils/roleApi";
 import CreateRole from "./CreateRole";
+import PaginationFooter from "@/components/footer/PaginationFooter";
 
 const ConfirmDialog = ({
   open,
@@ -61,11 +62,17 @@ const RoleList = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [targetId, setTargetId] = useState<string | null>(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalMenus, setTotalMenus] = useState(0);
+
   const loadRoles = async () => {
     setLoading(true);
     try {
       const data = await fetchAllRoles();
       setRoles(data);
+      setTotalMenus(data.length); // Set total count for pagination
     } catch (error) {
       toast.error("Failed to load roles.");
     } finally {
@@ -113,6 +120,10 @@ const RoleList = () => {
       setConfirmOpen(false);
     }
   };
+
+  // Calculate roles to display based on pagination
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const paginatedRoles = roles.slice(startIndex, startIndex + rowsPerPage);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -168,8 +179,8 @@ const RoleList = () => {
                     </div>
                   </td>
                 </tr>
-              ) : roles.length ? (
-                roles.map((role) => (
+              ) : paginatedRoles.length ? (
+                paginatedRoles.map((role) => (
                   <tr
                     key={role.roleId}
                     className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
@@ -189,7 +200,7 @@ const RoleList = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 max-w-[280px]">
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-1 text-green-500 dark:text-green-500 font-medium">
                         {Array.isArray(role.permissions) &&
                         role.permissions.length > 0 ? (
                           role.permissions.map((perm, idx) => (
@@ -266,9 +277,22 @@ const RoleList = () => {
             }}
             onUpdate={handleUpdate}
             onCreate={handleUpdate}
+            success={false}
+            data={[]}
           />
         </div>
       )}
+
+      <PaginationFooter
+        currentPage={currentPage}
+        rowsPerPage={rowsPerPage}
+        totalItems={totalMenus}
+        onPageChange={setCurrentPage}
+        onRowsPerPageChange={(rows) => {
+          setRowsPerPage(rows);
+          setCurrentPage(1);
+        }}
+      />
 
       <ConfirmDialog
         open={confirmOpen}
