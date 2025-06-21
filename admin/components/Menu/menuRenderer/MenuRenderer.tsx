@@ -1,10 +1,10 @@
-'use client';
-import { ChevronDown, ChevronRight } from 'lucide-react';
-import { MenuItem } from '@/types/menuTypes';
+"use client";
+
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { MenuItem } from "@/types/menuTypes";
 
 interface MenuRendererProps {
   items: MenuItem[];
-  // FIX: Update isActive to accept string | null | undefined
   isActive: (path: string | null | undefined) => boolean;
   expandedItems: Set<number>;
   onToggleExpand: (id: number) => void;
@@ -20,9 +20,11 @@ export const MenuRenderer = ({
   onToggleExpand,
   onItemClick,
   isCollapsed = false,
-  level = 0
+  level = 0,
 }: MenuRendererProps) => {
-  const sortedItems = [...items].sort((a, b) => (a.order || 0) - (b.order || 0));
+  const sortedItems = [...items].sort(
+    (a, b) => (a.order || 0) - (b.order || 0)
+  );
 
   return (
     <ul className={`space-y-1 ${level > 0 ? "pl-4 mt-1" : ""}`}>
@@ -35,22 +37,29 @@ export const MenuRenderer = ({
             <div className="flex items-center justify-between group">
               <div
                 onClick={() => onItemClick(item)}
-                className={`flex items-center flex-1 p-2 rounded transition-colors cursor-pointer ${
-                  isActive(item.url) // This line will no longer have a redline
-                    ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400'
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                } ${isCollapsed ? 'justify-center' : ''}`}
+                className={`flex items-center flex-1 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 ease-in-out shadow-sm
+                  ${
+                    isActive(item.url)
+                      ? "bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400 font-medium"
+                      : "bg-white dark:bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                  }
+                  ${isCollapsed ? "justify-center" : ""}
+                `}
               >
                 {item.icon && (
-                  <span className={`${isCollapsed ? 'mx-auto' : 'mr-2'} w-5 flex justify-center`}>
-                    {typeof item.icon === 'string' ? (
+                  <span
+                    className={`${
+                      isCollapsed ? "mx-auto" : "mr-3"
+                    } w-5 flex justify-center`}
+                  >
+                    {typeof item.icon === "string" ? (
                       <i className={`${item.icon}`} />
                     ) : (
                       item.icon
                     )}
                   </span>
                 )}
-                {!isCollapsed && <span>{item.name}</span>}
+                {!isCollapsed && <span className="truncate">{item.name}</span>}
               </div>
 
               {hasChildren && !isCollapsed && (
@@ -59,7 +68,7 @@ export const MenuRenderer = ({
                     e.stopPropagation();
                     onToggleExpand(item.id);
                   }}
-                  className="p-1 ml-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="ml-1 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
                   aria-expanded={isExpanded}
                 >
                   {isExpanded ? (
@@ -78,6 +87,7 @@ export const MenuRenderer = ({
                 expandedItems={expandedItems}
                 onToggleExpand={onToggleExpand}
                 onItemClick={onItemClick}
+                isCollapsed={isCollapsed}
                 level={level + 1}
               />
             )}

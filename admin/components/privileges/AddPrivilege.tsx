@@ -153,7 +153,13 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           disabled={loading}
           className="w-1/2 ml-2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
         >
-          {loading ? "Creating..." : "Create"}
+          {loading
+            ? id
+              ? "Updating..."
+              : "Creating..."
+            : id
+            ? "Update"
+            : "Create"}
         </button>
       </div>
     </form>

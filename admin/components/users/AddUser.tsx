@@ -28,6 +28,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(
     null
   );
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -56,7 +57,6 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
     };
 
     loadData();
-
     return () => {
       isMounted = false;
     };
@@ -84,7 +84,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success("Password copied to clipboard!");
+      setCopied(true);
     } catch {
       toast.error("Failed to copy password.");
     }
@@ -123,9 +123,6 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
         onClose();
       } else {
         const createdUser = await registerUser(formData);
-        toast("User created successfully!");
-
-        // Show password dialog instead of auto copy
         setGeneratedPassword(createdUser.generatedPassword);
 
         onCreate({
@@ -286,11 +283,14 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
                 className="ml-2 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 aria-label="Copy password"
               >
-                Copy
+                {copied ? "Copied" : "Copy"}
               </button>
             </div>
             <button
-              onClick={() => setGeneratedPassword(null)}
+              onClick={() => {
+                setGeneratedPassword(null);
+                onClose(); // Close whole modal
+              }}
               className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded hover:bg-gray-400"
             >
               Close

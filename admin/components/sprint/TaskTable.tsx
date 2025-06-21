@@ -83,7 +83,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ tasks }) => {
   };
 
   const renderRow = (task: TaskInSprint, index: number) => (
-    <tr key={task.key || index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+    <tr key={task.key || index} className="dark:hover:bg-gray-800">
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 dark:text-blue-400">
         <a href={`/tasks/${task.key}`} className="hover:underline">
           {task.key}

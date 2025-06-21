@@ -14,6 +14,7 @@ const ChangePassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -25,30 +26,19 @@ const ChangePassword = () => {
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!currentPassword.trim()) {
-      setError("Current password is required.");
-      return;
-    }
-    if (!newPassword.trim()) {
-      setError("New password is required.");
-      return;
-    }
-    if (newPassword.length < 8) {
-      setError("New password must be at least 8 characters.");
-      return;
-    }
-    if (newPassword !== confirmNewPassword) {
-      setError("New password and confirm password do not match.");
-      return;
-    }
-    if (!userId) {
-      setError("Invalid user ID.");
-      return;
-    }
+    if (!currentPassword.trim())
+      return setError("Current password is required.");
+    if (!newPassword.trim()) return setError("New password is required.");
+    if (newPassword.length < 8)
+      return setError("New password must be at least 8 characters.");
+    if (newPassword !== confirmNewPassword)
+      return setError("Passwords do not match.");
+    if (!userId) return setError("Invalid user ID.");
 
     try {
       setLoading(true);
       setError(null);
+      setSuccess(null);
 
       const payload: ChangePasswordPayload = {
         userId,
@@ -60,10 +50,8 @@ const ChangePassword = () => {
 
       await changePassword(payload);
 
-      alert(
-        "Password changed successfully. Please login with your new password."
-      );
-      router.push("/login");
+      setSuccess("Password changed successfully. ");
+      setTimeout(() => router.push("/login"), 2000);
     } catch (err: any) {
       setError(err.message || "Password change failed.");
     } finally {
@@ -72,12 +60,18 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="max-w-md w-full bg-white p-6 rounded shadow">
-        <h2 className="text-xl font-semibold mb-4">Change Your Password</h2>
-        <form onSubmit={handlePasswordChange} className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-50 to-teal-100 dark:from-gray-800 dark:to-gray-800 px-4 py-8">
+      <div className="w-full max-w-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-8 rounded-2xl shadow-2xl transition-all">
+        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
+          Change Your Password
+        </h2>
+
+        <form onSubmit={handlePasswordChange} className="space-y-5">
           <div>
-            <label htmlFor="currentPassword" className="block mb-1 font-medium">
+            <label
+              htmlFor="currentPassword"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
               Current Password
             </label>
             <input
@@ -86,12 +80,15 @@ const ChangePassword = () => {
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="Enter current password"
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-800 dark:text-white dark:border-gray-700"
             />
           </div>
 
           <div>
-            <label htmlFor="newPassword" className="block mb-1 font-medium">
+            <label
+              htmlFor="newPassword"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
               New Password
             </label>
             <input
@@ -100,14 +97,14 @@ const ChangePassword = () => {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Enter new password"
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-800 dark:text-white dark:border-gray-700"
             />
           </div>
 
           <div>
             <label
               htmlFor="confirmNewPassword"
-              className="block mb-1 font-medium"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
               Confirm New Password
             </label>
@@ -117,16 +114,26 @@ const ChangePassword = () => {
               value={confirmNewPassword}
               onChange={(e) => setConfirmNewPassword(e.target.value)}
               placeholder="Confirm new password"
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-800 dark:text-white dark:border-gray-700"
             />
           </div>
 
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+          {error && (
+            <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+              {error}
+            </p>
+          )}
+
+          {success && (
+            <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+              {success}
+            </p>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+            className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-300 disabled:opacity-50"
           >
             {loading ? "Changing..." : "Change Password"}
           </button>

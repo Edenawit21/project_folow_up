@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { MenuItem } from '@/types/menuTypes';
-//import { fetchMenu } from '@/utils/menu'; // Make sure this uses axiosInstance
+//import { fetchMenu } from '@/utils/menu',  Make sure this uses axiosInstance
 
 export const useMenuData = (initialData?: MenuItem[]) => {
   const [menuData, setMenuData] = useState<MenuItem[]>(initialData || []);
