@@ -185,7 +185,7 @@ const AddMenu: React.FC<AddMenuProps> = ({
           <X className="h-6 w-6 hover:text-red-500" />
         </button>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          {isEditing ? "Edit Menu" : "Add New Menu"}
+          {isEditing ? "Update  Menu" : "Add New Menu"}
         </h2>
       </div>
 
@@ -325,7 +325,7 @@ const AddMenu: React.FC<AddMenuProps> = ({
               {isSubmitting && (
                 <Loader2 className="animate-spin mr-2 h-4 w-4 inline-block" />
               )}
-              {isEditing ? "Save Changes" : "Create Menu"}
+              {isEditing ? "Update Menu" : "Create Menu"}
             </button>
           </div>
         </div>

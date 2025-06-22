@@ -145,7 +145,7 @@ const MenuList: React.FC = () => {
                     {menu.name}
                   </td>
                   <td className="px-6 py-4 text-sm text-green-500 whitespace-nowrap">
-                    {menu.requiredPermission || "None"}
+                    {menu.requiredPrivilege || "None"}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                     {menu.order ?? "N/A"}
