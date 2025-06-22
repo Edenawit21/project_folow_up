@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Menu, Moon, Search, Settings, Sun, User } from "lucide-react";
+import { Menu, Moon, Sun, User } from "lucide-react";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/utils";
@@ -18,7 +18,6 @@ const Navbar = () => {
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const accountRef = useRef<HTMLDivElement>(null);
 
-  // Close menu on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -33,56 +32,44 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="flex items-center justify-between px-4 py-3 shadow-sm text-gray-900  dark:bg-gray-800 dark:text-white dark:border-gray-700">
-      {/* Left: Sidebar Toggle & Search */}
+    <header className="flex items-center justify-between px-4 py-3 shadow-sm bg-white/80 backdrop-blur-sm dark:bg-gray-800 text-gray-900 dark:text-white transition-all duration-300 dark:shadow-">
+      {/* Left: Sidebar Toggle & Logo */}
       <div className="flex items-center gap-6">
         {isSidebarCollapsed && (
           <>
             <button
               aria-label="Open Sidebar"
               onClick={() => dispatch(setIsSidebarCollapsed(false))}
-              className="p-1 hover:opacity-80 dark:hover:opacity-80"
+              className="p-2 rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-6 w-6 text-gray-700 dark:text-white" />
             </button>
 
-            <Image src="/logo.png" alt="Logo" width={70} height={50} />
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={70}
+              height={50}
+              className="animate-fadeIn"
+            />
           </>
         )}
-
-        {/* <div className="relative w-50">
-          <Search className="absolute left-2 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
-          <input
-            type="search"
-            placeholder="Search..."
-            className="w-full rounded-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white pl-8 pr-2 py-2 placeholder-gray-500 dark:placeholder-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div> */}
       </div>
 
-      {/* Right: Theme, Settings, User */}
+      {/* Right: Theme Toggle & User */}
       <div className="flex items-center gap-4 relative">
         {/* Theme Toggle */}
         <button
           onClick={() => dispatch(setIsDarkMode(!isDarkMode))}
           aria-label="Toggle Theme"
-          className="rounded p-2 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm"
         >
           {isDarkMode ? (
-            <Sun className="h-5 w-5" />
+            <Sun className="h-5 w-5 text-yellow-400" />
           ) : (
-            <Moon className="h-5 w-5" />
+            <Moon className="h-5 w-5 text-blue-500" />
           )}
         </button>
-
-        {/* Settings */}
-        <Link
-          href="/settings"
-          aria-label="Settings"
-          className="rounded p-2 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-        >
-          <Settings className="h-5 w-5" />
-        </Link>
 
         {/* Divider */}
         <div className="hidden md:block h-6 w-px mx-2 bg-gray-300 dark:bg-gray-600" />
@@ -94,23 +81,24 @@ const Navbar = () => {
         >
           <button
             onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all shadow-sm"
             aria-label="Account Menu"
           >
-            <User className="h-6 w-6 cursor-pointer" />
+            <User className="h-6 w-6 cursor-pointer text-gray-700 dark:text-white" />
           </button>
 
+          {/* Dropdown Menu */}
           {isAccountMenuOpen && (
-            <div className="absolute right-0 top-10 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
+            <div className="absolute right-0 top-12 w-44 bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 backdrop-blur-md animate-fadeInUp overflow-hidden">
               <Link
                 href="/profile"
-                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
               >
                 Profile
               </Link>
               <button
                 onClick={logout}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
               >
                 Logout
               </button>

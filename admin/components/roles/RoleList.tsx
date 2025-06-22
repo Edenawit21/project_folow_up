@@ -191,7 +191,7 @@ const RoleList = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 max-w-xs">
-                      <div className="text-gray-600 dark:text-gray-300 whitespace-normal">
+                      <div className="text-gray-900 dark:text-gray-300 whitespace-normal">
                         {role.description || (
                           <span className="italic text-gray-400 dark:text-gray-500">
                             No description
@@ -206,7 +206,7 @@ const RoleList = () => {
                           role.permissions.map((perm, idx) => (
                             <span
                               key={idx}
-                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium "
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-base font-medium "
                             >
                               {perm}
                             </span>

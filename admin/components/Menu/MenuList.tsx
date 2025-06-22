@@ -88,7 +88,7 @@ const MenuList: React.FC = () => {
         </h2>
         <button
           onClick={handleCreateClick}
-          className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-md shadow-md transition-all duration-300"
+          className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white  shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:outline-none rounded-[6px]"
         >
           <Plus size={18} />
           Add Menu

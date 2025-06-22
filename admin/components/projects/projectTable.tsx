@@ -198,23 +198,23 @@ export const ProjectTable = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
         {/* Left: Heading and Description */}
         <div>
-          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <h2 className="text-3xl font-extrabold text-violet-700 dark:text-violet-700 tracking-tight mb-4">
             Project Dashboard
           </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-2xl text-gray-900 dark:text-gray-400 italic">
             Track and manage your projects effectively.
           </p>
         </div>
-
         {/* Right: Project Count Card */}
-        <div className="bg-green-500 dark:bg-green-500 text-white px-2 py-1 rounded-xl shadow-md flex items-center gap-2 w-full md:w-auto">
-          <div>
-            {" "}
-            <div className="text-sm opacity-90 flex gap-2">
-              <FolderKanban className="w-4 h-4 text-white" />
-              Total Projects
+        <div className=" px-4 py-3 rounded-2xl flex items-center gap-3 w-full md:w-auto animate-fadeInUp transition-all duration-500 hover:scale-[1.02]">
+          <div className="space-y-1">
+            <div className="text-sm font-medium flex items-center gap-2 opacity-90">
+              <FolderKanban className="w-4 h-4  animate-bounce-slow" />
+              <span>Total Projects</span>
             </div>
-            <div className="text-2xl font-bold text-center">{totalItems}</div>
+            <div className="text-3xl font-extrabold text-center tracking-wide">
+              {totalItems}
+            </div>
           </div>
         </div>
       </div>
