@@ -1,45 +1,43 @@
 export interface MenuItem {
   id: number;
   name: string;
-  url: string | null;
-  icon: string | null;
-  order: number | null;
-  parentId: number | null;
+  url: string;
+  icon: string;
+  order: number;
+  parentId: number;
   children: MenuItem[];
-  requiredPermission: string | null; 
-  content: string | null;
+  requiredPrivilege: string;
+  content: string;
 }
-
 
 export interface CreateMenuItem {
-  Name: string | null;
-  Url: string | null;
-  Icon: string | null;
-  RequiredPrivilege: string | null; 
-  ParentId: number | null;
-  Order: number | null;
+  Name: string;
+  Url: string;
+  Icon: string;
+  requiredPrivilege: string;
+  ParentId: number;
+  Order: number;
 }
 
-
 export interface UpdateMenuItemPayload {
-  Id: number; 
-  Name: string | null; 
-  Url: string | null;
-  Icon: string | null;
-  RequiredPrivilege: string | null;
-  ParentId: number | null;
-  Order: number | null;
-  
+  Id: number;
+  Name: string;
+  Url: string;
+  Icon: string;
+  RequiredPrivilege: string;
+  ParentId: number;
+  Order: number;
+
   url?: string;
   icon?: string | React.ReactNode;
   requiredPrivilege?: string;
   order?: number;
-  children?: MenuItem[]; 
+  children?: MenuItem[];
 }
 
 export interface MenuItemApiResponse {
   success: string;
-  data: MenuItem[]
+  data: MenuItem[];
 }
 
 export interface CreateMenuProps {
@@ -48,19 +46,18 @@ export interface CreateMenuProps {
   parentId?: string | number;
 }
 
-
-export interface payloadToSend{
-   Id: number; 
-  Name: string | null; 
-  Url: string | null;
-  Icon: string | null;
-  RequiredPrivilege: string | null;
-  ParentId: number | null;
-  Order: number | null;
+export interface payloadToSend {
+  Id: number;
+  Name: string;
+  Url: string;
+  Icon: string;
+  RequiredPrivilege: string;
+  ParentId: number;
+  Order: number;
   url?: string;
   icon?: string | React.ReactNode;
   requiredPrivilege?: string;
   parentId: string | number;
   order?: number;
-  children?: MenuItem[]; 
+  children?: MenuItem[];
 }

@@ -50,10 +50,10 @@ export const SideBar = () => {
             {/* Collapse toggle (desktop only) */}
             <button
               onClick={() => dispatch(setIsSidebarCollapsed(!isCollapsed))}
-              className="hidden md:inline-flex p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+              className="hidden md:inline-flex p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition"
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <Menu className="w-5 h-5 text-gray-900 dark:text-gray-300 font-medium" />
+              <Menu className="w-8 h-6 text-gray-900 dark:text-gray-300 font-medium " />
             </button>
 
             {/* Close button (mobile only, top right) */}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { PrivilegePayload, AddPrivilegeProps } from "@/types/privilege";
 import {
   createPermission,
@@ -8,7 +8,7 @@ import {
   getPermissionById,
 } from "@/utils/privilegeApi";
 import { toast } from "react-toastify";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 
 const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   id,
@@ -16,6 +16,13 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   onCreate,
   onUpdate,
 }) => {
+  // State to keep track of initial form data for resetting on Cancel
+  const [initialFormData, setInitialFormData] = useState<PrivilegePayload>({
+    permissionName: "",
+    description: "",
+    action: "",
+  });
+
   const [formData, setFormData] = useState<PrivilegePayload>({
     permissionName: "",
     description: "",
@@ -23,22 +30,48 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   });
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
+  // Close on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
+
+  // Fetch data if editing, set initialFormData and formData
   useEffect(() => {
     if (id) {
       setFetching(true);
       getPermissionById(id)
         .then((data) => {
-          setFormData({
+          const loadedData = {
             permissionName: data.permissionName || "",
             description: data.description || "",
             action: data.action || "",
-          });
+          };
+          setFormData(loadedData);
+          setInitialFormData(loadedData);
         })
         .catch(() => {
           toast.error("Failed to load privilege.");
         })
         .finally(() => setFetching(false));
+    } else {
+      // New form: reset both states to empty
+      const emptyData = {
+        permissionName: "",
+        description: "",
+        action: "",
+      };
+      setFormData(emptyData);
+      setInitialFormData(emptyData);
     }
   }, [id]);
 
@@ -71,9 +104,14 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
     }
   };
 
+  // Reset formData to initial values on Cancel
+  const handleCancel = () => {
+    setFormData(initialFormData);
+  };
+
   if (id && fetching) {
     return (
-      <div className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-300 dark:border-gray-600">
+      <div className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-300 dark:border-gray-600 flex items-center">
         <Loader2 className="animate-spin text-indigo-600 w-6 h-6" />
         <span className="ml-2 text-gray-700 dark:text-white">
           Loading privilege...
@@ -84,9 +122,21 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
-      className="w-[600px] p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-600 dark:border-gray-600 "
+      className="relative w-[600px] p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-600 dark:border-gray-600"
     >
+      {/* X Button */}
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white text-lg"
+        aria-label="Close"
+        disabled={loading}
+      >
+        <X className="w-6 h-6 hover:text-red-500" />
+      </button>
+
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
         {id ? "Update Privilege" : "Add Privilege"}
       </h2>
@@ -142,11 +192,11 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
       <div className="flex justify-between">
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleCancel}
           disabled={loading}
           className="w-1/2 mr-2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
         >
-          Cancel
+          Reset
         </button>
         <button
           type="submit"
@@ -158,8 +208,8 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
               ? "Updating..."
               : "Creating..."
             : id
-            ? "Update"
-            : "Create"}
+            ? "Update Privilege"
+            : "Create Privilege"}
         </button>
       </div>
     </form>

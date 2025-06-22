@@ -82,17 +82,22 @@ const MenuList: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
-      <header className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
-          Menu Management
-        </h2>
-        <button
-          onClick={handleCreateClick}
-          className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white  shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:outline-none rounded-[6px]"
-        >
-          <Plus size={18} />
-          Add Menu
-        </button>
+      <header className="flex flex-col mb-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-extrabold text-indigo-500 dark:text-gray-100">
+            Menu Management
+          </h2>
+          <button
+            onClick={handleCreateClick}
+            className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 rounded-[6px]"
+          >
+            <Plus size={18} />
+            Add Menu
+          </button>
+        </div>
+        <p className="mt-2 text-gray-600 dark:text-gray-300 italic">
+          Manage and organize menu items for the application.
+        </p>
       </header>
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-gray-800">

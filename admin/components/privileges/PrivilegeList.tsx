@@ -105,16 +105,16 @@ const PrivilegeList = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-indigo-500 dark:text-white">
             Privilege Management
           </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-gray-600 dark:text-gray-400 italic">
             Manage application permissions and access levels
           </p>
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-[6px] shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:outline-none"
+          className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-[6px] shadow-md hover:shadow-lg transition-all duration-300 "
         >
           <Plus className="w-5 h-5" />
           <span>Add Privilege</span>

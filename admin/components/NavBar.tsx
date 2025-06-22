@@ -40,7 +40,7 @@ const Navbar = () => {
             <button
               aria-label="Open Sidebar"
               onClick={() => dispatch(setIsSidebarCollapsed(false))}
-              className="p-2 rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+              className="p-2 rounded-md bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
             >
               <Menu className="h-6 w-6 text-gray-700 dark:text-white" />
             </button>
