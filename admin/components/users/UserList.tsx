@@ -90,17 +90,22 @@ const UserList = () => {
 
   return (
     <div className="max-w-7xl mx-auto mt-16 px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Users Management
-        </h2>
-        <button
-          onClick={handleCreate}
-          className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:outline-none rounded-[6px]"
-        >
-          <Plus size={18} />
-          Create User
-        </button>
+      <div className="flex flex-col mb-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold text-indigo-500 dark:text-white">
+            Users Management
+          </h2>
+          <button
+            onClick={handleCreate}
+            className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 rounded-[6px]"
+          >
+            <Plus size={18} />
+            Create User
+          </button>
+        </div>
+        <p className="mt-2 text-gray-600 dark:text-gray-300 italic">
+          Manage and organize users in the system.
+        </p>
       </div>
 
       <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm bg-white dark:bg-gray-800">
@@ -147,7 +152,7 @@ const UserList = () => {
                   <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">
                     {user.email}
                   </td>
-                  <td className="px-4 py-3 text-green-500 dark:text-gray-200 whitespace-nowrap text-base">
+                  <td className="px-4 py-3 text-green-500  whitespace-nowrap text-base dark:text-green-500">
                     {user.roles?.join(", ")}
                   </td>
                   <td className="px-4 py-3 dark:text-sky-500 whitespace-nowrap text-sky-600">

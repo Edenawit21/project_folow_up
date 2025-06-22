@@ -2,6 +2,14 @@
 
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { MenuItem } from "@/types/menuTypes";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faFolder,
+  faList,
+  faKey,
+  faUsers,
+  faUserShield,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface MenuRendererProps {
   items: MenuItem[];
@@ -12,6 +20,15 @@ interface MenuRendererProps {
   isCollapsed?: boolean;
   level?: number;
 }
+
+// Map icon names to FontAwesome icons
+const iconMap: { [key: string]: any } = {
+  projects: faFolder,
+  menu: faList,
+  privileges: faKey,
+  users: faUsers,
+  roles: faUserShield,
+};
 
 export const MenuRenderer = ({
   items,
@@ -31,6 +48,7 @@ export const MenuRenderer = ({
       {sortedItems.map((item) => {
         const hasChildren = item.children && item.children.length > 0;
         const isExpanded = hasChildren && expandedItems.has(item.id);
+        const lowerIcon = item.icon?.toLowerCase();
 
         return (
           <li key={item.id} className="relative">
@@ -40,25 +58,26 @@ export const MenuRenderer = ({
                 className={`flex items-center flex-1 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 ease-in-out shadow-sm
                   ${
                     isActive(item.url)
-                      ? "bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400 font-medium"
-                      : "bg-white dark:bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                      ? "text-green-500 dark:text-green-500 font-medium"
+                      : "bg-white dark:bg-transparent text-gray-700 dark:text-gray-300"
                   }
                   ${isCollapsed ? "justify-center" : ""}
                 `}
               >
-                {item.icon && (
-                  <span
-                    className={`${
-                      isCollapsed ? "mx-auto" : "mr-3"
-                    } w-5 flex justify-center`}
-                  >
-                    {typeof item.icon === "string" ? (
-                      <i className={`${item.icon}`} />
-                    ) : (
-                      item.icon
-                    )}
-                  </span>
-                )}
+                <span
+                  className={`${
+                    isCollapsed ? "mx-auto" : "mr-3"
+                  } w-5 flex justify-center`}
+                >
+                  {lowerIcon && iconMap[lowerIcon] ? (
+                    <FontAwesomeIcon
+                      icon={iconMap[lowerIcon]}
+                      className="w-4 h-4"
+                    />
+                  ) : (
+                    <span className="text-xs">?</span>
+                  )}
+                </span>
                 {!isCollapsed && <span className="truncate">{item.name}</span>}
               </div>
 

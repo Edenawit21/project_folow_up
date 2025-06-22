@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { RoleData } from "@/types/role";
 import { fetchAllRoles } from "@/utils/roleApi";
 import { registerUser, fetchUserById, updateUser } from "@/utils/userApi";
 import { toast } from "react-toastify";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { CreateUserDto, UpdateUserDto, AddUserProps } from "@/types/user";
 
 const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
   const isEdit = Boolean(id);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState<CreateUserDto>({
     firstName: "",
@@ -30,6 +31,39 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
   );
   const [copied, setCopied] = useState(false);
 
+  // Escape key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  // Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownOpen &&
+        formRef.current &&
+        !formRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownOpen]);
+
+  // Auto-reset copied state
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => setCopied(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [copied]);
+
+  // Fetch roles and user if editing
   useEffect(() => {
     let isMounted = true;
     const loadData = async () => {
@@ -55,7 +89,6 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
         if (isMounted) setLoading(false);
       }
     };
-
     loadData();
     return () => {
       isMounted = false;
@@ -76,18 +109,19 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
     });
   };
 
-  const toastError = (msg: string) => {
-    toast.error(msg);
-    setSubmitting(false);
-  };
-
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
+      toast.success("Password copied to clipboard!");
     } catch {
       toast.error("Failed to copy password.");
     }
+  };
+
+  const toastError = (msg: string) => {
+    toast.error(msg);
+    setSubmitting(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -118,14 +152,14 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
         };
 
         await updateUser(id, updatePayload);
-        toast("User updated successfully!");
-        onUpdate();
+        toast.success("User updated successfully!");
+        onUpdate?.();
         onClose();
       } else {
         const createdUser = await registerUser(formData);
         setGeneratedPassword(createdUser.generatedPassword);
 
-        onCreate({
+        onCreate?.({
           username: `${firstName} ${lastName}`,
           email,
           role: roles.join(", "),
@@ -137,9 +171,9 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
           email: "",
           roles: [],
         });
-      }
 
-      setDropdownOpen(false);
+        setDropdownOpen(false);
+      }
     } catch (err: any) {
       const errorMsg =
         err?.response?.data?.message || err?.message || "Operation failed.";
@@ -149,13 +183,44 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
     }
   };
 
+  const handleReset = () => {
+    if (existingUserData) {
+      setFormData({
+        firstName: existingUserData.firstName,
+        lastName: existingUserData.lastName,
+        email: existingUserData.email || "",
+        roles: existingUserData.roles || [],
+      });
+    } else {
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        roles: [],
+      });
+    }
+    setSearchTerm("");
+    setDropdownOpen(false);
+  };
+
   const filteredRoles = roles.filter((role) =>
     role.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <>
-      <div className="max-w-xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg">
+      <div
+        ref={formRef}
+        className="relative max-w-xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg"
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl"
+          aria-label="Close"
+        >
+          <X className="h-6 w-6 hover:text-red-500 " />
+        </button>
+
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
           {isEdit ? "Update User" : "Add User"}
         </h2>
@@ -247,11 +312,11 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
           <div className="flex justify-between pt-2">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleReset}
               disabled={loading || submitting}
               className="w-1/2 mr-2 py-2 px-4 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
             >
-              Cancel
+              Reset
             </button>
             <button
               type="submit"
@@ -264,7 +329,6 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
         </form>
       </div>
 
-      {/* Modal dialog for generated password */}
       {generatedPassword && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl text-center max-w-sm w-full">
@@ -289,7 +353,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
             <button
               onClick={() => {
                 setGeneratedPassword(null);
-                onClose(); // Close whole modal
+                onClose();
               }}
               className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded hover:bg-gray-400"
             >

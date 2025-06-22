@@ -129,16 +129,16 @@ const RoleList = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-indigo-500 dark:text-white">
             Role Management
           </h1>
-          <p className="mt-1 text-gray-600 dark:text-gray-400">
+          <p className="mt-1 text-gray-600 dark:text-gray-400 italic">
             Manage user roles and their permissions
           </p>
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white  shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:outline-none rounded-[6px]"
+          className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white  shadow-md hover:shadow-lg transition-all duration-300 rounded-[6px]"
         >
           <Plus className="w-5 h-5" />
           <span>Create Role</span>
@@ -191,7 +191,7 @@ const RoleList = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 max-w-xs">
-                      <div className="text-gray-600 dark:text-gray-300 whitespace-normal">
+                      <div className="text-gray-900 dark:text-gray-300 whitespace-normal">
                         {role.description || (
                           <span className="italic text-gray-400 dark:text-gray-500">
                             No description
@@ -206,7 +206,7 @@ const RoleList = () => {
                           role.permissions.map((perm, idx) => (
                             <span
                               key={idx}
-                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium "
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-base font-medium "
                             >
                               {perm}
                             </span>
