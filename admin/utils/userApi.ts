@@ -1,14 +1,13 @@
 import axios from "axios";
 import {
   UserData,
-  SingleUserResponse,
   CreateUserDto,
   UpdateUserDto,
+  RegisterUserResponse,
 } from "@/types/user";
 
-const API_BASE = process.env.BASE_API_URL;
+const API_BASE = process.env.NEXT_PUBLIC_BASE_API_URL;
 
-// GET /api/User - fetch all users
 export const getUsers = async (): Promise<UserData[]> => {
   const response = await axios.get<UserData[]>(`${API_BASE}/api/User`);
   if (!response.data) {
@@ -17,42 +16,32 @@ export const getUsers = async (): Promise<UserData[]> => {
   return response.data;
 };
 
-// GET /api/User/{id} - fetch a single user
 export const fetchUserById = async (id: string): Promise<UserData> => {
-  const response = await axios.get<SingleUserResponse>(
-    `${API_BASE}/api/User/${id}`
-  );
-
-  return response.data.data;
+  const response = await axios.get<UserData>(`${API_BASE}/api/User/${id}`);
+  return response.data;
 };
 
-// POST /api/User - create new user
 export const registerUser = async (
   userData: CreateUserDto
-): Promise<UserData> => {
-  const { data } = await axios.post<UserData>(
+): Promise<RegisterUserResponse> => {
+  const { data } = await axios.post<RegisterUserResponse>(
     `${API_BASE}/api/User/local`,
     userData
   );
   return data;
 };
 
-// PUT /api/User/{id} - update user
 export const updateUser = async (
   id: string,
   userData: UpdateUserDto
-): Promise<UserData> => {
-  const response = await axios.put<SingleUserResponse>(
-    `${API_BASE}/api/User/${id}`,
-    userData
-  );
-  if (!response.data.isSuccess) {
-    throw new Error("Failed to update user");
-  }
-  return response.data.data;
-};
+): Promise<UserData | null> => {
+  const response = await axios.put(`${API_BASE}/api/User/${id}`, userData);
 
-// DELETE /api/User/{id} - delete user
+  if (response.status === 204) {
+    return null;
+  }
+  return response.data;
+};
 export const deleteUser = async (id: string): Promise<void> => {
   await axios.delete(`${API_BASE}/api/User/${id}`);
 };

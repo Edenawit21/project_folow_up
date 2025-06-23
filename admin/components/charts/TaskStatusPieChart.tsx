@@ -5,10 +5,10 @@ import { ClipboardList } from 'lucide-react';
 import Card from '@/components/ProjectsDetails/Card';
 
 interface TaskStatusPieChartProps {
-  tasksStatusCounts?: { [status: string]: number }; // Make the prop optional
+  tasksStatusCounts?: { [status: string]: number }; 
 }
 
-const TaskStatusPieChart: React.FC<TaskStatusPieChartProps> = ({ tasksStatusCounts = {} }) => { // Provide a default empty object
+const TaskStatusPieChart: React.FC<TaskStatusPieChartProps> = ({ tasksStatusCounts = {} }) => { 
   const data = Object.keys(tasksStatusCounts).map(status => ({
     name: status,
     value: tasksStatusCounts[status]
@@ -18,7 +18,7 @@ const TaskStatusPieChart: React.FC<TaskStatusPieChartProps> = ({ tasksStatusCoun
 
   return (
     <Card title="Task Status Breakdown" icon={ClipboardList}>
-      {Object.keys(tasksStatusCounts).length > 0 ? ( // Conditionally render chart if there's data
+      {Object.keys(tasksStatusCounts).length > 0 ? ( 
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie

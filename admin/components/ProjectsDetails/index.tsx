@@ -1,131 +1,214 @@
-import React, { useState, useEffect } from 'react';
-import type { NextPage } from 'next'; 
-import { LayoutDashboard } from 'lucide-react';
+"use client";
+import React, { useState, useEffect } from "react";
+import type { NextPage } from "next";
+import { LayoutDashboard } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-// Import Types - Ensure both SprintReport and ProjectSprintOverviewResponse are imported
-import { SprintReport, ProjectSprintOverviewResponse } from '@/types/sprint';
+import {
+  SprintReport,
+  ProjectSprintOverviewResponse,
+  SprintReportDetail,
+  TaskInSprint,
+} from "@/types/sprint";
 
-// Import Utilities
-import { fetchApi } from '@/utils/sprintApi';
+import { fetchApi, fetchSprint } from "@/utils/sprintApi";
+import LoadingSpinner from "@/components/ProjectsDetails/LoadingSpinner";
+import ErrorAlert from "@/components/ProjectsDetails/ErrorAlert";
+import ProjectOverviewCharts from "@/components/charts/ProjectOverviewCharts";
+import SprintSummaryCard from "@/components/sprint/SprintSummaryCard";
+import SprintMetricsCard from "@/components/sprint/SprintMetricsCard";
+import TeamWorkloadTable from "@/components/sprint/TeamWorkloadTable";
+import RecentActivityTable from "@/components/sprint/RecentActivityTable";
+import { TasksTable } from "../sprint/TaskTable";
+import PriorityBreakdownCard from "@/components/sprint/PriorityBreakdownChart";
+import ProjectReportTable from "../usertable/ProjectReportTable";
 
-// Import UI Components
-import LoadingSpinner from '@/components/ProjectsDetails/LoadingSpinner';
-import ErrorAlert from '@/components/ProjectsDetails/ErrorAlert';
-
-// Import Chart Components
-import ProjectOverviewCharts from '@/components/charts/ProjectOverviewCharts';
-
-// Import Sprint-Specific Components
-import SprintSummaryCard from '@/components/sprint/SprintSummaryCard';
-import SprintMetricsCard from '@/components/sprint/SprintMetricsCard';
-import TeamWorkloadTable from '@/components/sprint/TeamWorkloadTable';
-import RecentActivityTable from '@/components/sprint/RecentActivityTable';
-
-// Define props interface for the ProjectDetail component (assuming projectKey is passed as a prop)
 interface ProjectDetailProps {
   projectKey: string;
 }
 
-// Renamed from Home to ProjectDetail to match your latest structure
 const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
-  const [sprintReport, setSprintReport] = useState<SprintReport | null>(null);
+  const router = useRouter();
+  const [sprintReport, setSprintReport] = useState<SprintReportDetail | null>(
+    null
+  );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [ProjectName,setProjectName] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [priorityCounts, setPriorityCounts] = useState<{
+    [key: string]: number;
+  }>({});
+
+  const [availableSprints, setAvailableSprints] = useState<SprintReport[]>([]);
+  const [selectedSprintId, setSelectedSprintId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError(null); // Clear previous errors
+      setError(null);
 
       try {
-        // Fetch the entire project overview response
-        const projectOverviewData: ProjectSprintOverviewResponse = await fetchApi(projectKey);
-
-        console.log("Raw projectOverviewData from API:", projectOverviewData);
+        const projectOverviewData: ProjectSprintOverviewResponse =
+          await fetchApi(projectKey);
         setProjectName(projectOverviewData.projectName);
 
-        let selectedSprint: SprintReport | undefined;
+        if (projectOverviewData.sprints?.length > 0) {
+          setAvailableSprints(projectOverviewData.sprints);
 
-        // Logic to select the most relevant sprint
-        // Prioritize 'active' sprints, otherwise take the first available sprint.
-        if (projectOverviewData.sprints && projectOverviewData.sprints.length > 0) {
-          selectedSprint = projectOverviewData.sprints.find(sprint => sprint.state === 'active');
+          let selected =
+            projectOverviewData.sprints.find((s) => s.state === "active") ||
+            projectOverviewData.sprints.find((s) => s.state === "closed") ||
+            projectOverviewData.sprints[0];
 
-          // If no active sprint, default to the first one in the array
-          if (!selectedSprint) {
-            selectedSprint = projectOverviewData.sprints[0];
-          }
-        }
-
-        if (selectedSprint) {
-          // Normalize the data for the selected sprint before setting state
-          setSprintReport({
-            ...selectedSprint,
-            taskStatusCounts: selectedSprint.taskStatusCounts || {},
-            issueTypeCounts: selectedSprint.issueTypeCounts || {},
-            developerWorkloads: selectedSprint.developerWorkloads || [],
-            recentActivities: selectedSprint.recentActivities || []
-          });
+          selected
+            ? setSelectedSprintId(selected.id)
+            : setError(`No sprints found for project with key: ${projectKey}`);
         } else {
-          // No sprints found for this project
           setError(`No sprints found for project with key: ${projectKey}`);
-          setSprintReport(null);
         }
-
       } catch (err: any) {
-        console.error("Error fetching project sprint overview:", err);
-        setError(err.message || "An unknown error occurred while fetching sprint data.");
-        setSprintReport(null); // Reset report on error
+        console.error("Error fetching project overview:", err);
+        setError(err.message || "Failed to fetch data.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [projectKey]); // Re-run effect if projectKey changes
+  }, [projectKey]);
 
-  // Optional: Display project name/key in the header
-  const projectName =  ProjectName || projectKey; // Use boardName if available, else sprint name, else projectKey
+  useEffect(() => {
+    const fetchSelectedSprintDetails = async () => {
+      if (!selectedSprintId) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const sprintDetail = await fetchSprint(selectedSprintId);
+
+        const priorityCount: { [key: string]: number } = {};
+        sprintDetail.tasksInSprint?.forEach((task: TaskInSprint) => {
+          const priority = task.priority || "N/A";
+          priorityCount[priority] = (priorityCount[priority] || 0) + 1;
+        });
+
+        setPriorityCounts(priorityCount);
+
+        setSprintReport({
+          ...sprintDetail,
+          taskStatusCounts: sprintDetail.taskStatusCounts || {},
+          issueTypeCounts: sprintDetail.issueTypeCounts || {},
+          developerWorkloads: sprintDetail.developerWorkloads || [],
+          recentActivities: sprintDetail.recentActivities || [],
+        });
+      } catch (err: any) {
+        console.error(`Error fetching sprint details:`, err);
+        setError(err.message || "Failed to fetch sprint details.");
+        setSprintReport(null);
+        setPriorityCounts({});
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSelectedSprintDetails();
+  }, [selectedSprintId]);
+
+  const handleSprintChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedSprintId(event.target.value);
+  };
+
+  const displayProjectName = projectName || projectKey;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 font-inter">
-      <div className="max-w-5xl mx-auto">
-        <header className="mb-5 rounded-lg p-3 bg-white shadow-md">
-          <h1 className="text-3xl font-bold text-gray-800 text-center">
-            <LayoutDashboard className="inline-block mr-1 h-8 w-8 text-blue-400" />
-            Project Dashboard: {projectName}
-          </h1>
+    <div className="min-h-screen dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 py-6 font-inter">
+      {/* Back Button at the very top-left */}
+      <div className="max-w-6xl mx-auto px-4 md:px-0">
+        <button
+          onClick={() => router.push("/dashboard/projects")}
+          className="text-xl font-medium text-blue-600 hover:underline flex items-center mb-4"
+        >
+          ← Back to Projects
+        </button>
+      </div>
+
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header */}
+        <header className="dark:bg-gray-800 p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-col md:flex-row md:items-center md:space-x-4 w-full">
+            <h1 className="text-2xl font-semibold flex items-center text-violet-700 mt-2 md:mt-0">
+              <LayoutDashboard className="h-6 w-6 text-blue-500 mr-2" />
+              Project Dashboard:
+              <span className="ml-2 font-bold">{displayProjectName}</span>
+            </h1>
+          </div>
+
+          {availableSprints.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="sprint-select"
+                className="text-sm font-medium text-green-500"
+              >
+                Select Sprint:
+              </label>
+              <select
+                id="sprint-select"
+                value={selectedSprintId || ""}
+                onChange={handleSprintChange}
+                className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                {availableSprints.map((sprint) => (
+                  <option key={sprint.id} value={sprint.id}>
+                    {sprint.name} ({sprint.state})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </header>
 
+        {/* Status Messages */}
         <main>
           {loading && <LoadingSpinner />}
           {error && <ErrorAlert message={error} />}
 
-          {/* Conditional rendering for sprintReport ensures we only try to access its properties if it's not null */}
           {!loading && !error && !sprintReport && (
-            <div className="text-center p-8 text-gray-600 text-lg">
-              No sprint report available for this project.
+            <div className="text-center text-gray-500 dark:text-gray-400 py-8 text-lg">
+              {availableSprints.length === 0
+                ? `No sprints found for project with key: ${projectKey}.`
+                : "Select a sprint to view its report."}
             </div>
           )}
 
+          {/* Main Dashboard */}
           {sprintReport && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="lg:col-span-2">
-                <SprintSummaryCard report={sprintReport} />
-              </div>
+              <SprintSummaryCard report={sprintReport} />
               <SprintMetricsCard report={sprintReport} />
-            <div> {/* You might want to remove the grid if this card spans full width */}
+
+              <PriorityBreakdownCard priorityCounts={priorityCounts} />
               <ProjectOverviewCharts
-                  issueTypeCounts={sprintReport.issueTypeCounts}
-                  tasksStatusCounts={sprintReport.taskStatusCounts} />
-              </div>
+                issueTypeCounts={sprintReport.issueTypeCounts}
+                tasksStatusCounts={sprintReport.taskStatusCounts}
+              />
+
               <div className="lg:col-span-2">
-                <TeamWorkloadTable developerWorkloads={sprintReport.developerWorkloads || []} />
+                <TasksTable tasks={sprintReport.tasksInSprint} />
               </div>
+
               <div className="lg:col-span-2">
-                <RecentActivityTable recentActivities={sprintReport.recentActivities || []} />
+                <TeamWorkloadTable
+                  developerWorkloads={sprintReport.developerWorkloads || []}
+                />
               </div>
+
+              <div className="lg:col-span-2">
+                <RecentActivityTable
+                  recentActivities={sprintReport.recentActivities || []}
+                />
+              </div>
+
             </div>
           )}
         </main>

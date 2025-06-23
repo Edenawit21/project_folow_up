@@ -11,7 +11,7 @@ import {
   RoleUpdatePayload,
 } from "@/types/role";
 import { Permission } from "@/types/privilege";
-import { Loader2, Search } from "lucide-react";
+import { Loader2, Search, X } from "lucide-react";
 
 const CreateRole: React.FC<CreateRoleProps> = ({
   id,
@@ -30,22 +30,16 @@ const CreateRole: React.FC<CreateRoleProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
+  // Close modal on ESC
   useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setDropdownOpen(false);
-      }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
     };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, []);
-
+  // Load all permissions
   useEffect(() => {
     const loadPermissions = async () => {
       setLoading(true);
@@ -58,10 +52,10 @@ const CreateRole: React.FC<CreateRoleProps> = ({
         setLoading(false);
       }
     };
-
     loadPermissions();
   }, []);
 
+  // Load role data if editing
   useEffect(() => {
     if (isEdit && id && permissions.length) {
       loadRole(id);
@@ -75,7 +69,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
       const role: RoleData = await fetchRoleById(roleId);
       setRoleName(role.name);
       setDescription(role.description || "");
-
       const permIds = Array.isArray(role.permissions)
         ? (role.permissions
             .map((permName: string) => {
@@ -86,7 +79,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
             })
             .filter(Boolean) as string[])
         : [];
-
       setSelectedPermissions(permIds);
     } catch {
       toast.error("Failed to load role.");
@@ -104,18 +96,19 @@ const CreateRole: React.FC<CreateRoleProps> = ({
     );
   };
 
+  const handleReset = () => {
+    setRoleName("");
+    setDescription("");
+    setSelectedPermissions([]);
+    setSearchTerm("");
+    setDropdownOpen(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!roleName.trim()) {
-      toast.warning("Role name is required.");
-      return;
-    }
-    if (selectedPermissions.length === 0) {
-      toast.warning("Please select at least one permission.");
-      return;
-    }
-
+    if (!roleName.trim()) return toast.warning("Role name is required.");
+    if (selectedPermissions.length === 0)
+      return toast.warning("Please select at least one permission.");
     setSubmitting(true);
     try {
       if (isEdit && id) {
@@ -126,7 +119,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
         };
         await updateRole(id, updatePayload);
         toast.success("Role updated successfully.");
-        if (onUpdate) await onUpdate(updatePayload);
+        await onUpdate?.(updatePayload);
       } else {
         const createPayload: RolePayload = {
           name: roleName.trim(),
@@ -135,7 +128,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
         };
         await createRole(createPayload);
         toast.success("Role created successfully.");
-        if (onCreate) await onCreate(createPayload);
+        await onCreate?.(createPayload);
       }
       onClose();
     } catch {
@@ -150,8 +143,17 @@ const CreateRole: React.FC<CreateRoleProps> = ({
   );
 
   return (
-    <div className="px-4 py-8 w-[600px] ml-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-      <div className="p-2 border-b border-gray-200 dark:border-gray-700 text-center">
+    <div className="relative px-4 py-4 w-[600px] ml-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+      {/* Close button */}
+      <button
+        onClick={onClose}
+        className="absolute top-3 right-4 text-gray-600 dark:text-white text-2xl hover:text-red-500"
+        aria-label="Close"
+      >
+        <X className="h-6 w-6 hover:text-red-500" />
+      </button>
+
+      <div className="p-2 border-b border-gray-200 dark:border-gray-700 ">
         <h2 className="text-xl font-bold text-gray-800 dark:text-white">
           {isEdit ? "Update Role" : "Create New Role"}
         </h2>
@@ -174,7 +176,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
               onChange={(e) => setRoleName(e.target.value)}
               placeholder="e.g., Administrator"
               required
-              className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+              className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
           </div>
 
@@ -188,11 +190,12 @@ const CreateRole: React.FC<CreateRoleProps> = ({
               rows={3}
               required
               placeholder="Describe the role..."
-              className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+              className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
           </div>
 
-          <div ref={dropdownRef} className="relative w-full">
+          {/* Permission dropdown */}
+          <div className="relative w-full">
             <button
               type="button"
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -232,6 +235,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                 />
               </svg>
             </button>
+
             {dropdownOpen && (
               <div className="absolute z-10 bottom-full bg-gray-100 dark:bg-gray-800 border rounded-xl shadow-2xl max-h-60 overflow-y-auto w-full mb-2">
                 <div className="sticky top-0 p-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -241,7 +245,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                       type="text"
                       placeholder="Search permissions..."
                       value={searchTerm}
-                      required
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 rounded-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-indigo-500"
                     />
@@ -251,11 +254,9 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                   filteredPermissions.map((perm) => (
                     <label
                       key={perm.id}
-                      htmlFor={`perm-${perm.id}`}
                       className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <input
-                        id={`perm-${perm.id}`}
                         type="checkbox"
                         checked={selectedPermissions.includes(perm.id)}
                         onChange={() => togglePermission(perm.id)}
@@ -278,10 +279,10 @@ const CreateRole: React.FC<CreateRoleProps> = ({
           <div className="flex justify-between">
             <button
               type="button"
-              onClick={onClose}
-              className="w-1/2 mr-2 py-2 px-4 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500 rounded"
+              onClick={handleReset}
+              className="w-1/2 mr-2 py-2 px-4 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 rounded"
             >
-              Cancel
+              Reset
             </button>
             <button
               type="submit"

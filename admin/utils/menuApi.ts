@@ -1,129 +1,116 @@
-import axios from 'axios';
-import { MenuItem, MenuItemApiResponse, CreateMenuItem, UpdateMenuItemPayload } from "@/types/menuTypes";
+import axios from "axios";
+import {
+  MenuItem,
+  MenuByIdResponse,
+  MenuItemSummary,
+  AllMenusResponse,
+  CreateMenuItem,
+  UpdateMenuItemPayload,
+} from "@/types/menuTypes";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
+
 if (!API_BASE_URL) {
-  console.error("NEXT_PUBLIC_BASE_API_URL is not defined. Please check your .env.local file.");
+  console.error(
+    "NEXT_PUBLIC_BASE_API_URL is not defined. Please check your .env.local file."
+  );
 }
 
-
-/*Fetches all menu items from the API.*/
-export const fetchAllMenus = async (): Promise<MenuItem[]> => {
+/* Fetch all menu items */
+export const fetchAllMenus = async (): Promise<MenuItemSummary[]> => {
   try {
-    const response = await axios.get<MenuItemApiResponse>(`${API_BASE_URL}/api/Menu/all`);
-
-    
-    if (Array.isArray(response.data.data)) {
-      return response.data.data;
-    } else {
-      return [response.data.data];
-    }
-  } catch (error) {
-    console.error("Error fetching all menus:", error);
-    throw new Error(
-      axios.isAxiosError(error)
-        ? error.response?.data?.message || "Failed to fetch menus. Please check your network or API server."
-        : "Failed to fetch menus. An unexpected error occurred."
+    const response = await axios.get<AllMenusResponse>(
+      `${API_BASE_URL}/api/Menu/all`
     );
+    const data = response.data.data;
+
+    // Normalize 'requiredPermission' to ensure it's always a string
+    return Array.isArray(data) ? data : [data];
+  } catch (error) {
+    handleApiError(error, "fetch menus");
   }
 };
 
+/* Fetch a single menu item by ID */
 export const fetchMenuById = async (id: number): Promise<MenuItem> => {
   try {
-    const response = await axios.get<MenuItemApiResponse>(
+    const response = await axios.get<MenuByIdResponse>(
       `${API_BASE_URL}/api/Menu/${id}`
     );
+    const raw = response.data.data;
 
-    
-
-    let menuData: MenuItem;
-
-    if (Array.isArray(response.data.data)) {
-      
-      menuData = response.data.data[0];
-    } else {
-      menuData = response.data.data;
-    }
+    // Defensive checks & normalization if needed (mostly your backend returns proper fields)
     return {
-      ...menuData,
-      url: menuData.url === '' ? null : menuData.url,
-      icon: menuData.icon === '' ? null : menuData.icon,
-      requiredPermission: menuData.requiredPermission === '' ? null : menuData.requiredPermission,
-      order: menuData.order ?? null,
-      parentId: menuData.parentId ?? null,
-      children: menuData.children || [],
+      ...raw,
+      url: raw.url ?? "",
+      icon: raw.icon ?? "",
+      requiredPrivilege: raw.requiredPrivilege ?? "",
+      order: raw.order ?? 0,
+      parentId: raw.parentId,
+      children: raw.children ?? [],
+      parent: raw.parent ?? null,
+      isActive: raw.isActive,
     };
-
   } catch (error) {
-    console.error(`Error fetching menu item by ID ${id}:`, error);
-    throw new Error(
-      axios.isAxiosError(error)
-        ? error.response?.data?.message || `Failed to fetch menu item ${id}`
-        : `Failed to fetch menu item ${id}. Please try again later.`
-    );
+    handleApiError(error, `fetch menu item ${id}`);
   }
 };
 
-/* Creates a new menu item. */
-export const createMenuItem = async (menuData: CreateMenuItem): Promise<void> => {
+/* Create a new menu item */
+export const createMenuItem = async (menu: CreateMenuItem): Promise<void> => {
   try {
-    const payloadToSend = {
-        ...menuData,
-        Url: menuData.Url === '' ? null : menuData.Url,
-        Icon: menuData.Icon === '' ? null : menuData.Icon,
-        RequiredPrivilege: menuData.RequiredPrivilege === '' ? null : menuData.RequiredPrivilege,
+    const payload = {
+      Name: menu.name,
+      Url: menu.url || null,
+      Icon: menu.icon || null,
+      RequiredPrivilege: menu.requiredPrivilege || null,
+      ParentId: menu.parentId ?? null,
+      Order: menu.order ?? 0,
     };
 
-    const response = await axios.post<MenuItemApiResponse>(`${API_BASE_URL}/api/Menu`, payloadToSend);
-    
+    await axios.post(`${API_BASE_URL}/api/Menu`, payload);
   } catch (error) {
-    console.error("Error creating menu:", error);
-    throw new Error(
-      axios.isAxiosError(error)
-        ? error.response?.data?.message || "Failed to create menu."
-        : "Failed to create menu. Please try again later."
-    );
+    handleApiError(error, "create menu");
   }
 };
 
-/* Updates an existing menu item. */
-export const updateMenu = async (id: number, menuData: UpdateMenuItemPayload): Promise<void> => {
+/* Update an existing menu item */
+export const updateMenuItem = async (
+  id: number,
+  menu: UpdateMenuItemPayload
+): Promise<void> => {
   try {
-    const payloadToSend: UpdateMenuItemPayload = {
-        Id: id,
-        Name: menuData.Name === '' ? null : menuData.Name,
-        Url: menuData.Url === '' ? null : menuData.Url,
-        Icon: menuData.Icon === '' ? null : menuData.Icon,
-        RequiredPrivilege: menuData.RequiredPrivilege === '' ? null : menuData.RequiredPrivilege,
-        ParentId: menuData.ParentId,
-        Order: menuData.Order,    
+    const payload = {
+      Id: id,
+      Name: menu.name || null,
+      Url: menu.url || null,
+      Icon: menu.icon || null,
+      RequiredPrivilege: menu.requiredPrivilege || null,
+      ParentId: menu.parentId ?? null,
+      Order: menu.order ?? null,
     };
 
-    const response = await axios.put<MenuItemApiResponse>(`${API_BASE_URL}/api/Menu/${id}`, payloadToSend);
-    
+    await axios.put(`${API_BASE_URL}/api/Menu/${id}`, payload);
   } catch (error) {
-    console.error(`Error updating menu ${id}:`, error);
-    throw new Error(
-      axios.isAxiosError(error)
-        ? error.response?.data?.message || `Failed to update menu ${id}.`
-        : `Failed to update menu ${id}. Please try again later.`
-    );
+    handleApiError(error, `update menu ${id}`);
   }
 };
 
-
-/* Deletes a menu item by its ID. */
+/* Delete a menu item */
 export const deleteMenuItem = async (id: number): Promise<void> => {
   try {
-    const response = await axios.delete<MenuItemApiResponse>(`${API_BASE_URL}/api/Menu/${id}`);
-
-    
+    await axios.delete(`${API_BASE_URL}/api/Menu/${id}`);
   } catch (error) {
-    console.error(`Error deleting menu ${id}:`, error);
-    throw new Error(
-      axios.isAxiosError(error)
-        ? error.response?.data?.message || `Failed to delete menu ${id}. Please check your network or API server.`
-        : `Failed to delete menu ${id}. An unexpected error occurred.`
-    );
+    handleApiError(error, `delete menu ${id}`);
   }
 };
+
+/* Error handler */
+function handleApiError(error: unknown, action: string): never {
+  console.error(`Error during ${action}:`, error);
+  throw new Error(
+    axios.isAxiosError(error)
+      ? error.response?.data?.message || `Failed to ${action}.`
+      : `Failed to ${action}. An unexpected error occurred.`
+  );
+}

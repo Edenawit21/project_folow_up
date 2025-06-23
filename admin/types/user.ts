@@ -32,6 +32,7 @@ export interface Errors {
   password?: string;
   general?: string;
 }
+
 export interface CreateUserDto {
   email: string;
   firstName: string;
@@ -39,12 +40,11 @@ export interface CreateUserDto {
   roles: string[];
 }
 
-export interface SingleUserResponse {
-  isSuccess: boolean;
-  data: UserData;
+export interface RegisterUserResponse extends UserData {
+  generatedPassword: string;
 }
 
-export interface UpdateUserDto {
+export type UpdateUserDto = {
   firstName: string;
   lastName: string;
   displayName: string;
@@ -53,7 +53,9 @@ export interface UpdateUserDto {
   roles: string[];
   timeZone: string;
   location: string;
-}
+};
+
+
 
 export interface AddUserProps {
   id?: string;

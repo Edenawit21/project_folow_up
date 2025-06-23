@@ -1,304 +1,283 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { MenuItem, CreateMenuItem, UpdateMenuItemPayload } from "@/types/menuTypes";
-import { createMenuItem, fetchAllMenus, fetchMenuById, updateMenu } from "@/utils/menuApi";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
-import { Loader2} from "lucide-react";
+import { Loader2, X } from "lucide-react";
+import {
+  fetchAllMenus,
+  fetchMenuById,
+  updateMenuItem,
+  createMenuItem,
+} from "@/utils/menuApi";
 
 interface AddMenuProps {
-  id: number;
+  id: number; // menu id to edit; 0 = create new
   onClose: () => void;
   onCreate: () => void;
   onUpdate: () => void;
 }
 
-interface MenuOption {
-  id: number;
+interface MenuFormData {
   name: string;
+  url: string;
+  icon: string;
+  requiredPrivilege: string;
+  parentId: number | null;
+  order: number | null;
 }
 
-const AddMenu: React.FC<AddMenuProps> = ({ id, onClose, onCreate, onUpdate }) => {
+const AddMenu: React.FC<AddMenuProps> = ({
+  id,
+  onClose,
+  onCreate,
+  onUpdate,
+}) => {
   const isEditing = id !== 0;
 
-  const [formData, setFormData] = useState<UpdateMenuItemPayload>({
-    Id: 0,
-    Name: "",
-    Url: null,
-    Icon: null,
-    RequiredPrivilege: null,
-    ParentId: null,
-    Order: null,
-  });
+  const emptyFormData: MenuFormData = {
+    name: "",
+    url: "",
+    icon: "",
+    requiredPrivilege: "",
+    parentId: null,
+    order: null,
+  };
 
+  const [formData, setFormData] = useState<MenuFormData>(emptyFormData);
   const [loadingInitialData, setLoadingInitialData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [menuOptions, setMenuOptions] = useState<MenuOption[]>([]);
-  const [fetchingParentMenus, setFetchingParentMenus] = useState(false);
+  const [menuOptions, setMenuOptions] = useState<
+    { id: number; name: string }[]
+  >([]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
   useEffect(() => {
     const loadData = async () => {
       setLoadingInitialData(true);
 
-      setFetchingParentMenus(true);
       try {
         const allMenus = await fetchAllMenus();
-        setMenuOptions(
-          allMenus
-            .filter((menu) => menu.id !== id) // Exclude current item from parent options
-            .map((menu) => ({ id: menu.id, name: menu.name }))
-        );
-      } catch (error) {
-        toast.error("Failed to load parent menu options.");
-        console.error("Error fetching parent menus:", error);
-      } finally {
-        setFetchingParentMenus(false);
-      }
+        setMenuOptions(allMenus);
 
-      if (!isEditing) {
-        setFormData({
-          Id: 0,
-          Name: "",
-          Url: null,
-          Icon: null,
-          RequiredPrivilege: null,
-          ParentId: null,
-          Order: null,
-        });
-        setLoadingInitialData(false);
-      } else {
-        try {
-          const menuToEdit = await fetchMenuById(id);
+        if (!isEditing) {
+          setFormData(emptyFormData);
+        } else {
+          const menu = await fetchMenuById(id);
           setFormData({
-            Id: menuToEdit.id,
-            Name: menuToEdit.name || "",
-            Url: menuToEdit.url || null,
-            Icon: menuToEdit.icon || null,
-            RequiredPrivilege: menuToEdit.requiredPermission || null,
-            ParentId: menuToEdit.parentId ?? null,
-            Order: menuToEdit.order ?? null,
+            name: menu.name || "",
+            url: menu.url || "",
+            icon: menu.icon || "",
+            requiredPrivilege: menu.requiredPrivilege || "",
+            parentId: typeof menu.parentId === "number" ? menu.parentId : null,
+            order: typeof menu.order === "number" ? menu.order : null,
           });
-          setLoadingInitialData(false);
-        } catch (error) {
-          toast.error("Failed to load menu for editing.");
-          console.error("Error fetching menu for edit:", error);
-          setLoadingInitialData(false);
-          onClose();
         }
+      } catch (err) {
+        toast.error("Failed to load data.");
+        onClose();
+      } finally {
+        setLoadingInitialData(false);
       }
     };
 
     loadData();
   }, [id, isEditing, onClose]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    setFormData((prev) => {
-      let newValue: string | number | null;
-
-      if (name === "Order" || name === "ParentId") {
-        newValue = value === "" ? null : parseInt(value);
-        if (isNaN(newValue as number)) {
-          newValue = null;
-        }
-      } else {
-        newValue = value === "" ? null : value;
-      }
-
-      return {
+    if (name === "parentId" || name === "order") {
+      // If empty string, set null; else parse number
+      const num = value === "" ? null : parseInt(value, 10);
+      setFormData((prev) => ({
         ...prev,
-        [name]: newValue,
-      };
-    });
+        [name]: num,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
     setIsSubmitting(true);
 
     try {
       if (isEditing) {
-        await updateMenu(id, formData);
+        await updateMenuItem(id, formData);
         toast.success("Menu updated successfully!");
         onUpdate();
       } else {
-        const createPayload: CreateMenuItem = {
-          Name: formData.Name,
-          Url: formData.Url,
-          Icon: formData.Icon,
-          RequiredPrivilege: formData.RequiredPrivilege,
-          ParentId: formData.ParentId,
-          Order: formData.Order,
-        };
-        await createMenuItem(createPayload);
+        await createMenuItem(formData);
         toast.success("Menu created successfully!");
         onCreate();
       }
       onClose();
-    } catch (error) {
+    } catch {
       toast.error(`Failed to ${isEditing ? "update" : "create"} menu.`);
-      console.error(`Error ${isEditing ? "updating" : "creating"} menu:`, error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleCancel = () => {
+    setFormData(emptyFormData);
+  };
+
   return (
-    <div className="w-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-300 dark:border-gray-600 flex flex-col max-h-[90vh] overflow-hidden">
-      {/* Header - Always fixed at the top */}
-      <div className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700 relative flex-shrink-0">
+    <div className="w-[600px] max-h-[90vh] overflow-hidden p-3 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-600 dark:border-gray-600">
+      <div className="px-6 pt-2 pb-4 border-b border-gray-200 dark:border-gray-700 relative">
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 z-10"
-          aria-label="Close modal"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
           disabled={isSubmitting}
         >
+          <X className="h-6 w-6 hover:text-red-500" />
         </button>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          {isEditing ? "Edit Menu" : "Add New Menu"}
+          {isEditing ? "Update Menu" : "Add New Menu"}
         </h2>
       </div>
 
-      {/* Conditional content for loading state or form */}
       {loadingInitialData ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <div className="flex items-center justify-center p-6">
           <Loader2 className="animate-spin h-8 w-8 text-indigo-600" />
-          <p className="mt-3 text-gray-600 dark:text-gray-400">Loading menu data...</p>
+          <p className="ml-3 text-gray-600 dark:text-gray-400">
+            Loading menu data...
+          </p>
         </div>
       ) : (
-        // Scrollable Body - This div takes all available space and its content scrolls
-        <div className="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar min-h-0">
-          <form id="menu-form" onSubmit={handleSubmit} className="space-y-4"> {/* Added id="menu-form", form wraps only fields */}
-            {/* All form fields here, including Order and Parent Menu */}
-            <label className="block">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Menu Name *
-              </span>
-              <input
-                name="Name"
-                type="text"
-                value={formData.Name || ""}
-                onChange={handleChange}
-                required
-                disabled={isSubmitting}
-                className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-              />
-            </label>
+        <form
+          id="menu-form"
+          onSubmit={handleSubmit}
+          className="px-6 py-4 space-y-4"
+        >
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
+            <input
+              name="name"
+              type="text"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              disabled={isSubmitting}
+              placeholder="Enter menu name"
+              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+            />
+          </label>
 
-            <label className="block">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Required Privilege
-              </span>
-              <input
-                name="RequiredPrivilege"
-                type="text"
-                value={formData.RequiredPrivilege || ""}
-                onChange={handleChange}
-                disabled={isSubmitting}
-                placeholder="e.g., menu.create"
-                className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-              />
-            </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
+            <input
+              name="requiredPrivilege"
+              type="text"
+              value={formData.requiredPrivilege}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              placeholder="Enter required privilege )"
+              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+            />
+          </label>
 
-            <label className="block">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                URL
-              </span>
-              <input
-                name="Url"
-                type="text"
-                value={formData.Url || ""}
-                onChange={handleChange}
-                disabled={isSubmitting}
-                placeholder="/dashboard/analytics"
-                className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-              />
-            </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
+            <input
+              name="url"
+              type="text"
+              value={formData.url}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              placeholder="Enter URL"
+              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+            />
+          </label>
 
-            <label className="block">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Icon
-              </span>
-              <input
-                name="Icon"
-                type="text"
-                value={formData.Icon || ""}
-                onChange={handleChange}
-                disabled={isSubmitting}
-                placeholder="e.g., home"
-                className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-              />
-            </label>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
+            <input
+              name="icon"
+              type="text"
+              value={formData.icon}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              placeholder="Enter icon class (e.g., folder)"
+              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+            />
+          </label>
+          <input
+            name="order"
+            type="number"
+            value={formData.order === null ? "" : formData.order}
+            onChange={handleChange}
+            disabled={isSubmitting}
+            min={0}
+            placeholder="Enter order "
+            className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          />
 
-            <label className="block">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Order
-              </span>
-              <input
-                name="Order"
-                type="number"
-                value={formData.Order ?? ""}
-                onChange={handleChange}
-                disabled={isSubmitting}
-                min="0"
-                className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-              />
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Parent Menu
-              </span>
-              <select
-                name="ParentId"
-                value={formData.ParentId === null ? "null" : formData.ParentId}
-                onChange={handleChange}
-                disabled={isSubmitting || fetchingParentMenus}
-                className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-              >
-                <option value="null">No Parent (Top Level)</option>
-                {menuOptions.map((menu) => (
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+              Parent Menu
+            </span>
+            <select
+              name="parentId"
+              value={formData.parentId === null ? "" : formData.parentId}
+              onChange={(e) => {
+                const value =
+                  e.target.value === "" ? null : parseInt(e.target.value, 10);
+                setFormData((prev) => ({
+                  ...prev,
+                  parentId: value,
+                }));
+              }}
+              disabled={isSubmitting}
+              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600  "
+            >
+              <option value="">No Parent</option>
+              {menuOptions
+                .filter((menu) => menu.id !== id)
+                .map((menu) => (
                   <option key={menu.id} value={menu.id}>
                     {menu.name}
                   </option>
                 ))}
-              </select>
-              {fetchingParentMenus && (
-                <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
-                  <Loader2 className="animate-spin h-3 w-3 mr-1" /> Loading parent options...
-                </span>
-              )}
-            </label>
-          </form>
-        </div>
+            </select>
+          </label>
+        </form>
       )}
 
-      {/* Footer - Always fixed at the bottom, ensures it doesn't shrink */}
       {!loadingInitialData && (
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex justify-end space-x-3">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleCancel}
               disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium rounded-md bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-500"
+              className="w-1/2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
             >
-              Cancel
+              Reset
             </button>
             <button
               type="submit"
               form="menu-form"
               disabled={isSubmitting || loadingInitialData}
-              className="px-4 py-2 text-sm font-medium rounded-md bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              className="w-1/2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
             >
               {isSubmitting && (
-                <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                <Loader2 className="animate-spin mr-2 h-4 w-4 inline-block" />
               )}
-              {isEditing ? "Save Changes" : "Create Menu"}
+              {isEditing ? "Update Menu" : "Create Menu"}
             </button>
           </div>
         </div>

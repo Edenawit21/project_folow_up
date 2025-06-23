@@ -36,7 +36,7 @@ const PaginationFooter: React.FC<PaginationFooterProps> = ({
           onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
           className="px-3 py-1 border rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-black"
         >
-          {[10, 20, 50, 100].map((num) => (
+          {[6, 10, 20, 50, 100].map((num) => (
             <option key={num} value={num}>
               {num}
             </option>

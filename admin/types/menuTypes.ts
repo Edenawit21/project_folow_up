@@ -1,66 +1,52 @@
+// Single menu response type
 export interface MenuItem {
   id: number;
   name: string;
-  url: string | null;
-  icon: string | null;
+  url: string;
+  icon: string;
+  requiredPrivilege: string;
+  parentId: number | null;
+  order: number | null;
+  isActive: boolean;
+  parent: MenuItem | null;
+  children: MenuItem[];
+}
+
+export interface MenuByIdResponse {
+  success: boolean;
+  data: MenuItem;
+}
+
+// All menus response type
+export interface MenuItemSummary {
+  id: number;
+  name: string;
+  url: string;
+  icon: string;
   order: number | null;
   parentId: number | null;
-  children: MenuItem[];
-  requiredPermission: string | null; 
-  content: string | null;
+  children: MenuItemSummary[];
+  requiredPermission: string;
 }
 
+export interface AllMenusResponse {
+  success: boolean;
+  data: MenuItemSummary[];
+}
+export interface UpdateMenuItemPayload {
+  name: string;
+  url: string;
+  icon: string;
+  requiredPrivilege: string;
+  parentId: number | null;
+  order: number | null;
+}
 
 export interface CreateMenuItem {
-  Name: string | null;
-  Url: string | null;
-  Icon: string | null;
-  RequiredPrivilege: string | null; 
-  ParentId: number | null;
-  Order: number | null;
-}
-
-
-export interface UpdateMenuItemPayload {
-  Id: number; 
-  Name: string | null; 
-  Url: string | null;
-  Icon: string | null;
-  RequiredPrivilege: string | null;
-  ParentId: number | null;
-  Order: number | null;
-  
-  url?: string;
-  icon?: string | React.ReactNode;
-  requiredPrivilege?: string;
-  order?: number;
-  children?: MenuItem[]; 
-}
-
-export interface MenuItemApiResponse {
-  success: string;
-  data: MenuItem[]
-}
-
-export interface CreateMenuProps {
-  onCreate: (item: MenuItem) => void;
-  onCancel?: () => void;
-  parentId?: string | number;
-}
-
-
-export interface payloadToSend{
-   Id: number; 
-  Name: string | null; 
-  Url: string | null;
-  Icon: string | null;
-  RequiredPrivilege: string | null;
-  ParentId: number | null;
-  Order: number | null;
-  url?: string;
-  icon?: string | React.ReactNode;
-  requiredPrivilege?: string;
-  parentId: string | number;
-  order?: number;
-  children?: MenuItem[]; 
+  name: string;
+  url: string;
+  icon: string;
+  requiredPrivilege: string;
+  parentId: number | null;
+  order: number | null;
 }
