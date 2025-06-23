@@ -3,7 +3,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { Loader2, X } from "lucide-react";
-import { fetchMenuById, updateMenuItem, createMenuItem } from "@/utils/menuApi";
+import {
+  fetchAllMenus,
+  fetchMenuById,
+  updateMenuItem,
+  createMenuItem,
+} from "@/utils/menuApi";
 
 interface AddMenuProps {
   id: number; // menu id to edit; 0 = create new
@@ -41,6 +46,9 @@ const AddMenu: React.FC<AddMenuProps> = ({
   const [formData, setFormData] = useState<MenuFormData>(emptyFormData);
   const [loadingInitialData, setLoadingInitialData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [menuOptions, setMenuOptions] = useState<
+    { id: number; name: string }[]
+  >([]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -54,26 +62,28 @@ const AddMenu: React.FC<AddMenuProps> = ({
     const loadData = async () => {
       setLoadingInitialData(true);
 
-      if (!isEditing) {
-        setFormData(emptyFormData);
-        setLoadingInitialData(false);
-      } else {
-        try {
+      try {
+        const allMenus = await fetchAllMenus();
+        setMenuOptions(allMenus);
+
+        if (!isEditing) {
+          setFormData(emptyFormData);
+        } else {
           const menu = await fetchMenuById(id);
           setFormData({
             name: menu.name || "",
             url: menu.url || "",
             icon: menu.icon || "",
             requiredPrivilege: menu.requiredPrivilege || "",
-            parentId: typeof menu.parentId === "number" ? menu.parentId : 0,
-            order: typeof menu.order === "number" ? menu.order : 0,
+            parentId: typeof menu.parentId === "number" ? menu.parentId : null,
+            order: typeof menu.order === "number" ? menu.order : null,
           });
-        } catch {
-          toast.error("Failed to load menu for editing.");
-          onClose();
-        } finally {
-          setLoadingInitialData(false);
         }
+      } catch (err) {
+        toast.error("Failed to load data.");
+        onClose();
+      } finally {
+        setLoadingInitialData(false);
       }
     };
 
@@ -216,16 +226,34 @@ const AddMenu: React.FC<AddMenuProps> = ({
             className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
           />
 
-          <input
-            name="parentId"
-            type="number"
-            value={formData.parentId === null ? "" : formData.parentId}
-            onChange={handleChange}
-            disabled={isSubmitting}
-            min={0}
-            placeholder="Enter parent ID "
-            className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-          />
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+              Parent Menu
+            </span>
+            <select
+              name="parentId"
+              value={formData.parentId === null ? "" : formData.parentId}
+              onChange={(e) => {
+                const value =
+                  e.target.value === "" ? null : parseInt(e.target.value, 10);
+                setFormData((prev) => ({
+                  ...prev,
+                  parentId: value,
+                }));
+              }}
+              disabled={isSubmitting}
+              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600  "
+            >
+              <option value="">No Parent</option>
+              {menuOptions
+                .filter((menu) => menu.id !== id)
+                .map((menu) => (
+                  <option key={menu.id} value={menu.id}>
+                    {menu.name}
+                  </option>
+                ))}
+            </select>
+          </label>
         </form>
       )}
 
