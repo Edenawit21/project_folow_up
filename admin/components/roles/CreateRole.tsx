@@ -143,7 +143,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
   );
 
   return (
-    <div className="relative px-4 py-8 w-[600px] ml-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+    <div className="relative px-4 py-4 w-[600px] ml-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
       {/* Close button */}
       <button
         onClick={onClose}
