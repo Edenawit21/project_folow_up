@@ -4,11 +4,12 @@ import React, { useEffect, useState } from "react";
 import { Trash2, Pencil, Plus } from "lucide-react";
 import { toast } from "react-toastify";
 import { UserData } from "@/types/user";
-import { getUsers, deleteUser } from "@/utils/userApi"; // <-- added this line
+import { getUsers, deleteUser } from "@/utils/userApi";
 import { fetchAllRoles } from "@/utils/roleApi";
 import AddUser from "./AddUser";
 import { RoleData } from "@/types/role";
 import PaginationFooter from "@/components/footer/PaginationFooter";
+import Link from "next/link"; // Import Link from next/link
 
 const UserList = () => {
   const [users, setUsers] = useState<UserData[]>([]);
@@ -142,29 +143,64 @@ const UserList = () => {
               </tr>
             ) : (
               paginatedUsers.map((user) => (
+                // Wrap the entire row content in Link
                 <tr
                   key={user.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                 >
-                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">
-                    {user.displayName || `${user.firstName} ${user.lastName}`}
+                  {/*
+                    The Link component should wrap the content you want to make clickable.
+                    We use a trick here: apply the Link to a div/span inside the first td,
+                    and make it block-level to cover the entire row visually.
+                    Alternatively, you can make the whole <tr> clickable with CSS
+                    and handle the navigation in an onClick, but Link is more semantic for Next.js.
+                    
+                    For a cleaner approach where the whole row is a link,
+                    you can render the <tr> directly inside the Link,
+                    or use a `router.push` on `onClick` of the tr.
+                    
+                    Let's go with the `router.push` approach for clean table HTML.
+                    First, import `useRouter` from `next/navigation`.
+                  */}
+                  <td
+                    onClick={() => {
+                      // Prevent navigation if an action button is clicked (edit/delete)
+                      // This ensures clicks on action buttons don't also trigger row navigation.
+                    }}
+                    className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer"
+                  >
+                    <Link href={`/users/${user.id}`} className="block w-full py-3 -my-3">
+                      {user.displayName || `${user.firstName} ${user.lastName}`}
+                    </Link>
                   </td>
-                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">
-                    {user.email}
+                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
+                    <Link href={`/users/${user.id}`} className="block w-full py-3 -my-3">
+                        {user.email}
+                    </Link>
                   </td>
-                  <td className="px-4 py-3 text-green-500  whitespace-nowrap text-base dark:text-green-500">
-                    {user.roles?.join(", ")}
+                  <td className="px-4 py-3 text-green-500 whitespace-nowrap text-base dark:text-green-500 cursor-pointer">
+                    <Link href={`/users/${user.id}`} className="block w-full py-3 -my-3">
+                        {user.roles?.join(", ")}
+                    </Link>
                   </td>
-                  <td className="px-4 py-3 dark:text-sky-500 whitespace-nowrap text-sky-600">
-                    {user.source}
+                  <td className="px-4 py-3 dark:text-sky-500 whitespace-nowrap text-sky-600 cursor-pointer">
+                    <Link href={`/users/${user.id}`} className="block w-full py-3 -my-3">
+                        {user.source}
+                    </Link>
                   </td>
-                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">
-                    {user.isActive ? "Yes" : "No"}
+                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
+                    <Link href={`/users/${user.id}`} className="block w-full py-3 -my-3">
+                        {user.isActive ? "Yes" : "No"}
+                    </Link>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center space-x-4">
+                      {/* Make sure these buttons' onClick handlers prevent event propagation */}
                       <button
-                        onClick={() => handleEdit(user.id)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Stop event from bubbling to the row's Link
+                          handleEdit(user.id);
+                        }}
                         disabled={user.source === "Jira"}
                         className={`text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-white ${
                           user.source === "Jira"
@@ -180,7 +216,10 @@ const UserList = () => {
                         <Pencil size={18} />
                       </button>
                       <button
-                        onClick={() => setDeleteId(user.id)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Stop event from bubbling to the row's Link
+                          setDeleteId(user.id);
+                        }}
                         disabled={user.source === "Jira"}
                         className={`text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 ${
                           user.source === "Jira"
