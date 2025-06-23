@@ -18,6 +18,10 @@ const MenuList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  // New states for confirmation dialog
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [menuIdToDelete, setMenuIdToDelete] = useState<number | null>(null);
+
   const loadMenus = async () => {
     setLoading(true);
     try {
@@ -51,14 +55,23 @@ const MenuList: React.FC = () => {
     setEditingId(undefined);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this menu?")) return;
+  // Open confirm dialog instead of deleting directly
+  const confirmDelete = (id: number) => {
+    setMenuIdToDelete(id);
+    setConfirmDialogOpen(true);
+  };
+
+  // Actual delete logic triggered by dialog confirm
+  const handleDeleteConfirmed = async () => {
+    if (menuIdToDelete === null) return;
+
+    setConfirmDialogOpen(false);
+    setDeletingId(menuIdToDelete);
 
     try {
-      setDeletingId(id);
-      await deleteMenuItem(id);
+      await deleteMenuItem(menuIdToDelete);
       toast.success("Menu deleted successfully.");
-      setMenus((prev) => prev.filter((m) => m.id !== id));
+      setMenus((prev) => prev.filter((m) => m.id !== menuIdToDelete));
       if (paginatedMenus.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
@@ -67,7 +80,13 @@ const MenuList: React.FC = () => {
       console.error("Delete menu error:", error);
     } finally {
       setDeletingId(null);
+      setMenuIdToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setConfirmDialogOpen(false);
+    setMenuIdToDelete(null);
   };
 
   const getParentName = (parentId: number | null | undefined) => {
@@ -80,6 +99,39 @@ const MenuList: React.FC = () => {
   const endIndex = startIndex + rowsPerPage;
   const paginatedMenus = menus.slice(startIndex, endIndex);
   const totalMenus = menus.length;
+
+  // Confirmation Dialog Component
+  const ConfirmDeleteDialog = () => {
+    if (!confirmDialogOpen || menuIdToDelete === null) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full shadow-lg">
+          <h3 className="text-lg font-semibold mb-4 dark:text-gray-100">
+            Confirm Delete
+          </h3>
+          <p className="mb-6 dark:text-gray-300">
+            Are you sure you want to delete this menu? This action cannot be
+            undone.
+          </p>
+          <div className="flex justify-end gap-4">
+            <button
+              onClick={cancelDelete}
+              className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 transition"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteConfirmed}
+              className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
@@ -164,7 +216,7 @@ const MenuList: React.FC = () => {
                         <Pencil size={18} />
                       </button>
                       <button
-                        onClick={() => handleDelete(menu.id)}
+                        onClick={() => confirmDelete(menu.id)}
                         disabled={deletingId === menu.id}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                       >
@@ -221,6 +273,9 @@ const MenuList: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Render the confirmation dialog */}
+      {confirmDialogOpen && <ConfirmDeleteDialog />}
     </div>
   );
 };
