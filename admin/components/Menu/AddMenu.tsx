@@ -1,26 +1,24 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { CreateMenuItem, UpdateMenuItemPayload } from "@/types/menuTypes";
-import {
-  createMenuItem,
-  fetchAllMenus,
-  fetchMenuById,
-  updateMenu,
-} from "@/utils/menuApi";
 import { toast } from "react-toastify";
 import { Loader2, X } from "lucide-react";
+import { fetchMenuById, updateMenuItem, createMenuItem } from "@/utils/menuApi";
 
 interface AddMenuProps {
-  id: number;
+  id: number; // menu id to edit; 0 = create new
   onClose: () => void;
   onCreate: () => void;
   onUpdate: () => void;
 }
 
-interface MenuOption {
-  id: number;
+interface MenuFormData {
   name: string;
+  url: string;
+  icon: string;
+  requiredPrivilege: string;
+  parentId: number | null;
+  order: number | null;
 }
 
 const AddMenu: React.FC<AddMenuProps> = ({
@@ -30,26 +28,19 @@ const AddMenu: React.FC<AddMenuProps> = ({
   onUpdate,
 }) => {
   const isEditing = id !== 0;
-  const modalRef = useRef<HTMLDivElement>(null);
 
-  const [initialFormData, setInitialFormData] = useState<UpdateMenuItemPayload>(
-    {
-      Id: 0,
-      Name: "",
-      Url: "",
-      Icon: "",
-      RequiredPrivilege: "",
-      ParentId: 0,
-      Order: 0,
-    }
-  );
+  const emptyFormData: MenuFormData = {
+    name: "",
+    url: "",
+    icon: "",
+    requiredPrivilege: "",
+    parentId: null,
+    order: null,
+  };
 
-  const [formData, setFormData] =
-    useState<UpdateMenuItemPayload>(initialFormData);
+  const [formData, setFormData] = useState<MenuFormData>(emptyFormData);
   const [loadingInitialData, setLoadingInitialData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [menuOptions, setMenuOptions] = useState<MenuOption[]>([]);
-  const [fetchingParentMenus, setFetchingParentMenus] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -62,51 +53,22 @@ const AddMenu: React.FC<AddMenuProps> = ({
   useEffect(() => {
     const loadData = async () => {
       setLoadingInitialData(true);
-      setFetchingParentMenus(true);
-      try {
-        const allMenus = await fetchAllMenus();
-        setMenuOptions(
-          allMenus
-            .filter((menu) => menu.id !== id)
-            .map((menu) => ({
-              id: menu.id,
-              name: menu.name,
-            }))
-        );
-      } catch (error) {
-        toast.error("Failed to load parent menu options.");
-      } finally {
-        setFetchingParentMenus(false);
-      }
 
       if (!isEditing) {
-        const emptyData: UpdateMenuItemPayload = {
-          Id: 0,
-          Name: "",
-          Url: "",
-          Icon: "",
-          RequiredPrivilege: "",
-          ParentId: 0,
-          Order: 0,
-        };
-        setFormData(emptyData);
-        setInitialFormData(emptyData);
+        setFormData(emptyFormData);
         setLoadingInitialData(false);
       } else {
         try {
           const menu = await fetchMenuById(id);
-          const loadedData: UpdateMenuItemPayload = {
-            Id: menu.id,
-            Name: menu.name || "",
-            Url: menu.url || "",
-            Icon: menu.icon || "",
-            RequiredPrivilege: menu.requiredPrivilege || "",
-            ParentId: menu.parentId ?? null,
-            Order: menu.order ?? 0,
-          };
-          setFormData(loadedData);
-          setInitialFormData(loadedData);
-        } catch (error) {
+          setFormData({
+            name: menu.name || "",
+            url: menu.url || "",
+            icon: menu.icon || "",
+            requiredPrivilege: menu.requiredPrivilege || "",
+            parentId: typeof menu.parentId === "number" ? menu.parentId : 0,
+            order: typeof menu.order === "number" ? menu.order : 0,
+          });
+        } catch {
           toast.error("Failed to load menu for editing.");
           onClose();
         } finally {
@@ -118,22 +80,22 @@ const AddMenu: React.FC<AddMenuProps> = ({
     loadData();
   }, [id, isEditing, onClose]);
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    let newValue: string | number | null = value;
 
-    if (name === "Order" || name === "ParentId") {
-      newValue = value === "" || value === "null" ? null : parseInt(value);
-      if (isNaN(newValue as number)) newValue = null;
+    if (name === "parentId" || name === "order") {
+      // If empty string, set null; else parse number
+      const num = value === "" ? null : parseInt(value, 10);
+      setFormData((prev) => ({
+        ...prev,
+        [name]: num,
+      }));
     } else {
-      newValue = value;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
     }
-
-    setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -142,24 +104,16 @@ const AddMenu: React.FC<AddMenuProps> = ({
 
     try {
       if (isEditing) {
-        await updateMenu(id, formData);
+        await updateMenuItem(id, formData);
         toast.success("Menu updated successfully!");
         onUpdate();
       } else {
-        const payload: CreateMenuItem = {
-          Name: formData.Name,
-          Url: formData.Url,
-          Icon: formData.Icon,
-          requiredPrivilege: formData.RequiredPrivilege,
-          ParentId: formData.ParentId,
-          Order: formData.Order,
-        };
-        await createMenuItem(payload);
+        await createMenuItem(formData);
         toast.success("Menu created successfully!");
         onCreate();
       }
       onClose();
-    } catch (error) {
+    } catch {
       toast.error(`Failed to ${isEditing ? "update" : "create"} menu.`);
     } finally {
       setIsSubmitting(false);
@@ -167,15 +121,12 @@ const AddMenu: React.FC<AddMenuProps> = ({
   };
 
   const handleCancel = () => {
-    setFormData(initialFormData);
+    setFormData(emptyFormData);
   };
 
   return (
-    <div
-      ref={modalRef}
-      className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-600 dark:border-gray-600"
-    >
-      <div className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700 relative">
+    <div className="w-[600px] max-h-[90vh] overflow-hidden p-3 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-600 dark:border-gray-600">
+      <div className="px-6 pt-2 pb-4 border-b border-gray-200 dark:border-gray-700 relative">
         <button
           type="button"
           onClick={onClose}
@@ -185,7 +136,7 @@ const AddMenu: React.FC<AddMenuProps> = ({
           <X className="h-6 w-6 hover:text-red-500" />
         </button>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          {isEditing ? "Update  Menu" : "Add New Menu"}
+          {isEditing ? "Update Menu" : "Add New Menu"}
         </h2>
       </div>
 
@@ -203,105 +154,78 @@ const AddMenu: React.FC<AddMenuProps> = ({
           className="px-6 py-4 space-y-4"
         >
           <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Menu Name *
-            </span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
             <input
-              name="Name"
+              name="name"
               type="text"
-              value={formData.Name}
+              value={formData.name}
               onChange={handleChange}
               required
               disabled={isSubmitting}
+              placeholder="Enter menu name"
               className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Required Privilege
-            </span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
             <input
-              name="RequiredPrivilege"
+              name="requiredPrivilege"
               type="text"
-              value={formData.RequiredPrivilege || ""}
+              value={formData.requiredPrivilege}
               onChange={handleChange}
               disabled={isSubmitting}
-              placeholder="e.g., menu.create"
+              placeholder="Enter required privilege )"
               className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              URL
-            </span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
             <input
-              name="Url"
+              name="url"
               type="text"
-              value={formData.Url || ""}
+              value={formData.url}
               onChange={handleChange}
               disabled={isSubmitting}
-              placeholder="/dashboard/analytics"
+              placeholder="Enter URL"
               className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Icon
-            </span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
             <input
-              name="Icon"
+              name="icon"
               type="text"
-              value={formData.Icon || ""}
+              value={formData.icon}
               onChange={handleChange}
               disabled={isSubmitting}
-              placeholder="e.g., home"
+              placeholder="Enter icon class (e.g., folder)"
               className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
           </label>
+          <input
+            name="order"
+            type="number"
+            value={formData.order === null ? "" : formData.order}
+            onChange={handleChange}
+            disabled={isSubmitting}
+            min={0}
+            placeholder="Enter order "
+            className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          />
 
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Order
-            </span>
-            <input
-              name="Order"
-              type="number"
-              value={formData.Order ?? ""}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              min="0"
-              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Parent Menu
-            </span>
-            <select
-              name="ParentId"
-              value={formData.ParentId === null ? "null" : formData.ParentId}
-              onChange={handleChange}
-              disabled={isSubmitting || fetchingParentMenus}
-              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-            >
-              <option value="null">No Parent (Top Level)</option>
-              {menuOptions.map((menu) => (
-                <option key={menu.id} value={menu.id}>
-                  {menu.name}
-                </option>
-              ))}
-            </select>
-            {fetchingParentMenus && (
-              <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
-                <Loader2 className="animate-spin h-3 w-3 mr-1" /> Loading parent
-                options...
-              </span>
-            )}
-          </label>
+          <input
+            name="parentId"
+            type="number"
+            value={formData.parentId === null ? "" : formData.parentId}
+            onChange={handleChange}
+            disabled={isSubmitting}
+            min={0}
+            placeholder="Enter parent ID "
+            className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          />
         </form>
       )}
 

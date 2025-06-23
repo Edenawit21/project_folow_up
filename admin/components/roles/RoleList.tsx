@@ -132,7 +132,7 @@ const RoleList = () => {
           <h1 className="text-3xl font-bold text-indigo-500 dark:text-white">
             Role Management
           </h1>
-          <p className="mt-1 text-gray-600 dark:text-gray-400 italic">
+          <p className="mt-1 text-gray-600 dark:text-gray-400 italic text-sm">
             Manage user roles and their permissions
           </p>
         </div>
