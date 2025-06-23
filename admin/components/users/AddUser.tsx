@@ -145,7 +145,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
           lastName,
           email,
           roles,
-          displayName: `${firstName} ${lastName}`,
+          displayName: `${firstName} ${lastName} `,
           timeZone: existingUserData.timeZone || "UTC",
           isActive: existingUserData.isActive ?? true,
           location: existingUserData.location || "",
@@ -209,10 +209,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
 
   return (
     <>
-      <div
-        ref={formRef}
-        className="relative max-w-xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg"
-      >
+      <div className="relative px-4 py-8 w-[600px] ml-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl"

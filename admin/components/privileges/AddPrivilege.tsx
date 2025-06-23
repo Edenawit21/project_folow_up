@@ -122,9 +122,8 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
 
   return (
     <form
-      ref={formRef}
       onSubmit={handleSubmit}
-      className="relative w-[600px] p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-600 dark:border-gray-600"
+      className="relative px-4 py-8 w-[600px] ml-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"
     >
       {/* X Button */}
       <button

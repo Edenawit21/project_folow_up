@@ -1,26 +1,43 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { ChevronDown, Search, Filter, CircleSlash } from "lucide-react";
+import {
+  ChevronDown,
+  Search,
+  Filter,
+  CircleSlash,
+  FolderKanban,
+} from "lucide-react";
 import { fetchProjects, ProjectDto } from "../../utils/Jira";
 import ViewProjectButton from "../ui/ViewProjectButton";
 import PaginationFooter from "@/components/footer/PaginationFooter";
-import { FolderKanban } from "lucide-react";
 
-const Progress = ({ value }: { value: number }) => (
-  <div className="flex flex-col gap-1.5">
-    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300">
-      <span>{Math.round(value)}%</span>
-      <span>Completed</span>
+const Progress = ({
+  completed,
+  total,
+}: {
+  completed: number;
+  total: number;
+}) => {
+  const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+  return (
+    <div className="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-300">
+      <div className="flex justify-between text-xs mb-1">
+        <span>
+          {completed} / {total} Tasks
+        </span>
+        <span className="text-gray-500 dark:text-gray-400"></span>
+      </div>
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+        <div
+          className="bg-blue-500 h-full transition-all duration-300"
+          style={{ width: `${percent}%` }}
+        />
+      </div>
     </div>
-    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-      <div
-        className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500 ease-out"
-        style={{ width: `${value}%` }}
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 const Badge = ({
   variant = "default",
@@ -98,11 +115,7 @@ export const ProjectTable = () => {
   const [projects, setProjects] = useState<ProjectDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState({
-    healthLevel: "",
-    search: "",
-  });
-
+  const [filters, setFilters] = useState({ healthLevel: "", search: "" });
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
 
@@ -196,20 +209,18 @@ export const ProjectTable = () => {
   return (
     <div className="space-y-6 p-4 sm:p-6 text-gray-800 dark:text-gray-100">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
-        {/* Left: Heading and Description */}
         <div>
           <h2 className="text-3xl font-extrabold text-violet-700 dark:text-violet-700 tracking-tight mb-4">
             Project Dashboard
           </h2>
-          <p className="mt-2 text-2xl text-gray-900 dark:text-gray-400 italic">
+          <p className="mt-2 text-sm text-gray-900 dark:text-gray-400 italic">
             Track and manage your projects effectively.
           </p>
         </div>
-        {/* Right: Project Count Card */}
-        <div className=" px-4 py-3 rounded-2xl flex items-center gap-3 w-full md:w-auto animate-fadeInUp transition-all duration-500 hover:scale-[1.02]">
+        <div className="px-4 py-3 rounded-2xl flex items-center gap-3 w-full md:w-auto">
           <div className="space-y-1">
             <div className="text-sm font-medium flex items-center gap-2 opacity-90">
-              <FolderKanban className="w-4 h-4  animate-bounce-slow" />
+              <FolderKanban className="w-4 h-4 animate-bounce-slow" />
               <span>Total Projects</span>
             </div>
             <div className="text-3xl font-extrabold text-center tracking-wide">
@@ -219,7 +230,6 @@ export const ProjectTable = () => {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 items-stretch">
         <div className="w-full md:w-64">
           <Input
@@ -230,7 +240,6 @@ export const ProjectTable = () => {
             }
           />
         </div>
-
         <div className="w-full md:w-56">
           <Select
             value={filters.healthLevel}
@@ -247,7 +256,6 @@ export const ProjectTable = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm bg-white dark:bg-gray-800">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 text-sm font-medium">
@@ -263,19 +271,10 @@ export const ProjectTable = () => {
           </thead>
           <tbody>
             {paginatedProjects.length > 0 ? (
-              paginatedProjects.map((project, index) => (
+              paginatedProjects.map((project) => (
                 <tr
                   key={project.Id}
-                  className={`
-                    border-t border-gray-200 dark:border-gray-700
-                    hover:bg-gray-50 dark:hover:bg-gray-700/30
-                    transition-colors duration-150
-                    ${
-                      index % 2 === 0
-                        ? "bg-gray-50/50 dark:bg-gray-800"
-                        : "bg-white dark:bg-gray-800"
-                    }
-                  `}
+                  className="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150"
                 >
                   <td className="p-4">
                     <div className="font-semibold text-gray-900 dark:text-white">
@@ -298,11 +297,8 @@ export const ProjectTable = () => {
                   </td>
                   <td className="p-4">
                     <Progress
-                      value={
-                        (project.Progress.CompletedTasks /
-                          project.Progress.TotalTasks) *
-                        100
-                      }
+                      completed={project.Progress.CompletedTasks}
+                      total={project.Progress.TotalTasks}
                     />
                   </td>
                   <td className="p-4">
@@ -318,12 +314,10 @@ export const ProjectTable = () => {
                   </td>
                   <td className="p-4">
                     {project.Progress.ActiveBlockers > 0 ? (
-                      <div className="flex items-center gap-2">
-                        <Badge variant="destructive">
-                          {project.Progress.ActiveBlockers} blocker
-                          {project.Progress.ActiveBlockers !== 1 ? "s" : ""}
-                        </Badge>
-                      </div>
+                      <Badge variant="destructive">
+                        {project.Progress.ActiveBlockers} blocker
+                        {project.Progress.ActiveBlockers !== 1 ? "s" : ""}
+                      </Badge>
                     ) : (
                       <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                         <CircleSlash size={16} className="text-green-500" />
@@ -341,7 +335,7 @@ export const ProjectTable = () => {
                 <td colSpan={7} className="py-16 text-center">
                   <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
                     <Filter size={48} className="mb-4 opacity-50" />
-                    <h3 className="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <h3 className="text-xl font-medium mb-2">
                       No projects found
                     </h3>
                     <p className="max-w-md">
@@ -356,7 +350,6 @@ export const ProjectTable = () => {
         </table>
       </div>
 
-      {/* Pagination */}
       {totalItems > 0 && (
         <div className="bg-white dark:bg-gray-800/30 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
           <PaginationFooter

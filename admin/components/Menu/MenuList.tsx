@@ -1,14 +1,15 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Pencil, Trash2, Loader2, Plus } from "lucide-react";
-import { MenuItem } from "@/types/menuTypes";
+import { MenuItemSummary } from "@/types/menuTypes";
 import { deleteMenuItem, fetchAllMenus } from "@/utils/menuApi";
 import PaginationFooter from "@/components/footer/PaginationFooter";
 import AddMenu from "./AddMenu";
 
 const MenuList: React.FC = () => {
-  const [menus, setMenus] = useState<MenuItem[]>([]);
+  const [menus, setMenus] = useState<MenuItemSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -95,7 +96,7 @@ const MenuList: React.FC = () => {
             Add Menu
           </button>
         </div>
-        <p className="mt-2 text-gray-600 dark:text-gray-300 italic">
+        <p className="mt-2 text-gray-600 dark:text-gray-300 italic text-sm">
           Manage and organize menu items for the application.
         </p>
       </header>
@@ -145,7 +146,7 @@ const MenuList: React.FC = () => {
                     {menu.name}
                   </td>
                   <td className="px-6 py-4 text-sm text-green-500 whitespace-nowrap">
-                    {menu.requiredPrivilege || "None"}
+                    {menu.requiredPermission || "None"}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                     {menu.order ?? "N/A"}

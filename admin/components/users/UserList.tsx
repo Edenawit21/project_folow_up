@@ -103,7 +103,7 @@ const UserList = () => {
             Create User
           </button>
         </div>
-        <p className="mt-2 text-gray-600 dark:text-gray-300 italic">
+        <p className="mt-2 text-gray-600 dark:text-gray-300 italic text-sm">
           Manage and organize users in the system.
         </p>
       </div>
@@ -165,13 +165,33 @@ const UserList = () => {
                     <div className="flex items-center space-x-4">
                       <button
                         onClick={() => handleEdit(user.id)}
-                        className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-white"
+                        disabled={user.source === "Jira"}
+                        className={`text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-white ${
+                          user.source === "Jira"
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        title={
+                          user.source === "Jira"
+                            ? "Edit disabled for Jira users"
+                            : "Edit User"
+                        }
                       >
                         <Pencil size={18} />
                       </button>
                       <button
                         onClick={() => setDeleteId(user.id)}
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
+                        disabled={user.source === "Jira"}
+                        className={`text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 ${
+                          user.source === "Jira"
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        title={
+                          user.source === "Jira"
+                            ? "Delete disabled for Jira users"
+                            : "Delete User"
+                        }
                       >
                         <Trash2 size={18} />
                       </button>
