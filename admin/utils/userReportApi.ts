@@ -9,7 +9,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL; // <--- IMPORTANT: Ve
 
 export async function fetchUserProjectReport(userId: string, projectId: string): Promise<UserProjectReport> {
     try {
-        const response = await axios.get<UserProjectReport>(`${API_BASE_URL}/UserReports/${userId}/projects/${projectId}/contributions`);
+        const response = await axios.get<UserProjectReport>(`${API_BASE_URL}/api/UserReports/${userId}/projects/${projectId}/contributions`);
         return response.data;
     } catch (error) {
         // It's good practice to log the full error from Axios
@@ -23,8 +23,11 @@ export async function fetchUserProjectReport(userId: string, projectId: string):
 }
 
 export async function FetchProjectById(userId: string): Promise<ProjectCompletionReports> {
+  console.log("Calling API for userId:", userId);
   try {
-    const response = await axios.get<ProjectCompletionReports>(`${API_BASE_URL}/UserReports/${userId}/projects`);
+    const response = await axios.get<ProjectCompletionReports>(
+      `${API_BASE_URL}/api/UserReports/${userId}/projects`
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

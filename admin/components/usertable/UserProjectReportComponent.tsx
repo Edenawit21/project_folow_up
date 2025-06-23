@@ -9,8 +9,10 @@ import { TaskInSprint } from '@/types/sprint'; // Assuming TaskInSprint is corre
 import { fetchUserProjectReport } from '../../utils/userReportApi'; // Adjust path based on where you saved api.ts
 
 interface UserProjectReportProps {
-    userId: string;   // The user ID to fetch the report for
-    projectId: string; // The project ID to fetch the report for
+  data: UserProjectReport;
+  loading: boolean;
+  userId: string;
+  projectId: string;
 }
 
 const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({ userId, projectId }) => {
@@ -187,6 +189,7 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({ userId, 
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <select
+                    aria-label="Filter tasks by status"
                     className="p-3 border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
