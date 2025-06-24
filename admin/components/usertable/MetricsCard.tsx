@@ -27,7 +27,7 @@ const MetricCard = <T extends object>({
 
   return (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow p-5 border-l-4 ${border}`}
+      className={`bg-white dark:bg-gray-800 rounded-lg  p-5 border-l-4 ${border}`}
     >
       <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">
         {title}

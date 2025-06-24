@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { Pencil, Trash2, Loader2, Plus } from "lucide-react";
+import { Pencil, Trash2, Loader2, Plus, Search } from "lucide-react";
 import { Permission } from "@/types/privilege";
 import { fetchAllPermissions, deletePermission } from "@/utils/privilegeApi";
 import AddPrivilege from "./AddPrivilege";
@@ -10,11 +10,15 @@ import PaginationFooter from "@/components/footer/PaginationFooter";
 
 const PrivilegeList = () => {
   const [privileges, setPrivileges] = useState<Permission[]>([]);
+  const [filteredPrivileges, setFilteredPrivileges] = useState<Permission[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | undefined>(undefined);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState(""); // State for search term
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,6 +32,8 @@ const PrivilegeList = () => {
       try {
         const data = await fetchAllPermissions();
         setPrivileges(data);
+        // Initialize filtered list with all data
+        setFilteredPrivileges(data);
         setTotalItems(data.length);
       } catch (error) {
         toast.error("Failed to load privileges.");
@@ -39,9 +45,25 @@ const PrivilegeList = () => {
     loadPrivileges();
   }, []);
 
+  // Filter privileges whenever search term changes
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = privileges.filter((p) =>
+        p.permissionName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredPrivileges(filtered);
+      setTotalItems(filtered.length);
+      // Reset to first page when search changes
+      setCurrentPage(1);
+    } else {
+      setFilteredPrivileges(privileges);
+      setTotalItems(privileges.length);
+    }
+  }, [searchTerm, privileges]);
+
   // Client-side pagination slice
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedPrivileges = privileges.slice(
+  const paginatedPrivileges = filteredPrivileges.slice(
     startIndex,
     startIndex + rowsPerPage
   );
@@ -66,6 +88,7 @@ const PrivilegeList = () => {
     try {
       const data = await fetchAllPermissions();
       setPrivileges(data);
+      setFilteredPrivileges(data);
       setTotalItems(data.length);
       // If current page is beyond total pages after update, reset to 1
       const totalPages = Math.ceil(data.length / rowsPerPage);
@@ -87,6 +110,7 @@ const PrivilegeList = () => {
       // Reload list after deletion
       const data = await fetchAllPermissions();
       setPrivileges(data);
+      setFilteredPrivileges(data);
       setTotalItems(data.length);
 
       // Adjust current page if necessary
@@ -119,6 +143,43 @@ const PrivilegeList = () => {
           <Plus className="w-5 h-5" />
           <span>Add Privilege</span>
         </button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Search className="w-5 h-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            className="w-full pl-10 pr-4 py-2 rounded-[8px] border border-gray-400 dark:border-gray-400 bg-gray-100 dark:bg-gray-400 text-gray-900 dark:text-white placeholder-gray-800"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Table */}
@@ -157,10 +218,14 @@ const PrivilegeList = () => {
                     <div className="flex flex-col items-center justify-center">
                       <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-16 h-16" />
                       <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
-                        No privileges found
+                        {searchTerm
+                          ? "No matching privileges found"
+                          : "No privileges found"}
                       </h3>
                       <p className="mt-1 text-gray-500 dark:text-gray-400">
-                        Get started by adding a new privilege
+                        {searchTerm
+                          ? "Try a different search term"
+                          : "Get started by adding a new privilege"}
                       </p>
                     </div>
                   </td>

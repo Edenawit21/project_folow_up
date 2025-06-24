@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Trash2, Pencil, Plus } from "lucide-react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { Trash2, Pencil, Plus, Search, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { UserData } from "@/types/user";
 import { getUsers, deleteUser } from "@/utils/userApi";
@@ -9,7 +9,7 @@ import { fetchAllRoles } from "@/utils/roleApi";
 import AddUser from "./AddUser";
 import { RoleData } from "@/types/role";
 import PaginationFooter from "@/components/footer/PaginationFooter";
-import Link from "next/link"; // Import Link from next/link
+import Link from "next/link";
 
 const UserList = () => {
   const [users, setUsers] = useState<UserData[]>([]);
@@ -18,11 +18,11 @@ const UserList = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | undefined>();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalMenus, setTotalMenus] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,7 +34,6 @@ const UserList = () => {
         ]);
         setUsers(usersResponse);
         setRoles(rolesResponse);
-        setTotalMenus(usersResponse.length);
       } catch (error) {
         toast.error("Failed to fetch users or roles");
       } finally {
@@ -50,13 +49,30 @@ const UserList = () => {
     try {
       const response = await getUsers();
       setUsers(response);
-      setTotalMenus(response.length);
     } catch (error) {
       toast.error("Failed to fetch users");
     } finally {
       setLoading(false);
     }
   };
+
+  // Filter users based on search query
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery) return users;
+
+    const query = searchQuery.toLowerCase();
+    return users.filter(
+      (user) =>
+        (user.displayName || `${user.firstName} ${user.lastName}`)
+          .toLowerCase()
+          .includes(query) ||
+        user.email.toLowerCase().includes(query) ||
+        (user.roles &&
+          user.roles.some((role) => role.toLowerCase().includes(query))) ||
+        user.source.toLowerCase().includes(query) ||
+        (user.isActive ? "yes" : "no").includes(query)
+    );
+  }, [users, searchQuery]);
 
   const handleEdit = (id: string) => {
     setEditingId(id);
@@ -85,9 +101,17 @@ const UserList = () => {
     }
   };
 
-  // Calculate users to display for current page (simple client-side pagination)
+  // Reset to first page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // Calculate users to display for current page
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedUsers = users.slice(startIndex, startIndex + rowsPerPage);
+  const paginatedUsers = filteredUsers.slice(
+    startIndex,
+    startIndex + rowsPerPage
+  );
 
   return (
     <div className="max-w-7xl mx-auto mt-16 px-4 sm:px-6 lg:px-8">
@@ -98,7 +122,7 @@ const UserList = () => {
           </h2>
           <button
             onClick={handleCreate}
-            className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 rounded-[6px]"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 rounded-[6px]"
           >
             <Plus size={18} />
             Create User
@@ -107,6 +131,30 @@ const UserList = () => {
         <p className="mt-2 text-gray-600 dark:text-gray-300 italic text-sm">
           Manage and organize users in the system.
         </p>
+      </div>
+
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative max-w-lg">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search..."
+            className="block w-full pl-10 pr-10 py-2.5 text-base rounded-lg border border-gray-300 dark:border-gray-600  dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              <X className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm bg-white dark:bg-gray-800">
@@ -129,7 +177,10 @@ const UserList = () => {
                   colSpan={6}
                   className="px-4 py-8 text-center text-gray-500 dark:text-gray-300"
                 >
-                  Loading users...
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-indigo-600 dark:border-indigo-400 mr-2"></div>
+                    Loading users...
+                  </div>
                 </td>
               </tr>
             ) : paginatedUsers.length === 0 ? (
@@ -138,67 +189,72 @@ const UserList = () => {
                   colSpan={6}
                   className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
                 >
-                  No users found.
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-16 h-16" />
+                    <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                      {searchQuery
+                        ? "No matching users found"
+                        : "No users found"}
+                    </h3>
+                    <p className="mt-1 text-gray-500 dark:text-gray-400">
+                      {searchQuery
+                        ? "Try adjusting your search query"
+                        : "Get started by creating a new user"}
+                    </p>
+                  </div>
                 </td>
               </tr>
             ) : (
               paginatedUsers.map((user) => (
-                // Wrap the entire row content in Link
                 <tr
                   key={user.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                 >
-                  {/*
-                    The Link component should wrap the content you want to make clickable.
-                    We use a trick here: apply the Link to a div/span inside the first td,
-                    and make it block-level to cover the entire row visually.
-                    Alternatively, you can make the whole <tr> clickable with CSS
-                    and handle the navigation in an onClick, but Link is more semantic for Next.js.
-                    
-                    For a cleaner approach where the whole row is a link,
-                    you can render the <tr> directly inside the Link,
-                    or use a `router.push` on `onClick` of the tr.
-                    
-                    Let's go with the `router.push` approach for clean table HTML.
-                    First, import `useRouter` from `next/navigation`.
-                  */}
-                  <td
-                    onClick={() => {
-                      // Prevent navigation if an action button is clicked (edit/delete)
-                      // This ensures clicks on action buttons don't also trigger row navigation.
-                    }}
-                    className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer"
-                  >
-                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
+                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
+                    <Link
+                      href={`/dashboard/users/${user.id}`}
+                      className="block w-full py-3 -my-3"
+                    >
                       {user.displayName || `${user.firstName} ${user.lastName}`}
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
-                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
-                        {user.email}
+                    <Link
+                      href={`/dashboard/users/${user.id}`}
+                      className="block w-full py-3 -my-3"
+                    >
+                      {user.email}
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-green-500 whitespace-nowrap text-base dark:text-green-500 cursor-pointer">
-                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
-                        {user.roles?.join(", ")}
+                    <Link
+                      href={`/dashboard/users/${user.id}`}
+                      className="block w-full py-3 -my-3"
+                    >
+                      {user.roles?.join(", ")}
                     </Link>
                   </td>
                   <td className="px-4 py-3 dark:text-sky-500 whitespace-nowrap text-sky-600 cursor-pointer">
-                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
-                        {user.source}
+                    <Link
+                      href={`/dashboard/users/${user.id}`}
+                      className="block w-full py-3 -my-3"
+                    >
+                      {user.source}
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
-                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
-                        {user.isActive ? "Yes" : "No"}
+                    <Link
+                      href={`/dashboard/users/${user.id}`}
+                      className="block w-full py-3 -my-3"
+                    >
+                      {user.isActive ? "Yes" : "No"}
                     </Link>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center space-x-4">
-                      {/* Make sure these buttons' onClick handlers prevent event propagation */}
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // Stop event from bubbling to the row's Link
+                          e.stopPropagation();
                           handleEdit(user.id);
                         }}
                         disabled={user.source === "Jira"}
@@ -217,7 +273,7 @@ const UserList = () => {
                       </button>
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // Stop event from bubbling to the row's Link
+                          e.stopPropagation();
                           setDeleteId(user.id);
                         }}
                         disabled={user.source === "Jira"}
@@ -246,7 +302,7 @@ const UserList = () => {
       <PaginationFooter
         currentPage={currentPage}
         rowsPerPage={rowsPerPage}
-        totalItems={totalMenus}
+        totalItems={filteredUsers.length}
         onPageChange={setCurrentPage}
         onRowsPerPageChange={(rows) => {
           setRowsPerPage(rows);

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Trash2, Edit2, Loader2, Plus } from "lucide-react";
+import React, { useEffect, useState, useCallback } from "react";
+import { Trash2, Edit2, Loader2, Plus, X, Search } from "lucide-react";
 import { RoleData } from "@/types/role";
 import { toast } from "react-toastify";
 import { fetchAllRoles, deleteRole } from "@/utils/roleApi";
@@ -106,6 +106,7 @@ const RoleList = () => {
   const [editingId, setEditingId] = useState<string | undefined>(undefined);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [targetId, setTargetId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -129,6 +130,20 @@ const RoleList = () => {
     loadRoles();
   }, []);
 
+  // Filter roles based on search query
+  const filteredRoles = useCallback(() => {
+    if (!searchQuery) return roles;
+
+    const query = searchQuery.toLowerCase();
+    return roles.filter(
+      (role) =>
+        role.name.toLowerCase().includes(query) ||
+        (role.description && role.description.toLowerCase().includes(query)) ||
+        (role.permissions &&
+          role.permissions.some((p) => p.toLowerCase().includes(query)))
+    );
+  }, [roles, searchQuery]);
+
   const handleEdit = (id: string) => {
     setEditingId(id);
     setModalOpen(true);
@@ -138,13 +153,11 @@ const RoleList = () => {
     setEditingId(undefined);
     setModalOpen(true);
   };
-
   const handleUpdate = () => {
     loadRoles();
     setModalOpen(false);
     setEditingId(undefined);
   };
-
   const requestDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setTargetId(id);
@@ -165,11 +178,10 @@ const RoleList = () => {
       setConfirmOpen(false);
     }
   };
-
   // Calculate roles to display based on pagination
+  const filtered = filteredRoles();
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedRoles = roles.slice(startIndex, startIndex + rowsPerPage);
-
+  const paginatedRoles = filtered.slice(startIndex, startIndex + rowsPerPage);
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -183,11 +195,35 @@ const RoleList = () => {
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 rounded-[6px]"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 rounded-[6px]"
         >
           <Plus className="w-5 h-5" />
           <span>Create Role</span>
         </button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative max-w-lg">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search..."
+            className="block w-full pl-10 pr-10 py-2.5 text-base rounded-lg border border-gray-300 dark:border-gray-600  dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              <X className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
@@ -289,7 +325,9 @@ const RoleList = () => {
                         No roles found
                       </h3>
                       <p className="mt-1 text-gray-500 dark:text-gray-400">
-                        Get started by creating a new role
+                        {searchQuery
+                          ? "No matching roles found. Try a different search."
+                          : "Get started by creating a new role"}
                       </p>
                     </div>
                   </td>
@@ -319,7 +357,7 @@ const RoleList = () => {
       <PaginationFooter
         currentPage={currentPage}
         rowsPerPage={rowsPerPage}
-        totalItems={totalMenus}
+        totalItems={filtered.length}
         onPageChange={setCurrentPage}
         onRowsPerPageChange={(rows) => {
           setRowsPerPage(rows);

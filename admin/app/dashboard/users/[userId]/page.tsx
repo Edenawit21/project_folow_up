@@ -70,7 +70,7 @@ export default function UserDetailComponent({ params }: PageProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-800">
+      <div className="flex items-center justify-center min-h-screen dark:bg-gray-800">
         <p className="text-gray-600 dark:text-gray-300 text-lg">
           Loading user details...
         </p>
@@ -80,7 +80,7 @@ export default function UserDetailComponent({ params }: PageProps) {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-800 text-red-600 dark:text-red-400">
+      <div className="flex items-center justify-center min-h-screen  dark:bg-gray-800 text-red-600 dark:text-red-400">
         <div className="text-center">
           <p className="text-lg font-semibold">Error: {error}</p>
           <p className="text-sm mt-2">User ID: {userId}</p>
@@ -91,7 +91,7 @@ export default function UserDetailComponent({ params }: PageProps) {
 
   if (!project) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-800">
+      <div className="flex items-center justify-center min-h-screen dark:bg-gray-800">
         <p className="text-gray-600 dark:text-gray-300 text-lg">
           Project not found.
         </p>
@@ -100,13 +100,13 @@ export default function UserDetailComponent({ params }: PageProps) {
   }
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-800 min-h-screen py-10 px-4 sm:px-6 lg:px-8">
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-w-5xl mx-auto p-6 sm:p-8 transition-colors">
+    <div className="dark:bg-gray-800 min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+      <div className="dark:bg-gray-800 max-w-5xl mx-auto p-6 sm:p-8 transition-colors">
         {selectedProject && selectedProjectId ? (
           <>
             <button
               onClick={handleBackToProjects}
-              className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-lg transition"
+              className="mb-6 inline-flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-xl transition text-base"
             >
               ← Back to Projects
             </button>

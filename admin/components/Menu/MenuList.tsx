@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { Pencil, Trash2, Loader2, Plus } from "lucide-react";
+import { Pencil, Trash2, Loader2, Plus, Search } from "lucide-react";
 import { MenuItemSummary } from "@/types/menuTypes";
 import { deleteMenuItem, fetchAllMenus } from "@/utils/menuApi";
 import PaginationFooter from "@/components/footer/PaginationFooter";
@@ -10,10 +10,12 @@ import AddMenu from "./AddMenu";
 
 const MenuList: React.FC = () => {
   const [menus, setMenus] = useState<MenuItemSummary[]>([]);
+  const [filteredMenus, setFilteredMenus] = useState<MenuItemSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | undefined>(undefined);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -27,6 +29,7 @@ const MenuList: React.FC = () => {
     try {
       const data = await fetchAllMenus();
       setMenus(data);
+      setFilteredMenus(data);
     } catch (error) {
       console.error("Failed to load menus", error);
       toast.error("Failed to load menus.");
@@ -38,6 +41,20 @@ const MenuList: React.FC = () => {
   useEffect(() => {
     loadMenus();
   }, []);
+
+  // Filter menus based on search term
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = menus.filter((menu) =>
+        menu.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredMenus(filtered);
+      // Reset to first page when search changes
+      setCurrentPage(1);
+    } else {
+      setFilteredMenus(menus);
+    }
+  }, [searchTerm, menus]);
 
   const handleEdit = (id: number) => {
     setEditingId(id);
@@ -71,7 +88,11 @@ const MenuList: React.FC = () => {
     try {
       await deleteMenuItem(menuIdToDelete);
       toast.success("Menu deleted successfully.");
+      // Update both menus and filteredMenus after deletion
       setMenus((prev) => prev.filter((m) => m.id !== menuIdToDelete));
+      setFilteredMenus((prev) => prev.filter((m) => m.id !== menuIdToDelete));
+
+      // Adjust pagination if needed
       if (paginatedMenus.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
@@ -97,8 +118,8 @@ const MenuList: React.FC = () => {
 
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const paginatedMenus = menus.slice(startIndex, endIndex);
-  const totalMenus = menus.length;
+  const paginatedMenus = filteredMenus.slice(startIndex, endIndex);
+  const totalMenus = filteredMenus.length;
 
   // Confirmation Dialog Component
   const ConfirmDeleteDialog = () => {
@@ -152,6 +173,43 @@ const MenuList: React.FC = () => {
           Manage and organize menu items for the application.
         </p>
       </header>
+
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Search className="w-5 h-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            className="w-full pl-10 pr-4 py-2 rounded-[8px] border border-gray-300 dark:border-gray-400  bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-gray-800">
         <table className="w-full border-collapse">
@@ -238,7 +296,16 @@ const MenuList: React.FC = () => {
                 >
                   <div className="flex flex-col items-center justify-center gap-3">
                     <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-16 h-16" />
-                    <h3 className="text-lg font-medium">No menus found</h3>
+                    <h3 className="text-lg font-medium">
+                      {searchTerm
+                        ? "No matching menus found"
+                        : "No menus found"}
+                    </h3>
+                    <p className="mt-1 text-gray-500 dark:text-gray-400">
+                      {searchTerm
+                        ? "Try a different search term"
+                        : "Get started by adding a new menu"}
+                    </p>
                   </div>
                 </td>
               </tr>
