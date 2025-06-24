@@ -9,7 +9,7 @@ import { fetchAllRoles } from "@/utils/roleApi";
 import AddUser from "./AddUser";
 import { RoleData } from "@/types/role";
 import PaginationFooter from "@/components/footer/PaginationFooter";
-import Link from "next/link"; // Import Link from next/link
+import Link from "next/link";
 
 const UserList = () => {
   const [users, setUsers] = useState<UserData[]>([]);
@@ -85,7 +85,6 @@ const UserList = () => {
     }
   };
 
-  // Calculate users to display for current page (simple client-side pagination)
   const startIndex = (currentPage - 1) * rowsPerPage;
   const paginatedUsers = users.slice(startIndex, startIndex + rowsPerPage);
 
@@ -143,29 +142,12 @@ const UserList = () => {
               </tr>
             ) : (
               paginatedUsers.map((user) => (
-                // Wrap the entire row content in Link
                 <tr
                   key={user.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                 >
-                  {/*
-                    The Link component should wrap the content you want to make clickable.
-                    We use a trick here: apply the Link to a div/span inside the first td,
-                    and make it block-level to cover the entire row visually.
-                    Alternatively, you can make the whole <tr> clickable with CSS
-                    and handle the navigation in an onClick, but Link is more semantic for Next.js.
-                    
-                    For a cleaner approach where the whole row is a link,
-                    you can render the <tr> directly inside the Link,
-                    or use a `router.push` on `onClick` of the tr.
-                    
-                    Let's go with the `router.push` approach for clean table HTML.
-                    First, import `useRouter` from `next/navigation`.
-                  */}
                   <td
                     onClick={() => {
-                      // Prevent navigation if an action button is clicked (edit/delete)
-                      // This ensures clicks on action buttons don't also trigger row navigation.
                     }}
                     className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer"
                   >
@@ -195,10 +177,9 @@ const UserList = () => {
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center space-x-4">
-                      {/* Make sure these buttons' onClick handlers prevent event propagation */}
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // Stop event from bubbling to the row's Link
+                          e.stopPropagation(); 
                           handleEdit(user.id);
                         }}
                         disabled={user.source === "Jira"}
@@ -217,7 +198,7 @@ const UserList = () => {
                       </button>
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // Stop event from bubbling to the row's Link
+                          e.stopPropagation(); 
                           setDeleteId(user.id);
                         }}
                         disabled={user.source === "Jira"}

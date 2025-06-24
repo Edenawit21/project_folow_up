@@ -1,7 +1,3 @@
-// /**
-//  * Enum for common task statuses.
-//  * This should mirror your backend enum if applicable.
-//  */
 export enum TaskStatus {
   ToDo = 'To Do',
   InProgress = 'In Progress',
@@ -82,8 +78,8 @@ export interface UserProjectReport {
   taskCompletionPercentage: number;
   storyPointCompletionPercentage: number;
   userTasksInProject: TaskInSprint[];
-  taskStatusCounts: { [key: string]: number }; // Object mapping status name to count
-  issueTypeCounts: { [key: string]: number }; // Object mapping issue type to count
-  priorityCounts: { [key: string]: number }; // Object mapping priority to count
+  taskStatusCounts: { [key: string]: number }; 
+  issueTypeCounts: { [key: string]: number }; 
+  priorityCounts: { [key: string]: number }; 
   sprintsInvolvedIn: SprintInvolvedIn[];
 }

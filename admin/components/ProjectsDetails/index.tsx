@@ -1,8 +1,18 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import type { NextPage } from "next";
-import { LayoutDashboard } from "lucide-react";
+import {
+  LayoutDashboard,
+  List,
+  Users,
+  Activity,
+  PieChart,
+  ClipboardList,
+  Gauge,
+  BarChart2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import {
   SprintReport,
@@ -21,7 +31,7 @@ import TeamWorkloadTable from "@/components/sprint/TeamWorkloadTable";
 import RecentActivityTable from "@/components/sprint/RecentActivityTable";
 import { TasksTable } from "../sprint/TaskTable";
 import PriorityBreakdownCard from "@/components/sprint/PriorityBreakdownChart";
-import ProjectReportTable from "../usertable/ProjectReportTable";
+
 
 interface ProjectDetailProps {
   projectKey: string;
@@ -120,22 +130,28 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
   };
 
   const displayProjectName = projectName || projectKey;
+  const navItems = [
+    { id: "sprint-summary-section", title: "Sprint Summary", icon: ClipboardList },
+    { id: "sprint-metrics-section", title: "Sprint Metrics", icon: Gauge },
+    { id: "priority-breakdown-section", title: "Priorities", icon: BarChart2 },
+    { id: "project-charts-section", title: "Overview Analytics", icon: PieChart },
+    { id: "tasks-table-section", title: "Tasks in Sprint", icon: List },
+    { id: "team-workload-section", title: "Team Workload", icon: Users },
+    { id: "recent-activity-section", title: "Recent Activity", icon: Activity },
+  ];
 
   return (
-    <div className="min-h-screen dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 py-6 font-inter">
-      {/* Back Button at the very top-left */}
-      <div className="max-w-6xl mx-auto px-4 md:px-0">
-        <button
-          onClick={() => router.push("/dashboard/projects")}
-          className="text-xl font-medium text-blue-600 hover:underline flex items-center mb-4"
-        >
-          ← Back to Projects
-        </button>
-      </div>
-
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <header className="dark:bg-gray-800 p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="min-h-screen dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 py-0 font-inter">
+      <div className="max-w-6xl mx-auto px-4 md:px-0 -mt-8">
+        <div className="flex justify-end mb-2">
+          <button
+            onClick={() => router.push("/dashboard/projects")}
+            className="text-xl font-medium text-blue-600 hover:underline flex items-center"
+          >
+            ← Back to Projects
+          </button>
+        </div>
+        <header className="dark:bg-gray-800 p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 rounded-lg shadow-md">
           <div className="flex flex-col md:flex-row md:items-center md:space-x-4 w-full">
             <h1 className="text-2xl font-semibold flex items-center text-violet-700 mt-2 md:mt-0">
               <LayoutDashboard className="h-6 w-6 text-blue-500 mr-2" />
@@ -168,6 +184,20 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
           )}
         </header>
 
+        {/* Changed flex-wrap to flex-nowrap to ensure single row */}
+        <div className="flex flex-nowrap gap-2 mb-6 justify-start">
+          {navItems.map((item) => (
+            <Link
+              key={item.id}
+              href={`#${item.id}`}
+              className="flex flex-row items-center bg-gray-100 dark:bg-gray-700 rounded-md py-2 px-4 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors duration-200 cursor-pointer"
+            >
+              {item.icon && React.createElement(item.icon, { className: "h-4 w-4 mr-2 text-blue-500 dark:text-blue-400" })}
+              {item.title}
+            </Link>
+          ))}
+        </div>
+
         {/* Status Messages */}
         <main>
           {loading && <LoadingSpinner />}
@@ -184,31 +214,40 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
           {/* Main Dashboard */}
           {sprintReport && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SprintSummaryCard report={sprintReport} />
-              <SprintMetricsCard report={sprintReport} />
+              <div id="sprint-summary-section" className="lg:col-span-1">
+                <SprintSummaryCard report={sprintReport} />
+              </div>
 
-              <PriorityBreakdownCard priorityCounts={priorityCounts} />
-              <ProjectOverviewCharts
-                issueTypeCounts={sprintReport.issueTypeCounts}
-                tasksStatusCounts={sprintReport.taskStatusCounts}
-              />
+              <div id="sprint-metrics-section" className="lg:col-span-1">
+                <SprintMetricsCard report={sprintReport} />
+              </div>
 
-              <div className="lg:col-span-2">
+              <div id="priority-breakdown-section" className="lg:col-span-1">
+                <PriorityBreakdownCard priorityCounts={priorityCounts} />
+              </div>
+
+              <div id="project-charts-section" className="lg:col-span-1">
+                <ProjectOverviewCharts
+                  issueTypeCounts={sprintReport.issueTypeCounts}
+                  tasksStatusCounts={sprintReport.taskStatusCounts}
+                />
+              </div>
+
+              <div id="tasks-table-section" className="lg:col-span-2">
                 <TasksTable tasks={sprintReport.tasksInSprint} />
               </div>
 
-              <div className="lg:col-span-2">
+              <div id="team-workload-section" className="lg:col-span-2">
                 <TeamWorkloadTable
                   developerWorkloads={sprintReport.developerWorkloads || []}
                 />
               </div>
 
-              <div className="lg:col-span-2">
+              <div id="recent-activity-section" className="lg:col-span-2">
                 <RecentActivityTable
                   recentActivities={sprintReport.recentActivities || []}
                 />
               </div>
-
             </div>
           )}
         </main>
