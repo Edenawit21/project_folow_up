@@ -8,6 +8,54 @@ import { fetchAllRoles, deleteRole } from "@/utils/roleApi";
 import CreateRole from "./CreateRole";
 import PaginationFooter from "@/components/footer/PaginationFooter";
 
+// Helper component for permissions display
+const PermissionsDisplay = ({ permissions }: { permissions: string[] }) => {
+  const [showAll, setShowAll] = useState(false);
+  const displayLimit = 3; // Number of permissions to show initially
+
+  if (!permissions || permissions.length === 0) {
+    return (
+      <span className="italic text-gray-400 dark:text-gray-500">
+        No permissions
+      </span>
+    );
+  }
+
+  const displayedPermissions = showAll
+    ? permissions
+    : permissions.slice(0, displayLimit);
+  const remainingCount = permissions.length - displayLimit;
+
+  return (
+    <div className="flex flex-wrap gap-1 text-green-500 dark:text-green-500 font-medium">
+      {displayedPermissions.map((perm, idx) => (
+        <span
+          key={idx}
+          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
+        >
+          {perm}
+        </span>
+      ))}
+      {remainingCount > 0 && !showAll && (
+        <button
+          onClick={() => setShowAll(true)}
+          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+        >
+          +{remainingCount} more
+        </button>
+      )}
+      {showAll && (
+        <button
+          onClick={() => setShowAll(false)}
+          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+        >
+          Show less
+        </button>
+      )}
+    </div>
+  );
+};
+
 const ConfirmDialog = ({
   open,
   message,
@@ -138,7 +186,7 @@ const RoleList = () => {
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white  shadow-md hover:shadow-lg transition-all duration-300 rounded-[6px]"
+          className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 rounded-[6px]"
         >
           <Plus className="w-5 h-5" />
           <span>Create Role</span>
@@ -199,24 +247,8 @@ const RoleList = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 max-w-[280px]">
-                      <div className="flex flex-wrap gap-1 text-green-500 dark:text-green-500 font-medium">
-                        {Array.isArray(role.permissions) &&
-                        role.permissions.length > 0 ? (
-                          role.permissions.map((perm, idx) => (
-                            <span
-                              key={idx}
-                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-base font-medium "
-                            >
-                              {perm}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="italic text-gray-400 dark:text-gray-500">
-                            No permissions
-                          </span>
-                        )}
-                      </div>
+                    <td className="px-6 py-4 **max-w-[200px] whitespace-normal**">
+                      <PermissionsDisplay permissions={role.permissions || []} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {role.createdAt

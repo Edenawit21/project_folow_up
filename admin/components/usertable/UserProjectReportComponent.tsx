@@ -2,35 +2,32 @@ import React, { useEffect, useState } from "react";
 import BreakdownCard from "./BreakdownCard";
 import MetricCard from "./MetricsCard";
 import { TasksTable } from "../sprint/TaskTable";
-import { UserProjectReport, TaskStatus } from '../../types/userReport'; // Make sure TaskStatus is exported from userReport.ts
-import { TaskInSprint } from '@/types/sprint'; // Assuming TaskInSprint is correctly imported
+import { UserProjectReport, TaskStatus } from '../../types/userReport'; 
+import { TaskInSprint } from '@/types/sprint'; 
 
 // Import the API utility function
-import { fetchUserProjectReport } from '../../utils/userReportApi'; // Adjust path based on where you saved api.ts
+import { fetchUserProjectReport } from '../../utils/userReportApi'; 
 
 interface UserProjectReportProps {
-    userId: string;   // The user ID to fetch the report for
-    projectId: string; // The project ID to fetch the report for
+    userId: string;   
+    projectId: string; 
 }
 
 const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({ userId, projectId }) => {
-    // State to hold the fetched report data
     const [reportData, setReportData] = useState<UserProjectReport | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    // State for local filtering and search of the tasks list
     const [filterStatus, setFilterStatus] = useState<string>('All');
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [displayedTasks, setDisplayedTasks] = useState<TaskInSprint[]>([]);
 
-    // --- API CALL LOCATION: useEffect hook ---
     useEffect(() => {
         const getReport = async () => {
-            setLoading(true); // Start loading
-            setError(null);    // Clear any previous errors
-            setReportData(null); // Clear previous data
-            setDisplayedTasks([]); // Clear tasks
+            setLoading(true); 
+            setError(null);    
+            setReportData(null); 
+            setDisplayedTasks([]); 
 
             if (!userId || !projectId) {
                 setError("User ID or Project ID is missing.");
@@ -39,22 +36,18 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({ userId, 
             }
 
             try {
-                // Call the API using the utility function
                 const data = await fetchUserProjectReport(userId, projectId);
                 setReportData(data);
-                // Initialize displayedTasks with all tasks from the fetched report
                 setDisplayedTasks(data.userTasksInProject || []);
-            } catch (err: any) { // Use 'any' or more specific error type if you have one
+            } catch (err: any) { 
                 setError(err.message || "An unexpected error occurred while fetching the report.");
             } finally {
-                setLoading(false); // End loading
+                setLoading(false); 
             }
         };
 
-        getReport(); // Execute the async function
-    }, [userId, projectId]); // Dependencies: Re-run this effect if userId or projectId changes
-
-    // Effect for local filtering of tasks (depends on fetched reportData and filters)
+        getReport(); 
+    }, [userId, projectId]); 
     useEffect(() => {
         if (!reportData || !reportData.userTasksInProject) {
             setDisplayedTasks([]);
@@ -65,7 +58,6 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({ userId, 
             const matchesStatus =
                 filterStatus === 'All' || task.status === filterStatus;
 
-            // Use optional chaining (?) for task properties that might be undefined
             const matchesSearch =
                 searchTerm === '' ||
                 task.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,9 +68,8 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({ userId, 
         });
 
         setDisplayedTasks(filtered);
-    }, [filterStatus, searchTerm, reportData]); // Dependencies: re-filter when filters or reportData changes
+    }, [filterStatus, searchTerm, reportData]); 
 
-    // Defensive checks for loading, error, and no data states
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -96,7 +87,6 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({ userId, 
         );
     }
 
-    // After loading and error checks, if reportData is still null, it means no data was found or something went wrong
     if (!reportData) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -105,7 +95,6 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({ userId, 
         );
     }
 
-    // Destructure reportData once it's confirmed to exist
     const {
         userName,
         projectName,
@@ -117,7 +106,6 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({ userId, 
         activeBlockers,
         taskCompletionPercentage,
         storyPointCompletionPercentage,
-        // userTasksInProject is now managed by `displayedTasks` state for filtering
         taskStatusCounts,
         issueTypeCounts,
         priorityCounts,
@@ -192,7 +180,6 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({ userId, 
                     onChange={(e) => setFilterStatus(e.target.value)}
                 >
                     <option value="All">All Task Statuses</option>
-                    {/* Ensure TaskStatus is an exported enum or object from '../../types/userReport' */}
                     {Object.values(TaskStatus).map(status => (
                         <option key={status} value={status}>{status}</option>
                     ))}

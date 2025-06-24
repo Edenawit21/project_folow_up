@@ -1,15 +1,12 @@
-// src/utils/api.ts (or similar)
 import axios from 'axios';
-import { UserProjectReport } from '../types/userReport'; // Adjust path as needed
+import { UserProjectReport } from '../types/userReport'; 
 import { ProjectCompletionReports } from '@/types/userProject';
 
-// Assuming your API is running on localhost:5001 or similar for .NET
-// Make sure this base URL matches your backend's address.
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL; // <--- IMPORTANT: Verify your backend port
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL; 
 
 export async function fetchUserProjectReport(userId: string, projectId: string): Promise<UserProjectReport> {
     try {
-        const response = await axios.get<UserProjectReport>(`${API_BASE_URL}/UserReports/${userId}/projects/${projectId}/contributions`);
+        const response = await axios.get<UserProjectReport>(`${API_BASE_URL}/api/UserReports/${userId}/projects/${projectId}/contributions`);
         return response.data;
     } catch (error) {
         // It's good practice to log the full error from Axios
@@ -24,7 +21,7 @@ export async function fetchUserProjectReport(userId: string, projectId: string):
 
 export async function FetchProjectById(userId: string): Promise<ProjectCompletionReports> {
   try {
-    const response = await axios.get<ProjectCompletionReports>(`${API_BASE_URL}/UserReports/${userId}/projects`);
+    const response = await axios.get<ProjectCompletionReports>(`${API_BASE_URL}/api/UserReports/${userId}/projects`);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
