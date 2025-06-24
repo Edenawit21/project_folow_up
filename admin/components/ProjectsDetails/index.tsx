@@ -21,6 +21,7 @@ import TeamWorkloadTable from "@/components/sprint/TeamWorkloadTable";
 import RecentActivityTable from "@/components/sprint/RecentActivityTable";
 import { TasksTable } from "../sprint/TaskTable";
 import PriorityBreakdownCard from "@/components/sprint/PriorityBreakdownChart";
+import ProjectReportTable from "../usertable/ProjectReportTable";
 
 interface ProjectDetailProps {
   projectKey: string;
@@ -207,6 +208,7 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
                   recentActivities={sprintReport.recentActivities || []}
                 />
               </div>
+
             </div>
           )}
         </main>
