@@ -27,11 +27,11 @@ const PermissionsDisplay = ({ permissions }: { permissions: string[] }) => {
   const remainingCount = permissions.length - displayLimit;
 
   return (
-    <div className="flex flex-wrap gap-1 text-green-500 dark:text-green-500 font-medium">
+    <div className="flex flex-wrap gap-1 text-green-400 dark:text-green-400 font-medium">
       {displayedPermissions.map((perm, idx) => (
         <span
           key={idx}
-          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
+          className="inline-flex items-center px-2.5 py-0.5 text-base font-medium  text-green-700 dark:text-green-400"
         >
           {perm}
         </span>
@@ -240,15 +240,19 @@ const RoleList = () => {
                     </td>
                     <td className="px-6 py-4 max-w-xs">
                       <div className="text-gray-900 dark:text-gray-300 whitespace-normal">
-                        {role.description || (
+                        {role.description ? (
+                          role.description
+                        ) : (
                           <span className="italic text-gray-400 dark:text-gray-500">
                             No description
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 **max-w-[200px] whitespace-normal**">
-                      <PermissionsDisplay permissions={role.permissions || []} />
+                    <td className="px-6 py-4 max-w-[200px] whitespace-normal text-base">
+                      <PermissionsDisplay
+                        permissions={role.permissions || []}
+                      />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {role.createdAt
