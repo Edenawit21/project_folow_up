@@ -20,8 +20,11 @@ export async function fetchUserProjectReport(userId: string, projectId: string):
 }
 
 export async function FetchProjectById(userId: string): Promise<ProjectCompletionReports> {
+  console.log("Calling API for userId:", userId);
   try {
-    const response = await axios.get<ProjectCompletionReports>(`${API_BASE_URL}/api/UserReports/${userId}/projects`);
+    const response = await axios.get<ProjectCompletionReports>(
+      `${API_BASE_URL}/api/UserReports/${userId}/projects`
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

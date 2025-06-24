@@ -151,27 +151,27 @@ const UserList = () => {
                     }}
                     className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer"
                   >
-                    <Link href={`/api/users/${user.id}`} className="block w-full py-3 -my-3">
+                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
                       {user.displayName || `${user.firstName} ${user.lastName}`}
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
-                    <Link href={`/api/users/${user.id}`} className="block w-full py-3 -my-3">
+                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
                         {user.email}
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-green-500 whitespace-nowrap text-base dark:text-green-500 cursor-pointer">
-                    <Link href={`/api/users/${user.id}`} className="block w-full py-3 -my-3">
+                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
                         {user.roles?.join(", ")}
                     </Link>
                   </td>
                   <td className="px-4 py-3 dark:text-sky-500 whitespace-nowrap text-sky-600 cursor-pointer">
-                    <Link href={`/api/users/${user.id}`} className="block w-full py-3 -my-3">
+                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
                         {user.source}
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
-                    <Link href={`/api/users/${user.id}`} className="block w-full py-3 -my-3">
+                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
                         {user.isActive ? "Yes" : "No"}
                     </Link>
                   </td>

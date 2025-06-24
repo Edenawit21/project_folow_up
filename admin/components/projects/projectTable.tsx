@@ -99,6 +99,8 @@ const Select = ({
       value={value}
       onChange={(e) => onValueChange(e.target.value)}
       className="h-10 w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-100 pl-10 pr-10 py-2 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+      aria-label={placeholder}
+      title={placeholder}
     >
       <option value="">{placeholder}</option>
       {options.map((opt) => (
