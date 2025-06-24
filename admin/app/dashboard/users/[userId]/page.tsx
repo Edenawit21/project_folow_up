@@ -89,7 +89,7 @@ export default function UserDetailComponent({ params }: PageProps) {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mt-8 border border-gray-200 mx-auto max-w-4xl w-full">
+   <div className="bg-white p-4 rounded-lg shadow-md mt-4 border border-gray-200 mx-auto w-full overflow-x-auto">
       {selectedProject && selectedProjectId ? (
         <div>
           <button
@@ -107,7 +107,7 @@ export default function UserDetailComponent({ params }: PageProps) {
         </div>
       ) : (
         <>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+           <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
             Assigned Projects Overview
           </h2>
           <ProjectReportTable 
