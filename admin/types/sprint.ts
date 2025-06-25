@@ -1,27 +1,24 @@
-// src/types/sprint.ts (Add this new interface)
-
-
-export interface SprintReport { // This remains your existing SprintReport interface
+export interface SprintReport { 
  id: string;
  name: string;
  state: string;
 }
 
-// NEW INTERFACE for the overall API response
+
 export interface ProjectSprintOverviewResponse {
   projectKey: string;
   projectName: string;
-  sprints: SprintReport[]; // This is an array of SprintReport objects
+  sprints: SprintReport[]; 
 }
 
 export interface SprintReportDetail {
   id: string | null;
   jiraId: number | null;
   name: string | null;
-  state: "closed" | "active" | "future"; // Assuming other possible states
-  startDate: string | null; // ISO 8601 date string
-  endDate: string | null; // ISO 8601 date string
-  completeDate: string | null; // ISO 8601 date string, or null if not completed
+  state: "closed" | "active" | "future"; 
+  startDate: string | null; 
+  endDate: string | null; 
+  completeDate: string | null; 
   goal: string | null;
   boardName: string | null;
   totalStoryPoints: number | null;
@@ -35,10 +32,10 @@ export interface SprintReportDetail {
   bugsCreatedThisSprint: number | null;
   tasksMovedFromPreviousSprint: number | null;
   taskStatusCounts: {
-    [key: string]: number ; // e.g., { "Done": 2, "In Progress": 0 }
+    [key: string]: number ; 
   };
   issueTypeCounts: {
-    [key: string]: number ; // e.g., { "Story": 1, "Task": 1 }
+    [key: string]: number ; 
   };
   developerWorkloads: DeveloperWorkload[];
   recentActivities: RecentActivity[];
@@ -47,11 +44,11 @@ export interface SprintReportDetail {
 
 export interface DeveloperWorkload {
   assigneeId: string | null;
-  assigneeName: string | null;
+  assigneeName: string;
   estimatedWork: number | null;
   completedWork: number | null;
   taskStatusBreakdown: {
-    [key: string]: number | null; // e.g., { "Done": 2, "To Do": 0 }
+    [key: string]: number | null; 
   };
 }
 
@@ -59,7 +56,7 @@ export interface DeveloperWorkload {
   taskKey: string | null;
   description: string | null;
   changedBy: string | null;
-  timestamp: string ; // ISO 8601 date string
+  timestamp: string ; 
 }
 
  export interface TaskInSprint {
@@ -68,19 +65,19 @@ export interface DeveloperWorkload {
   description: string | null;
   status: string | null;
   statusCategory: string | null;
-  assigneeId: string | null; // Can be null if unassigned
-  assigneeName: string | null; // Can be null if unassigned
-  createdDate: string | null; // ISO 8601 date string
-  updatedDate: string | null; // ISO 8601 date string
-  dueDate: string | null; // ISO 8601 date string, or null
-  storyPoints: number | null; // Can be null
-  timeEstimateMinutes: number | null; // Can be null
+  assigneeId: string | null; 
+  assigneeName: string | null; 
+  createdDate: string | null; 
+  updatedDate: string | null; 
+  dueDate: string | null; 
+  storyPoints: number | null; 
+  timeEstimateMinutes: number | null; 
   issueType: string | null;
-  epicKey: string | null; // Can be null
-  parentKey: string | null; // Can be null
-  labels: string[] | null; // Can be null, or an array of strings
+  epicKey: string | null; 
+  parentKey: string | null; 
+  labels: string[] | null; 
   priority: string | null;
-  currentSprintJiraId: number | null; // Can be null if not in a sprint
-  currentSprintName: string | null; // Can be null
-  currentSprintState: string | null; // Can be null, e.g., "active", "closed"
+  currentSprintJiraId: number | null; 
+  currentSprintName: string | null; 
+  currentSprintState: string | null; 
 }

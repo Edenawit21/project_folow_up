@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Trash2, Pencil, Plus, Search, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { UserData } from "@/types/user";
@@ -74,6 +74,11 @@ const UserList = () => {
     );
   }, [users, searchQuery]);
 
+  // Reset to first page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   const handleEdit = (id: string) => {
     setEditingId(id);
     setModalOpen(true);
@@ -101,11 +106,6 @@ const UserList = () => {
     }
   };
 
-  // Reset to first page when search changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
-
   // Calculate users to display for current page
   const startIndex = (currentPage - 1) * rowsPerPage;
   const paginatedUsers = filteredUsers.slice(
@@ -115,6 +115,7 @@ const UserList = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header */}
       <div className="flex flex-col mb-6">
         <div className="flex items-center justify-between">
           <div>
@@ -152,6 +153,7 @@ const UserList = () => {
             <button
               onClick={() => setSearchQuery("")}
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              aria-label="Clear search"
             >
               <X className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100" />
             </button>
@@ -159,6 +161,7 @@ const UserList = () => {
         </div>
       </div>
 
+      {/* Table */}
       <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-800">
         <table className="min-w-full">
           <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
@@ -208,8 +211,11 @@ const UserList = () => {
               </tr>
             ) : (
               paginatedUsers.map((user) => (
-                <tr key={user.id}>
-                  <td className="px-6 py-4 whitespace-nowra">
+                <tr
+                  key={user.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <Link
                       href={`/dashboard/users/${user.id}`}
                       className="block w-full py-3 -my-3"
@@ -217,7 +223,7 @@ const UserList = () => {
                       {user.displayName || `${user.firstName} ${user.lastName}`}
                     </Link>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowra">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <Link
                       href={`/dashboard/users/${user.id}`}
                       className="block w-full py-3 -my-3"
@@ -225,7 +231,7 @@ const UserList = () => {
                       {user.email}
                     </Link>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowra">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <Link
                       href={`/dashboard/users/${user.id}`}
                       className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold rounded-md bg-green-100 text-green-500 dark:bg-green-900/30 dark:text-green-300"
@@ -233,7 +239,7 @@ const UserList = () => {
                       {user.roles?.join(", ")}
                     </Link>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowra">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <Link
                       href={`/dashboard/users/${user.id}`}
                       className="block w-full py-3 -my-3 text-indigo-400"
@@ -241,7 +247,7 @@ const UserList = () => {
                       {user.source}
                     </Link>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowra">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <Link
                       href={`/dashboard/users/${user.id}`}
                       className="block w-full py-3 -my-3"
@@ -249,7 +255,7 @@ const UserList = () => {
                       {user.isActive ? "Yes" : "No"}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-4">
                       <button
                         onClick={(e) => {
@@ -298,6 +304,7 @@ const UserList = () => {
         </table>
       </div>
 
+      {/* Pagination */}
       <PaginationFooter
         currentPage={currentPage}
         rowsPerPage={rowsPerPage}
