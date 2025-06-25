@@ -75,7 +75,7 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center dark:bg-gray-800">
         <p className="text-gray-700 dark:text-gray-300 text-lg">
           Loading report data...
         </p>
@@ -85,7 +85,7 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center dark:bg-gray-800">
         <div className="text-center">
           <p className="text-red-600 dark:text-red-400 text-lg font-semibold">
             Error: {error}
@@ -100,7 +100,7 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({
 
   if (!reportData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center">
         <p className="text-gray-700 dark:text-gray-300 text-lg">
           No report data available.
         </p>
@@ -126,8 +126,8 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({
   } = reportData;
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-800 px-4 py-6 sm:px-6 lg:px-8">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="min-h-screen dark:bg-gray-800 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="dark:bg-gray-800 rounded-xl  p-6 lg:p-8 max-w-7xl mx-auto">
         <header className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             {userName}'s Report for {projectName}
@@ -179,7 +179,7 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({
 
         {/* Sprint Badges */}
         {sprintsInvolvedIn?.length > 0 && (
-          <section className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-8 shadow-inner">
+          <section className="dark:bg-gray-700 p-4 rounded-lg mb-8 ">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
               Sprints Involved In
             </h2>
@@ -201,7 +201,6 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({
             </div>
           </section>
         )}
-
         {/* Breakdown Cards */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <BreakdownCard
@@ -216,18 +215,18 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({
         </section>
 
         {/* Filters */}
-        <section className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8 flex flex-col sm:flex-row gap-4 items-center">
+        <section className="dark:bg-gray-800 p-6 rounded-lg mb-8 flex flex-col sm:flex-row gap-4 items-center">
           <input
             type="text"
             placeholder="Search tasks (Key, Title, Description)"
-            className="w-full sm:flex-1 p-2 border rounded-md text-gray-800 dark:text-white bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:ring-indigo-500 focus:outline-none"
+            className="w-full sm:flex-1 p-2 text-gray-800 dark:text-white dark:bg-gray-800  focus:ring-indigo-500 focus:outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="w-full sm:w-56 p-2 border rounded-md text-gray-800 dark:text-white bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:ring-indigo-500 focus:outline-none"
+            className="w-full sm:w-56 p-2 rounded-md text-gray-800 dark:text-white  dark:bg-gray-800 focus:ring-indigo-500 focus:outline-none"
           >
             <option value="All">All Statuses</option>
             {Object.values(TaskStatus).map((status) => (
@@ -253,11 +252,13 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({
             Filtered Tasks ({displayedTasks.length})
           </h2>
           {displayedTasks.length > 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-              <TasksTable tasks={displayedTasks} />
+            <div className="rounded-lg overflow-x-auto w-full">
+              <div className="min-w-full">
+                <TasksTable tasks={displayedTasks} />
+              </div>
             </div>
           ) : (
-            <div className="bg-white dark:bg-gray-800 p-6 text-center text-gray-600 dark:text-gray-400 rounded-lg shadow">
+            <div className="dark:bg-gray-800 p-6 text-center text-gray-600 dark:text-gray-400 rounded-lg">
               No tasks match your search/filter criteria.
             </div>
           )}

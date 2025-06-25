@@ -143,7 +143,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
       {/* Permission Name */}
       <label className="block mb-4">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Permission Name
+          Privilege Name
         </span>
         <input
           name="permissionName"

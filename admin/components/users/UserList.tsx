@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Trash2, Pencil, Plus } from "lucide-react";
+import React, { useEffect, useState, useMemo } from "react";
+import { Trash2, Pencil, Plus, Search, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { UserData } from "@/types/user";
 import { getUsers, deleteUser } from "@/utils/userApi";
@@ -18,11 +18,11 @@ const UserList = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | undefined>();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalMenus, setTotalMenus] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,7 +34,6 @@ const UserList = () => {
         ]);
         setUsers(usersResponse);
         setRoles(rolesResponse);
-        setTotalMenus(usersResponse.length);
       } catch (error) {
         toast.error("Failed to fetch users or roles");
       } finally {
@@ -50,13 +49,35 @@ const UserList = () => {
     try {
       const response = await getUsers();
       setUsers(response);
-      setTotalMenus(response.length);
     } catch (error) {
       toast.error("Failed to fetch users");
     } finally {
       setLoading(false);
     }
   };
+
+  // Filter users based on search query
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery) return users;
+
+    const query = searchQuery.toLowerCase();
+    return users.filter(
+      (user) =>
+        (user.displayName || `${user.firstName} ${user.lastName}`)
+          .toLowerCase()
+          .includes(query) ||
+        user.email.toLowerCase().includes(query) ||
+        (user.roles &&
+          user.roles.some((role) => role.toLowerCase().includes(query))) ||
+        user.source.toLowerCase().includes(query) ||
+        (user.isActive ? "yes" : "no").includes(query)
+    );
+  }, [users, searchQuery]);
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const handleEdit = (id: string) => {
     setEditingId(id);
@@ -85,50 +106,86 @@ const UserList = () => {
     }
   };
 
+  // Calculate users to display for current page
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedUsers = users.slice(startIndex, startIndex + rowsPerPage);
+  const paginatedUsers = filteredUsers.slice(
+    startIndex,
+    startIndex + rowsPerPage
+  );
 
   return (
-    <div className="max-w-7xl mx-auto mt-16 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header */}
       <div className="flex flex-col mb-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold text-indigo-500 dark:text-white">
-            Users Management
-          </h2>
+          <div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
+              Users Management
+            </h2>
+            <p className="mt-2 text-gray-600 dark:text-gray-300 italic text-sm">
+              Manage and organize users in the system.
+            </p>
+          </div>
           <button
             onClick={handleCreate}
-            className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 rounded-[6px]"
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 group"
           >
-            <Plus size={18} />
-            Create User
+            <Plus className="w-5 h-5 transition-transform group-hover:rotate-90" />
+            <span> Create User</span>
           </button>
         </div>
-        <p className="mt-2 text-gray-600 dark:text-gray-300 italic text-sm">
-          Manage and organize users in the system.
-        </p>
       </div>
 
-      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm bg-white dark:bg-gray-800">
-        <table className="min-w-full text-sm text-left">
-          <thead className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 uppercase text-xs font-semibold sticky top-0 z-10">
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search..."
+            className="w-full pl-10 pr-10 py-2.5 rounded-[7px] border-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300 placeholder-gray-400"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              aria-label="Clear search"
+            >
+              <X className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-800">
+        <table className="min-w-full">
+          <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
             <tr>
               {["Name", "Email", "Roles", "Source", "Active", "Actions"].map(
                 (header) => (
-                  <th key={header} className="px-4 py-3 whitespace-nowrap">
+                  <th
+                    key={header}
+                    className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider"
+                  >
                     {header}
                   </th>
                 )
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {loading ? (
               <tr>
-                <td
-                  colSpan={6}
-                  className="px-4 py-8 text-center text-gray-500 dark:text-gray-300"
-                >
-                  Loading users...
+                <td colSpan={6} className="py-16 text-center">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="h-10 w-10 animate-spin text-indigo-600 dark:text-indigo-400"></div>
+                    Loading users...
+                  </div>
                 </td>
               </tr>
             ) : paginatedUsers.length === 0 ? (
@@ -137,7 +194,19 @@ const UserList = () => {
                   colSpan={6}
                   className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
                 >
-                  No users found.
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-16 h-16" />
+                    <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                      {searchQuery
+                        ? "No matching users found"
+                        : "No users found"}
+                    </h3>
+                    <p className="mt-1 text-gray-500 dark:text-gray-400">
+                      {searchQuery
+                        ? "Try adjusting your search query"
+                        : "Get started by creating a new user"}
+                    </p>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -146,44 +215,55 @@ const UserList = () => {
                   key={user.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                 >
-                  <td
-                    onClick={() => {
-                    }}
-                    className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer"
-                  >
-                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Link
+                      href={`/dashboard/users/${user.id}`}
+                      className="block w-full py-3 -my-3"
+                    >
                       {user.displayName || `${user.firstName} ${user.lastName}`}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
-                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
-                        {user.email}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Link
+                      href={`/dashboard/users/${user.id}`}
+                      className="block w-full py-3 -my-3"
+                    >
+                      {user.email}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-green-500 whitespace-nowrap text-base dark:text-green-500 cursor-pointer">
-                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
-                        {user.roles?.join(", ")}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Link
+                      href={`/dashboard/users/${user.id}`}
+                      className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold rounded-md bg-green-100 text-green-500 dark:bg-green-900/30 dark:text-green-300"
+                    >
+                      {user.roles?.join(", ")}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 dark:text-sky-500 whitespace-nowrap text-sky-600 cursor-pointer">
-                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
-                        {user.source}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Link
+                      href={`/dashboard/users/${user.id}`}
+                      className="block w-full py-3 -my-3 text-indigo-400"
+                    >
+                      {user.source}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
-                    <Link href={`/dashboard/users/${user.id}`} className="block w-full py-3 -my-3">
-                        {user.isActive ? "Yes" : "No"}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Link
+                      href={`/dashboard/users/${user.id}`}
+                      className="block w-full py-3 -my-3"
+                    >
+                      {user.isActive ? "Yes" : "No"}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-4">
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); 
+                          e.stopPropagation();
                           handleEdit(user.id);
                         }}
                         disabled={user.source === "Jira"}
-                        className={`text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-white ${
+                        className={`p-2 rounded-lg bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md ${
                           user.source === "Jira"
                             ? "opacity-50 cursor-not-allowed"
                             : ""
@@ -198,11 +278,11 @@ const UserList = () => {
                       </button>
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); 
+                          e.stopPropagation();
                           setDeleteId(user.id);
                         }}
                         disabled={user.source === "Jira"}
-                        className={`text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 ${
+                        className={`p-2 rounded-lg bg-red-50 dark:bg-gray-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed ${
                           user.source === "Jira"
                             ? "opacity-50 cursor-not-allowed"
                             : ""
@@ -224,10 +304,11 @@ const UserList = () => {
         </table>
       </div>
 
+      {/* Pagination */}
       <PaginationFooter
         currentPage={currentPage}
         rowsPerPage={rowsPerPage}
-        totalItems={totalMenus}
+        totalItems={filteredUsers.length}
         onPageChange={setCurrentPage}
         onRowsPerPageChange={(rows) => {
           setRowsPerPage(rows);

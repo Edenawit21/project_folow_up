@@ -58,7 +58,7 @@ export const MenuContainer = ({
     }
   };
 
-  if (loading) return <LoadingSpinner className="my-8" />;
+  if (loading) return <LoadingSpinner className="my-8 text-green-500" />;
   if (error) return <ErrorMessage message="Failed to load menu" retry={() => window.location.reload()} />;
 
   return (

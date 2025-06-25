@@ -13,11 +13,11 @@ const ProjectReportTable: React.FC<UserProjectTable> = ({
   onShowMore,
 }) => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-800 font-sans p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8">
-        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+    <div className="min-h-screen dark:bg-gray-800 font-sans p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto dark:bg-gray-800 p-6 sm:p-8">
+        <div className="overflow-x-auto ">
+          <table className="min-w-full divide-y dark:divide-gray-700">
+            <thead className="dark:bg-gray-700">
               <tr>
                 {[
                   "Project Name",
@@ -39,7 +39,7 @@ const ProjectReportTable: React.FC<UserProjectTable> = ({
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="dark:bg-gray-800 divide-y  dark:divide-gray-700">
               {data.length === 0 ? (
                 <tr>
                   <td
@@ -54,9 +54,7 @@ const ProjectReportTable: React.FC<UserProjectTable> = ({
                   <tr
                     key={project.projectId}
                     className={`${
-                      index % 2 === 0
-                        ? "bg-white dark:bg-gray-800"
-                        : "bg-gray-50 dark:bg-gray-700"
+                      index % 2 === 0 ? "dark:bg-gray-800" : "dark:bg-gray-700"
                     }`}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
