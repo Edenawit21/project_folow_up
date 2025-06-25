@@ -5,7 +5,7 @@ import MenuList from "@/components/Menu/MenuList";
 
 export default function MenuListPage() {
   return (
-    <div className="p-6 relative">
+    <div>
       <MenuList />
     </div>
   );

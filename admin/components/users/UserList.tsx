@@ -114,28 +114,30 @@ const UserList = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto mt-16 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col mb-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold text-indigo-500 dark:text-white">
-            Users Management
-          </h2>
+          <div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
+              Users Management
+            </h2>
+            <p className="mt-2 text-gray-600 dark:text-gray-300 italic text-sm">
+              Manage and organize users in the system.
+            </p>
+          </div>
           <button
             onClick={handleCreate}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 focus:ring-2 rounded-[6px]"
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 group"
           >
-            <Plus size={18} />
-            Create User
+            <Plus className="w-5 h-5 transition-transform group-hover:rotate-90" />
+            <span> Create User</span>
           </button>
         </div>
-        <p className="mt-2 text-gray-600 dark:text-gray-300 italic text-sm">
-          Manage and organize users in the system.
-        </p>
       </div>
 
       {/* Search Bar */}
       <div className="mb-6">
-        <div className="relative max-w-lg">
+        <div className="relative max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
           </div>
@@ -144,7 +146,7 @@ const UserList = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search..."
-            className="block w-full pl-10 pr-10 py-2.5 text-base rounded-lg border border-gray-300 dark:border-gray-600  dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+            className="w-full pl-10 pr-10 py-2.5 rounded-[7px] border-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300 placeholder-gray-400"
           />
           {searchQuery && (
             <button
@@ -157,28 +159,28 @@ const UserList = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm bg-white dark:bg-gray-800">
-        <table className="min-w-full text-sm text-left">
-          <thead className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 uppercase text-xs font-semibold sticky top-0 z-10">
+      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-800">
+        <table className="min-w-full">
+          <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
             <tr>
               {["Name", "Email", "Roles", "Source", "Active", "Actions"].map(
                 (header) => (
-                  <th key={header} className="px-4 py-3 whitespace-nowrap">
+                  <th
+                    key={header}
+                    className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider"
+                  >
                     {header}
                   </th>
                 )
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {loading ? (
               <tr>
-                <td
-                  colSpan={6}
-                  className="px-4 py-8 text-center text-gray-500 dark:text-gray-300"
-                >
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-indigo-600 dark:border-indigo-400 mr-2"></div>
+                <td colSpan={6} className="py-16 text-center">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="h-10 w-10 animate-spin text-indigo-600 dark:text-indigo-400"></div>
                     Loading users...
                   </div>
                 </td>
@@ -206,11 +208,8 @@ const UserList = () => {
               </tr>
             ) : (
               paginatedUsers.map((user) => (
-                <tr
-                  key={user.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                >
-                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
+                <tr key={user.id}>
+                  <td className="px-6 py-4 whitespace-nowra">
                     <Link
                       href={`/dashboard/users/${user.id}`}
                       className="block w-full py-3 -my-3"
@@ -218,7 +217,7 @@ const UserList = () => {
                       {user.displayName || `${user.firstName} ${user.lastName}`}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
+                  <td className="px-6 py-4 whitespace-nowra">
                     <Link
                       href={`/dashboard/users/${user.id}`}
                       className="block w-full py-3 -my-3"
@@ -226,23 +225,23 @@ const UserList = () => {
                       {user.email}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-green-500 whitespace-nowrap text-base dark:text-green-500 cursor-pointer">
+                  <td className="px-6 py-4 whitespace-nowra">
                     <Link
                       href={`/dashboard/users/${user.id}`}
-                      className="block w-full py-3 -my-3"
+                      className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold rounded-md bg-green-100 text-green-500 dark:bg-green-900/30 dark:text-green-300"
                     >
                       {user.roles?.join(", ")}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 dark:text-sky-500 whitespace-nowrap text-sky-600 cursor-pointer">
+                  <td className="px-6 py-4 whitespace-nowra">
                     <Link
                       href={`/dashboard/users/${user.id}`}
-                      className="block w-full py-3 -my-3"
+                      className="block w-full py-3 -my-3 text-indigo-400"
                     >
                       {user.source}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap cursor-pointer">
+                  <td className="px-6 py-4 whitespace-nowra">
                     <Link
                       href={`/dashboard/users/${user.id}`}
                       className="block w-full py-3 -my-3"
@@ -258,7 +257,7 @@ const UserList = () => {
                           handleEdit(user.id);
                         }}
                         disabled={user.source === "Jira"}
-                        className={`text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-white ${
+                        className={`p-2 rounded-lg bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md ${
                           user.source === "Jira"
                             ? "opacity-50 cursor-not-allowed"
                             : ""
@@ -277,7 +276,7 @@ const UserList = () => {
                           setDeleteId(user.id);
                         }}
                         disabled={user.source === "Jira"}
-                        className={`text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 ${
+                        className={`p-2 rounded-lg bg-red-50 dark:bg-gray-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed ${
                           user.source === "Jira"
                             ? "opacity-50 cursor-not-allowed"
                             : ""

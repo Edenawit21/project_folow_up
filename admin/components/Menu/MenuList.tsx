@@ -45,11 +45,19 @@ const MenuList: React.FC = () => {
   // Filter menus based on search term
   useEffect(() => {
     if (searchTerm) {
-      const filtered = menus.filter((menu) =>
-        menu.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const lowerSearch = searchTerm.toLowerCase();
+      const filtered = menus.filter((menu) => {
+        const nameMatch = menu.name.toLowerCase().includes(lowerSearch);
+        const permissionMatch = (menu.requiredPermission || "")
+          .toLowerCase()
+          .includes(lowerSearch);
+        const orderMatch = menu.order?.toString().includes(lowerSearch);
+        const parentName = getParentName(menu.parentId).toLowerCase();
+        const parentMatch = parentName.includes(lowerSearch);
+
+        return nameMatch || permissionMatch || orderMatch || parentMatch;
+      });
       setFilteredMenus(filtered);
-      // Reset to first page when search changes
       setCurrentPage(1);
     } else {
       setFilteredMenus(menus);
@@ -155,24 +163,24 @@ const MenuList: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8">
-      <header className="flex flex-col mb-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-extrabold text-indigo-500 dark:text-gray-100">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
             Menu Management
           </h2>
-          <button
-            onClick={handleCreateClick}
-            className="flex items-center gap-2 px-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 rounded-[6px]"
-          >
-            <Plus size={18} />
-            Add Menu
-          </button>
+          <p className="mt-2 text-gray-600 dark:text-gray-400 italic text-sm">
+            Manage and organize menu items for the application.
+          </p>
         </div>
-        <p className="mt-2 text-gray-600 dark:text-gray-300 italic text-sm">
-          Manage and organize menu items for the application.
-        </p>
-      </header>
+        <button
+          onClick={handleCreateClick}
+          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 group"
+        >
+          <Plus className="w-5 h-5 transition-transform group-hover:rotate-90" />
+          <span>Add Menu</span>
+        </button>
+      </div>
 
       {/* Search Bar */}
       <div className="mb-6">
@@ -182,7 +190,7 @@ const MenuList: React.FC = () => {
           </div>
           <input
             type="text"
-            className="w-full pl-10 pr-4 py-2 rounded-[8px] border border-gray-300 dark:border-gray-400  bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500"
+            className="w-full pl-10 pr-10 py-2.5 rounded-[7px] border-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300 placeholder-gray-400"
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -212,22 +220,22 @@ const MenuList: React.FC = () => {
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-gray-800">
-        <table className="w-full border-collapse">
+        <table className="min-w-full">
           <thead>
             <tr className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Required Permission
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Order
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Parent
               </th>
-              <th className="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <th className="px-4 py-4 text-center text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -252,36 +260,36 @@ const MenuList: React.FC = () => {
                   key={menu.id}
                   className="border-b border-gray-200 dark:border-gray-700 transition-colors"
                 >
-                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                    {menu.name}
+                  <td className="px-6 py-4 whitespace-nowrap">{menu.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold rounded-md bg-green-100 text-green-500 dark:bg-green-900/30 dark:text-green-300">
+                      {menu.requiredPermission || "None"}
+                    </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-green-500 whitespace-nowrap">
-                    {menu.requiredPermission || "None"}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     {menu.order ?? "N/A"}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     {getParentName(menu.parentId)}
                   </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex justify-center space-x-4">
                       <button
                         onClick={() => handleEdit(menu.id)}
                         disabled={deletingId === menu.id}
-                        className="dark:text-white hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
+                        className="p-2 rounded-lg bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md"
                       >
-                        <Pencil size={18} />
+                        <Pencil className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => confirmDelete(menu.id)}
                         disabled={deletingId === menu.id}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                        className="p-2 rounded-lg bg-red-50 dark:bg-gray-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {deletingId === menu.id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                          <Trash2 size={18} />
+                          <Trash2 className="w-5 h-5" />
                         )}
                       </button>
                     </div>

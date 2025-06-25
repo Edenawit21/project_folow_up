@@ -11,7 +11,7 @@ import PaginationFooter from "@/components/footer/PaginationFooter";
 // Helper component for permissions display
 const PermissionsDisplay = ({ permissions }: { permissions: string[] }) => {
   const [showAll, setShowAll] = useState(false);
-  const displayLimit = 3; // Number of permissions to show initially
+  const displayLimit = 3;
 
   if (!permissions || permissions.length === 0) {
     return (
@@ -27,11 +27,11 @@ const PermissionsDisplay = ({ permissions }: { permissions: string[] }) => {
   const remainingCount = permissions.length - displayLimit;
 
   return (
-    <div className="flex flex-wrap gap-1 text-green-400 dark:text-green-400 font-medium">
+    <div className="flex flex-col gap-1 text-green-600 dark:text-green-400 font-medium">
       {displayedPermissions.map((perm, idx) => (
         <span
           key={idx}
-          className="inline-flex items-center px-2.5 py-0.5 text-base font-medium  text-green-700 dark:text-green-400"
+          className="inline-block px-2.5 py-0.5 rounded-md  text-green-700  dark:text-green-300 text-sm"
         >
           {perm}
         </span>
@@ -39,7 +39,7 @@ const PermissionsDisplay = ({ permissions }: { permissions: string[] }) => {
       {remainingCount > 0 && !showAll && (
         <button
           onClick={() => setShowAll(true)}
-          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          className="text-xs text-indigo-600 hover:underline dark:text-indigo-400"
         >
           +{remainingCount} more
         </button>
@@ -47,7 +47,7 @@ const PermissionsDisplay = ({ permissions }: { permissions: string[] }) => {
       {showAll && (
         <button
           onClick={() => setShowAll(false)}
-          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          className="text-xs text-indigo-600 hover:underline dark:text-indigo-400"
         >
           Show less
         </button>
@@ -184,27 +184,27 @@ const RoleList = () => {
   const paginatedRoles = filtered.slice(startIndex, startIndex + rowsPerPage);
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-indigo-500 dark:text-white">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
             Role Management
           </h1>
-          <p className="mt-1 text-gray-600 dark:text-gray-400 italic text-sm">
+          <p className="mt-2 text-gray-600 dark:text-gray-400 italic text-sm">
             Manage user roles and their permissions
           </p>
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 rounded-[6px]"
+          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 group"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-5 h-5 transition-transform group-hover:rotate-90" />
           <span>Create Role</span>
         </button>
       </div>
 
       {/* Search Bar */}
       <div className="mb-6">
-        <div className="relative max-w-lg">
+        <div className="relative max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
           </div>
@@ -213,7 +213,7 @@ const RoleList = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search..."
-            className="block w-full pl-10 pr-10 py-2.5 text-base rounded-lg border border-gray-300 dark:border-gray-600  dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+            className="w-full pl-10 pr-10 py-2.5 rounded-[7px] border-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300 placeholder-gray-400"
           />
           {searchQuery && (
             <button
@@ -226,29 +226,29 @@ const RoleList = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+      <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-gray-800">
+        <div className="w-full border-collapse">
+          <table className="min-w-full">
+            <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                   Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                   Description
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                   Permissions
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                   Created At
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-4 text-center text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {loading ? (
                 <tr>
                   <td colSpan={5} className="py-16 text-center">
@@ -272,21 +272,20 @@ const RoleList = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 max-w-xs">
-                      <div className="text-gray-900 dark:text-gray-300 whitespace-normal">
-                        {role.description ? (
-                          role.description
-                        ) : (
+                      <div className="text-gray-600 dark:text-gray-300 whitespace-normal">
+                        {role.description || (
                           <span className="italic text-gray-400 dark:text-gray-500">
                             No description
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 max-w-[200px] whitespace-normal text-base">
+                    <td className="px-6 py-4 whitespace-nowrap align-top ">
                       <PermissionsDisplay
                         permissions={role.permissions || []}
                       />
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {role.createdAt
                         ? new Date(role.createdAt).toLocaleDateString("en-US", {
@@ -300,14 +299,14 @@ const RoleList = () => {
                       <div className="flex justify-end space-x-3">
                         <button
                           onClick={() => handleEdit(role.roleId)}
-                          className="p-1.5 rounded-lg text-indigo-600 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 dark:text-indigo-400 transition-colors"
+                          className="p-2 rounded-lg bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md"
                           aria-label="Edit role"
                         >
                           <Edit2 className="w-5 h-5" />
                         </button>
                         <button
                           onClick={(e) => requestDelete(role.roleId, e)}
-                          className="p-1.5 rounded-lg text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 dark:text-red-400 transition-colors"
+                          className="p-2 rounded-lg bg-red-50 dark:bg-gray-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                           aria-label="Delete role"
                         >
                           <Trash2 className="w-5 h-5" />
