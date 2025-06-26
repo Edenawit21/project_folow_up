@@ -262,7 +262,7 @@ const MenuList: React.FC = () => {
                 >
                   <td className="px-6 py-4 whitespace-nowrap">{menu.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold rounded-md bg-green-100 text-green-500 dark:bg-green-900/30 dark:text-green-300">
+                    <span className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold   text-green-500 dark:text-green-300">
                       {menu.requiredPermission || "None"}
                     </span>
                   </td>
@@ -277,14 +277,14 @@ const MenuList: React.FC = () => {
                       <button
                         onClick={() => handleEdit(menu.id)}
                         disabled={deletingId === menu.id}
-                        className="p-2 rounded-lg bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md"
+                        className="p-2 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md"
                       >
                         <Pencil className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => confirmDelete(menu.id)}
                         disabled={deletingId === menu.id}
-                        className="p-2 rounded-lg bg-red-50 dark:bg-gray-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {deletingId === menu.id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />

@@ -211,10 +211,7 @@ const UserList = () => {
               </tr>
             ) : (
               paginatedUsers.map((user) => (
-                <tr
-                  key={user.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                >
+                <tr key={user.id} className="transition">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Link
                       href={`/dashboard/users/${user.id}`}
@@ -234,7 +231,7 @@ const UserList = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Link
                       href={`/dashboard/users/${user.id}`}
-                      className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold rounded-md bg-green-100 text-green-500 dark:bg-green-900/30 dark:text-green-300"
+                      className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold rounded-md  text-green-500  dark:text-green-300"
                     >
                       {user.roles?.join(", ")}
                     </Link>
@@ -263,7 +260,7 @@ const UserList = () => {
                           handleEdit(user.id);
                         }}
                         disabled={user.source === "Jira"}
-                        className={`p-2 rounded-lg bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md ${
+                        className={`p-2 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md ${
                           user.source === "Jira"
                             ? "opacity-50 cursor-not-allowed"
                             : ""
@@ -282,7 +279,7 @@ const UserList = () => {
                           setDeleteId(user.id);
                         }}
                         disabled={user.source === "Jira"}
-                        className={`p-2 rounded-lg bg-red-50 dark:bg-gray-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed ${
+                        className={`p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed ${
                           user.source === "Jira"
                             ? "opacity-50 cursor-not-allowed"
                             : ""
