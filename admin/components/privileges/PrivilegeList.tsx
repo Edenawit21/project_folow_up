@@ -149,7 +149,7 @@ const PrivilegeList = () => {
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 group"
+          className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 group w-full md:w-auto justify-center"
         >
           <Plus className="w-5 h-5 transition-transform group-hover:rotate-90" />
           <span>Add Privilege</span>
@@ -158,13 +158,13 @@ const PrivilegeList = () => {
 
       {/* Enhanced Search Bar */}
       <div className="mb-6">
-        <div className="relative max-w-md">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-indigo-500">
-            <Search className="w-5 h-5" />
+        <div className="mb-4 max-w-md">
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
           <input
             type="text"
-            className="w-full pl-10 pr-10 py-2.5 rounded-[7px] border-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300 placeholder-gray-400"
+            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
             placeholder="Search privileges..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

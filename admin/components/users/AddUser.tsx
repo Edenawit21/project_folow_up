@@ -31,7 +31,6 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
   );
   const [copied, setCopied] = useState(false);
 
-  // Escape key to close modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -40,7 +39,6 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  // Click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -55,7 +53,6 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [dropdownOpen]);
 
-  // Auto-reset copied state
   useEffect(() => {
     if (copied) {
       const timer = setTimeout(() => setCopied(false), 2000);
@@ -63,7 +60,6 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
     }
   }, [copied]);
 
-  // Fetch roles and user if editing
   useEffect(() => {
     let isMounted = true;
     const loadData = async () => {
@@ -145,7 +141,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
           lastName,
           email,
           roles,
-          displayName: `${firstName} ${lastName} `,
+          displayName: `${firstName} ${lastName}`,
           timeZone: existingUserData.timeZone || "UTC",
           isActive: existingUserData.isActive ?? true,
           location: existingUserData.location || "",
@@ -158,20 +154,13 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
       } else {
         const createdUser = await registerUser(formData);
         setGeneratedPassword(createdUser.generatedPassword);
-
         onCreate?.({
           username: `${firstName} ${lastName}`,
           email,
           role: roles.join(", "),
         });
 
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          roles: [],
-        });
-
+        setFormData({ firstName: "", lastName: "", email: "", roles: [] });
         setDropdownOpen(false);
       }
     } catch (err: any) {
@@ -192,12 +181,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
         roles: existingUserData.roles || [],
       });
     } else {
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        roles: [],
-      });
+      setFormData({ firstName: "", lastName: "", email: "", roles: [] });
     }
     setSearchTerm("");
     setDropdownOpen(false);
@@ -209,13 +193,13 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
 
   return (
     <>
-      <div className="relative px-4 py-8 w-[600px] ml-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+      <div className="relative w-full max-w-lg mx-auto px-4 py-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-y-auto max-h-[90vh]">
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl"
           aria-label="Close"
         >
-          <X className="h-6 w-6 hover:text-red-500 " />
+          <X className="h-6 w-6 hover:text-red-500" />
         </button>
 
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
@@ -238,7 +222,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
             />
           ))}
 
-          <div className="relative">
+          <div className="relative" ref={formRef}>
             <label
               htmlFor="rolesDropdown"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-center"
@@ -250,7 +234,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
               type="button"
               onClick={() => setDropdownOpen((open) => !open)}
               disabled={loading || submitting}
-              className="w-full px-4 py-2 border-[1px] rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-left"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-left"
               aria-haspopup="listbox"
               aria-expanded={dropdownOpen}
             >
@@ -260,11 +244,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
             </button>
 
             {dropdownOpen && (
-              <div
-                className="absolute z-10 bottom-full bg-gray-100 dark:bg-gray-800 border rounded-xl shadow-2xl max-h-60 overflow-y-auto w-full mb-2"
-                role="listbox"
-                aria-multiselectable="true"
-              >
+              <div className="absolute z-10 bottom-full bg-gray-100 dark:bg-gray-800 border rounded-xl shadow-2xl max-h-60 overflow-y-auto w-full mb-2">
                 <div className="sticky top-0 bg-white dark:bg-gray-900 p-2 border-b">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -306,19 +286,19 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
             )}
           </div>
 
-          <div className="flex justify-between pt-2">
+          <div className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 pt-2">
             <button
               type="button"
               onClick={handleReset}
               disabled={loading || submitting}
-              className="w-1/2 mr-2 py-2 px-4 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
+              className="w-full md:w-1/2 py-2 px-4 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
             >
               Reset
             </button>
             <button
               type="submit"
               disabled={submitting || loading}
-              className="w-1/2 py-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold"
+              className="w-full md:w-1/2 py-2 px-4 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold"
             >
               {isEdit ? "Update User" : "Register User"}
             </button>
@@ -327,8 +307,8 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
       </div>
 
       {generatedPassword && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl text-center max-w-sm w-full">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl text-center w-full max-w-sm mx-auto">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
               Generated Password
             </h3>

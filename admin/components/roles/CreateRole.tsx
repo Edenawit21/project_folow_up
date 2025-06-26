@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { fetchRoleById, createRole, updateRole } from "@/utils/roleApi";
 import { fetchAllPermissions } from "@/utils/privilegeApi";
@@ -30,7 +30,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Close modal on ESC
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -39,7 +38,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  // Load all permissions
   useEffect(() => {
     const loadPermissions = async () => {
       setLoading(true);
@@ -55,7 +53,6 @@ const CreateRole: React.FC<CreateRoleProps> = ({
     loadPermissions();
   }, []);
 
-  // Load role data if editing
   useEffect(() => {
     if (isEdit && id && permissions.length) {
       loadRole(id);
@@ -143,31 +140,31 @@ const CreateRole: React.FC<CreateRoleProps> = ({
   );
 
   return (
-    <div className="relative px-4 py-4 w-[600px] ml-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-      {/* Close button */}
-      <button
-        onClick={onClose}
-        className="absolute top-3 right-4 text-gray-600 dark:text-white text-2xl hover:text-red-500"
-        aria-label="Close"
-      >
-        <X className="h-6 w-6 hover:text-red-500" />
-      </button>
-
-      <div className="p-2 border-b border-gray-200 dark:border-gray-700 ">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+    <div className="w-full max-w-3xl mx-auto p-4 sm:p-6 md:p-8 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-y-auto max-h-[90vh]">
+      {/* Header */}
+      <div className="relative border-b pb-4 mb-4">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center">
           {isEdit ? "Update Role" : "Create New Role"}
         </h2>
+        <button
+          onClick={onClose}
+          className="absolute top-0 right-0 text-gray-600 dark:text-white hover:text-red-500"
+          aria-label="Close"
+        >
+          <X className="h-6 w-6" />
+        </button>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-48">
+        <div className="flex items-center justify-center h-40">
           <Loader2 className="animate-spin h-8 w-8 text-indigo-600" />
-          <span className="ml-2 text-indigo-600">Loading...</span>
+          <span className="ml-3 text-indigo-600">Loading...</span>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Role Name */}
           <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Role Name *
             </label>
             <input
@@ -176,39 +173,35 @@ const CreateRole: React.FC<CreateRoleProps> = ({
               onChange={(e) => setRoleName(e.target.value)}
               placeholder="e.g., Administrator"
               required
-              className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+              className="w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
           </div>
 
+          {/* Description */}
           <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Description
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              required
               placeholder="Describe the role..."
-              className="w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+              className="w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
           </div>
 
-          {/* Permission dropdown */}
-          <div className="relative w-full">
+          {/* Permissions Dropdown */}
+          <div className="relative">
             <button
               type="button"
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className={`w-full px-4 py-3 border ${
-                dropdownOpen
-                  ? "border-indigo-500 ring-1 ring-indigo-500"
-                  : "border-gray-300"
-              } rounded-sm bg-white dark:bg-gray-700 flex justify-between items-center`}
+              className="w-full px-4 py-3 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-left"
             >
               <span
                 className={
                   selectedPermissions.length
-                    ? "text-gray-900 dark:text-gray-100"
+                    ? "text-gray-900 dark:text-white"
                     : "text-gray-500"
                 }
               >
@@ -220,7 +213,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                   : "Select permissions..."}
               </span>
               <svg
-                className={`w-5 h-5 transition-transform ${
+                className={`w-5 h-5 absolute right-4 top-4 transition-transform ${
                   dropdownOpen ? "rotate-180" : ""
                 }`}
                 fill="none"
@@ -237,16 +230,16 @@ const CreateRole: React.FC<CreateRoleProps> = ({
             </button>
 
             {dropdownOpen && (
-              <div className="absolute z-10 bottom-full bg-gray-100 dark:bg-gray-800 border rounded-xl shadow-2xl max-h-60 overflow-y-auto w-full mb-2">
-                <div className="sticky top-0 p-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+              <div className="absolute z-10 mt-2 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-lg max-h-64 overflow-y-auto">
+                <div className="p-2 sticky top-0 bg-white dark:bg-gray-800 border-b dark:border-gray-700">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <input
                       type="text"
-                      placeholder="Search permissions..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 rounded-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-indigo-500"
+                      placeholder="Search permissions..."
+                      className="w-full pl-10 pr-3 py-2 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -254,7 +247,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                   filteredPermissions.map((perm) => (
                     <label
                       key={perm.id}
-                      className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                     >
                       <input
                         type="checkbox"
@@ -262,32 +255,33 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                         onChange={() => togglePermission(perm.id)}
                         className="h-4 w-4 text-indigo-600"
                       />
-                      <span className="ml-3 text-gray-900 dark:text-gray-100 font-medium">
+                      <span className="ml-3 text-gray-900 dark:text-white">
                         {perm.permissionName}
                       </span>
                     </label>
                   ))
                 ) : (
                   <div className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
-                    No matching permissions found.
+                    No matching permissions.
                   </div>
                 )}
               </div>
             )}
           </div>
 
-          <div className="flex justify-between">
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row justify-between gap-3">
             <button
               type="button"
               onClick={handleReset}
-              className="w-1/2 mr-2 py-2 px-4 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 rounded"
+              className="w-full sm:w-1/2 py-2 px-4 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 rounded"
             >
               Reset
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="w-1/2 ml-2 py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded"
+              className="w-full sm:w-1/2 py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded"
             >
               {submitting
                 ? isEdit

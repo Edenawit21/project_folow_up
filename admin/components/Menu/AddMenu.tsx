@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { Loader2, X } from "lucide-react";
 import {
@@ -61,7 +61,6 @@ const AddMenu: React.FC<AddMenuProps> = ({
   useEffect(() => {
     const loadData = async () => {
       setLoadingInitialData(true);
-
       try {
         const allMenus = await fetchAllMenus();
         setMenuOptions(allMenus);
@@ -92,20 +91,13 @@ const AddMenu: React.FC<AddMenuProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    if (name === "parentId" || name === "order") {
-      // If empty string, set null; else parse number
-      const num = value === "" ? null : parseInt(value, 10);
-      setFormData((prev) => ({
-        ...prev,
-        [name]: num,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+    const parsedValue =
+      name === "parentId" || name === "order"
+        ? value === ""
+          ? null
+          : parseInt(value, 10)
+        : value;
+    setFormData((prev) => ({ ...prev, [name]: parsedValue }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,8 +127,8 @@ const AddMenu: React.FC<AddMenuProps> = ({
   };
 
   return (
-    <div className="w-[600px] max-h-[90vh] overflow-hidden p-3 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-600 dark:border-gray-600">
-      <div className="px-6 pt-2 pb-4 border-b border-gray-200 dark:border-gray-700 relative">
+    <div className="w-full max-w-2xl mx-auto max-h-[90vh] overflow-y-auto p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-300 dark:border-gray-600">
+      <div className="pt-2 pb-4 border-b border-gray-200 dark:border-gray-700 relative">
         <button
           type="button"
           onClick={onClose}
@@ -145,7 +137,7 @@ const AddMenu: React.FC<AddMenuProps> = ({
         >
           <X className="h-6 w-6 hover:text-red-500" />
         </button>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center">
           {isEditing ? "Update Menu" : "Add New Menu"}
         </h2>
       </div>
@@ -158,63 +150,29 @@ const AddMenu: React.FC<AddMenuProps> = ({
           </p>
         </div>
       ) : (
-        <form
-          id="menu-form"
-          onSubmit={handleSubmit}
-          className="px-6 py-4 space-y-4"
-        >
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
+        <form id="menu-form" onSubmit={handleSubmit} className="pt-4 space-y-4">
+          {[
+            { name: "name", placeholder: "Enter menu name" },
+            {
+              name: "requiredPrivilege",
+              placeholder: "Enter required privilege",
+            },
+            { name: "url", placeholder: "Enter URL" },
+            { name: "icon", placeholder: "Enter icon class (e.g., folder)" },
+          ].map(({ name, placeholder }) => (
             <input
-              name="name"
+              key={name}
+              name={name}
               type="text"
-              value={formData.name}
+              value={(formData as any)[name]}
               onChange={handleChange}
-              required
+              required={name === "name"}
               disabled={isSubmitting}
-              placeholder="Enter menu name"
-              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+              placeholder={placeholder}
+              className="w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
-          </label>
+          ))}
 
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
-            <input
-              name="requiredPrivilege"
-              type="text"
-              value={formData.requiredPrivilege}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              placeholder="Enter required privilege )"
-              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
-            <input
-              name="url"
-              type="text"
-              value={formData.url}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              placeholder="Enter URL"
-              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
-            <input
-              name="icon"
-              type="text"
-              value={formData.icon}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              placeholder="Enter icon class (e.g., folder)"
-              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-            />
-          </label>
           <input
             name="order"
             type="number"
@@ -222,27 +180,26 @@ const AddMenu: React.FC<AddMenuProps> = ({
             onChange={handleChange}
             disabled={isSubmitting}
             min={0}
-            placeholder="Enter order "
-            className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+            placeholder="Enter order"
+            className="w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
           />
 
           <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Parent Menu
             </span>
             <select
               name="parentId"
               value={formData.parentId === null ? "" : formData.parentId}
-              onChange={(e) => {
-                const value =
-                  e.target.value === "" ? null : parseInt(e.target.value, 10);
+              onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
-                  parentId: value,
-                }));
-              }}
+                  parentId:
+                    e.target.value === "" ? null : parseInt(e.target.value, 10),
+                }))
+              }
               disabled={isSubmitting}
-              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600  "
+              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             >
               <option value="">No Parent</option>
               {menuOptions
@@ -258,13 +215,13 @@ const AddMenu: React.FC<AddMenuProps> = ({
       )}
 
       {!loadingInitialData && (
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex justify-end space-x-3">
+        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="button"
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="w-1/2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
+              className="w-full py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
             >
               Reset
             </button>
@@ -272,7 +229,7 @@ const AddMenu: React.FC<AddMenuProps> = ({
               type="submit"
               form="menu-form"
               disabled={isSubmitting || loadingInitialData}
-              className="w-1/2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
+              className="w-full py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
             >
               {isSubmitting && (
                 <Loader2 className="animate-spin mr-2 h-4 w-4 inline-block" />
