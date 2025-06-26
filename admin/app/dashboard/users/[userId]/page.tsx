@@ -12,25 +12,27 @@ import ProjectReportTable from "@/components/usertable/ProjectReportTable";
 import UserProjectReportComponent from "@/components/usertable/UserProjectReportComponent";
 
 interface PageProps {
-  params: Promise<{ userId: string }>;
+  params: { userId: string };
 }
 
 export default function UserDetailComponent({ params }: PageProps) {
-  const { userId } = React.use(params); // Still assuming `params` is a Promise, but this line may need to be `await params` in `useEffect`
+  const { userId } = params;
 
   const [project, setProject] = useState<ProjectCompletionReports | null>(null);
   const [selectedProject, setSelectedProject] =
     useState<UserProjectReport | null>(null);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    null
-  );
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [projectLoading, setProjectLoading] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (!userId) return;
+      if (!userId) {
+        setLoading(false);
+        setError("User ID is missing.");
+        return;
+      }
 
       setLoading(true);
       setError(null);
@@ -53,6 +55,11 @@ export default function UserDetailComponent({ params }: PageProps) {
     setSelectedProjectId(projectId);
     setProjectLoading(true);
     try {
+      if (!userId) {
+        toast.error("User ID not available to fetch project details.");
+        setProjectLoading(false);
+        return;
+      }
       const projectReport = await fetchUserProjectReport(userId, projectId);
       setSelectedProject(projectReport);
     } catch (err) {
@@ -71,9 +78,7 @@ export default function UserDetailComponent({ params }: PageProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen dark:bg-gray-800 dark:text-white">
-        <p className="text-gray-600 dark:text-gray-300">
-          Loading user details...
-        </p>
+        <p className="text-gray-600 dark:text-gray-300">Loading user details...</p>
       </div>
     );
   }
@@ -98,13 +103,9 @@ export default function UserDetailComponent({ params }: PageProps) {
   }
 
   return (
-<<<<<<< features/MenuRenderer
-   <div className="bg-white p-4 rounded-lg shadow-md mt-4 border border-gray-200 mx-auto w-full overflow-x-auto">
-=======
-    <div className="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow-md mt-8 border border-gray-200 dark:border-gray-700 mx-auto max-w-4xl w-full">
->>>>>>> main
+    <div className="mx-auto max-w-4xl w-full mt-8">
       {selectedProject && selectedProjectId ? (
-        <div>
+        <div className="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
           <button
             onClick={handleBackToProjects}
             className="mb-4 px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors"
@@ -120,18 +121,16 @@ export default function UserDetailComponent({ params }: PageProps) {
         </div>
       ) : (
         <>
-<<<<<<< features/MenuRenderer
-           <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
-=======
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
->>>>>>> main
+          <h2 className="text-2xl sm:text-3xl mb-5 font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent text-center">
             Assigned Projects Overview
           </h2>
-          <ProjectReportTable
-            data={project}
-            currentUserId={userId}
-            onShowMore={handleShowMore}
-          />
+          <div className="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <ProjectReportTable
+              data={project}
+              currentUserId={userId}
+              onShowMore={handleShowMore}
+            />
+          </div>
         </>
       )}
     </div>
