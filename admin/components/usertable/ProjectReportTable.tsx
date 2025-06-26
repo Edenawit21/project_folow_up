@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { UserProject } from "@/types/userProject";
 
@@ -53,7 +55,7 @@ const ProjectReportTable: React.FC<UserProjectTable> = ({
                 <tr>
                   <td
                     colSpan={9}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 text-center"
+                    className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 text-center"
                   >
                     No project data available.
                   </td>
@@ -68,19 +70,19 @@ const ProjectReportTable: React.FC<UserProjectTable> = ({
                         : "bg-gray-50 dark:bg-gray-700"
                     }`}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white truncate max-w-xs">
                       {project.projectName}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
                       {project.projectKey}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
                       {project.totalTasksAssigned}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
                       {project.completedTasks}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <td className="px-6 py-4 text-sm">
                       <div className="flex items-center">
                         <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                           <div
@@ -95,13 +97,13 @@ const ProjectReportTable: React.FC<UserProjectTable> = ({
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
                       {project.totalStoryPointsAssigned}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
                       {project.completedStoryPoints}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <td className="px-6 py-4 text-sm">
                       <div className="flex items-center">
                         <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                           <div
@@ -116,12 +118,12 @@ const ProjectReportTable: React.FC<UserProjectTable> = ({
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                    <td className="px-6 py-4 text-sm">
                       <button
                         onClick={() => onShowMore(project.projectId)}
-                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                        className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                       >
-                        Show More
+                        Details
                       </button>
                     </td>
                   </tr>

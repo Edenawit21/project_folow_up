@@ -98,7 +98,11 @@ export default function UserDetailComponent({ params }: PageProps) {
   }
 
   return (
+<<<<<<< features/MenuRenderer
+   <div className="bg-white p-4 rounded-lg shadow-md mt-4 border border-gray-200 mx-auto w-full overflow-x-auto">
+=======
     <div className="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow-md mt-8 border border-gray-200 dark:border-gray-700 mx-auto max-w-4xl w-full">
+>>>>>>> main
       {selectedProject && selectedProjectId ? (
         <div>
           <button
@@ -116,7 +120,11 @@ export default function UserDetailComponent({ params }: PageProps) {
         </div>
       ) : (
         <>
+<<<<<<< features/MenuRenderer
+           <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+=======
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
+>>>>>>> main
             Assigned Projects Overview
           </h2>
           <ProjectReportTable

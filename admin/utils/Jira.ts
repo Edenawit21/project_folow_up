@@ -27,6 +27,12 @@ export interface ApiProject {
     activeBlockers: number;
     recentUpdates: number;
   };
+  owner?: {
+    name: string;
+    contactInfo?: string; // Optional field for contact info
+  };
+  targetEndDate?: string; // Optional field for target end date
+  status?: string; // Optional field for status
   critical: boolean;
 }
 
@@ -52,6 +58,12 @@ export type ProjectDto = {
   Name: string;
   Description: string;
   Lead: string;
+  Status?: string; // Optional field for status
+  TargetEndDate?: string; // Optional field for target end date
+  ProjectOwner?: {
+    Name?: string;
+    ContactInfo ?: string;
+  }; // Optional field for project owner
   Health: {
     Level: number;
     Reason: string;
@@ -66,6 +78,7 @@ export type ProjectDto = {
     ActiveBlockers: number;
     RecentUpdates: number;
   };
+
   Critical: boolean;
 };
 
@@ -90,6 +103,12 @@ const mapApiToProjectDto = (api: ApiProject): ProjectDto => ({
     ActiveBlockers: api.progress.activeBlockers,
     RecentUpdates: api.progress.recentUpdates,
   },
+  ProjectOwner: {
+    Name: api.owner?.name , // Assuming lead is a string, but can be an object if needed
+    ContactInfo: api.owner?.contactInfo , // Assuming contact info is optional
+  },
+  TargetEndDate: api.targetEndDate ? new Date(api.targetEndDate).toISOString() : undefined,
+  Status: api.status, // Optional field for status
   Critical: api.critical,
 });
 
