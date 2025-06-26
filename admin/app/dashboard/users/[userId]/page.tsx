@@ -2,28 +2,23 @@
 
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { ProjectCompletionReports } from "@/types/userProject";
-import { UserProjectReport } from "@/types/userReport";
-import {
-  FetchProjectById,
-  fetchUserProjectReport,
-} from "@/utils/userReportApi";
+import { ProjectCompletionReports,  } from "@/types/userProject";
+import {UserProjectReport} from "@/types/userReport";
+import { FetchProjectById, fetchUserProjectReport } from "@/utils/userReportApi";
 import ProjectReportTable from "@/components/usertable/ProjectReportTable";
 import UserProjectReportComponent from "@/components/usertable/UserProjectReportComponent";
 
 interface PageProps {
-  params: Promise<{ userId: string }>;
+  params: Promise<{ userId: string }>; // Type remains the same
 }
 
 export default function UserDetailComponent({ params }: PageProps) {
-  const { userId } = React.use(params); // unwrap promise
+  // Properly unwrap the params promise
+  const { userId } = React.use(params); // This is the key fix
 
   const [project, setProject] = useState<ProjectCompletionReports | null>(null);
-  const [selectedProject, setSelectedProject] =
-    useState<UserProjectReport | null>(null);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    null
-  );
+  const [selectedProject, setSelectedProject] = useState<UserProjectReport | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [projectLoading, setProjectLoading] = useState(false);
@@ -70,68 +65,58 @@ export default function UserDetailComponent({ params }: PageProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen dark:bg-gray-800">
-        <p className="text-gray-600 dark:text-gray-300 text-lg">
-          Loading user details...
-        </p>
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-600">Loading user details...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen  dark:bg-gray-800 text-red-600 dark:text-red-400">
-        <div className="text-center">
-          <p className="text-lg font-semibold">Error: {error}</p>
-          <p className="text-sm mt-2">User ID: {userId}</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen text-red-600">
+        <p>Error: {error}</p>
+        <p>User ID: {userId}</p>
       </div>
     );
   }
 
   if (!project) {
     return (
-      <div className="flex items-center justify-center min-h-screen dark:bg-gray-800">
-        <p className="text-gray-600 dark:text-gray-300 text-lg">
-          Project not found.
-        </p>
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-600">Project not found.</p>
       </div>
     );
   }
 
   return (
-    <div className="dark:bg-gray-800 min-h-screen py-10 px-4 sm:px-6 lg:px-8">
-      <div className="dark:bg-gray-800 max-w-5xl mx-auto p-6 sm:p-8 transition-colors">
-        {selectedProject && selectedProjectId ? (
-          <>
-            <button
-              onClick={handleBackToProjects}
-              className="mb-6 inline-flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-xl transition text-base"
-            >
-              ← Back to Projects
-            </button>
-            <UserProjectReportComponent
-              userId={userId}
-              projectId={selectedProjectId}
-              data={selectedProject}
-              loading={projectLoading}
-            />
-          </>
-        ) : (
-          <>
-            <h2 className="text-2xl sm:text-3xl font-bold text-center text-indigo-600 dark:text-indigo-400 mb-6">
-              Assigned Projects Overview
-            </h2>
-            <div className="overflow-x-auto">
-              <ProjectReportTable
-                data={project}
-                currentUserId={userId}
-                onShowMore={handleShowMore}
-              />
-            </div>
-          </>
-        )}
-      </div>
+    <div className="bg-white p-6 rounded-lg shadow-md mt-8 border border-gray-200 mx-auto max-w-4xl w-full">
+      {selectedProject && selectedProjectId ? (
+        <div>
+          <button
+            onClick={handleBackToProjects}
+            className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+          >
+            ← Back to Projects
+          </button>
+          <UserProjectReportComponent 
+            userId={userId}
+            projectId={selectedProjectId}
+            data={selectedProject}
+            loading={projectLoading}
+          />
+        </div>
+      ) : (
+        <>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+            Assigned Projects Overview
+          </h2>
+          <ProjectReportTable 
+            data={project}  
+            currentUserId={userId}
+            onShowMore={handleShowMore}
+          />
+        </>
+      )}
     </div>
   );
 }
