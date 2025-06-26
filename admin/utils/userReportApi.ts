@@ -1,11 +1,8 @@
-// src/utils/api.ts (or similar)
 import axios from 'axios';
-import { UserProjectReport } from '../types/userReport'; // Adjust path as needed
+import { UserProjectReport } from '../types/userReport'; 
 import { ProjectCompletionReports } from '@/types/userProject';
 
-// Assuming your API is running on localhost:5001 or similar for .NET
-// Make sure this base URL matches your backend's address.
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL; // <--- IMPORTANT: Verify your backend port
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL; 
 
 export async function fetchUserProjectReport(userId: string, projectId: string): Promise<UserProjectReport> {
     try {

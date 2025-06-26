@@ -3,7 +3,7 @@
 import RoleList from "@/components/roles/RoleList";
 export default function RolesPage() {
   return(
-  <div className="">
+  <div >
     
     <RoleList />
   </div>)

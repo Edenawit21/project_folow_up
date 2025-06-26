@@ -16,7 +16,6 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   onCreate,
   onUpdate,
 }) => {
-  // State to keep track of initial form data for resetting on Cancel
   const [initialFormData, setInitialFormData] = useState<PrivilegePayload>({
     permissionName: "",
     description: "",
@@ -28,6 +27,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
     description: "",
     action: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -35,17 +35,13 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   // Close on ESC key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
+      if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  // Fetch data if editing, set initialFormData and formData
+  // Fetch privilege data if editing
   useEffect(() => {
     if (id) {
       setFetching(true);
@@ -64,12 +60,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
         })
         .finally(() => setFetching(false));
     } else {
-      // New form: reset both states to empty
-      const emptyData = {
-        permissionName: "",
-        description: "",
-        action: "",
-      };
+      const emptyData = { permissionName: "", description: "", action: "" };
       setFormData(emptyData);
       setInitialFormData(emptyData);
     }
@@ -85,33 +76,31 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       if (id) {
-        const updatedPermission = await updatePermission(id, formData);
+        const updated = await updatePermission(id, formData);
         toast.success("Privilege updated successfully!");
-        onUpdate?.(updatedPermission);
+        onUpdate?.(updated);
       } else {
-        const createdPermission = await createPermission(formData);
+        const created = await createPermission(formData);
         toast.success("Privilege created successfully!");
-        onCreate?.(createdPermission);
+        onCreate?.(created);
       }
       onClose();
     } catch {
-      toast.error("Failed to create privilege.");
+      toast.error("Failed to save privilege.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Reset formData to initial values on Cancel
   const handleCancel = () => {
     setFormData(initialFormData);
   };
 
   if (id && fetching) {
     return (
-      <div className="w-[600px] p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-300 dark:border-gray-600 flex items-center">
+      <div className="w-full max-w-xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-300 dark:border-gray-600 flex items-center">
         <Loader2 className="animate-spin text-indigo-600 w-6 h-6" />
         <span className="ml-2 text-gray-700 dark:text-white">
           Loading privilege...
@@ -122,8 +111,9 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
-      className="relative px-4 py-8 w-[600px] ml-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"
+      className="relative w-full max-w-xl mx-auto px-4 py-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"
     >
       {/* X Button */}
       <button
@@ -136,14 +126,14 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
         <X className="w-6 h-6 hover:text-red-500" />
       </button>
 
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 text-center sm:text-left">
         {id ? "Update Privilege" : "Add Privilege"}
       </h2>
 
       {/* Permission Name */}
       <label className="block mb-4">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Permission Name
+          Privilege Name
         </span>
         <input
           name="permissionName"
@@ -152,7 +142,7 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           onChange={handleChange}
           required
           disabled={loading}
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
         />
       </label>
 
@@ -167,12 +157,12 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           onChange={handleChange}
           rows={4}
           disabled={loading}
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
         />
       </label>
 
       {/* Action */}
-      <label className="block mb-4">
+      <label className="block mb-6">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Action
         </span>
@@ -183,24 +173,24 @@ const AddPrivilege: React.FC<AddPrivilegeProps> = ({
           onChange={handleChange}
           disabled={loading}
           placeholder="e.g. create, read, update"
-          className="mt-1 w-full px-3 py-2 border rounded text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+          className="mt-1 w-full px-3 py-2 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
         />
       </label>
 
       {/* Buttons */}
-      <div className="flex justify-between">
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
         <button
           type="button"
           onClick={handleCancel}
           disabled={loading}
-          className="w-1/2 mr-2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
+          className="w-full sm:w-1/2 py-2 px-4 rounded bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
         >
           Reset
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="w-1/2 ml-2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
+          className="w-full sm:w-1/2 py-2 px-4 rounded bg-green-600 hover:bg-green-700 text-white"
         >
           {loading
             ? id

@@ -213,10 +213,10 @@ export const ProjectTable = () => {
     <div className="space-y-6 p-4 sm:p-6 text-gray-800 dark:text-gray-100">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
         <div>
-          <h2 className="text-3xl font-extrabold text-violet-700 dark:text-violet-700 tracking-tight mb-4">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
             Project Dashboard
           </h2>
-          <p className="mt-2 text-sm text-gray-900 dark:text-gray-400 italic">
+          <p className="mt-2 text-gray-600 dark:text-gray-400 italic text-sm">
             Track and manage your projects effectively.
           </p>
         </div>

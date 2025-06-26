@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { login } from "@/utils/auth";
@@ -18,6 +18,16 @@ const Login = () => {
   const [errors, setErrors] = useState<Errors>({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isReturningUser, setIsReturningUser] = useState(false);
+
+  useEffect(() => {
+    const visitedBefore = sessionStorage.getItem("hasVisitedLogin");
+    setIsReturningUser(!!visitedBefore);
+
+    if (!visitedBefore) {
+      sessionStorage.setItem("hasVisitedLogin", "true");
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,7 +55,6 @@ const Login = () => {
       const response = await login(form);
 
       if (response.requiresPasswordChange) {
-        // Redirect to change password page with user id as a query param or via state
         router.push(`/change_password?userId=${response.userId}`);
       } else {
         localStorage.setItem("token", response.token);
@@ -67,10 +76,12 @@ const Login = () => {
         className="w-full max-w-md backdrop-blur-md bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 shadow-2xl rounded-2xl p-10"
       >
         <h2 className="text-4xl font-extrabold text-center mb-6 text-gray-800 dark:text-white">
-          Welcome Back
+          {isReturningUser ? "Welcome back" : "Welcome"}
         </h2>
         <p className="text-center text-sm text-gray-600 dark:text-gray-300 mb-8">
-          Please sign in to your account
+          {isReturningUser
+            ? "Great to see you again! Please sign in"
+            : "Please sign in to your account"}
         </p>
 
         <form onSubmit={handleLogin} className="space-y-6" autoComplete="off">

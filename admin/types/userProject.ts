@@ -24,7 +24,5 @@ export interface UserProject
   storyPointCompletionPercentage: number;
 }
 
-/**
- * Represents an array of project completion reports.
- */
+/* Represents an array of project completion reports. */
 export type ProjectCompletionReports = ProjectCompletionReport[];
