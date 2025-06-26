@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { fetchProjects, ProjectDto } from "../../utils/Jira";
 import ViewProjectButton from "../ui/ViewProjectButton";
+import EditProjectButton from "../ui/EditProjectButton";
 import PaginationFooter from "@/components/footer/PaginationFooter";
 
 const Progress = ({
@@ -264,6 +265,9 @@ export const ProjectTable = () => {
             <tr>
               <th className="p-4 text-left">Project</th>
               <th className="p-4 text-left">Lead</th>
+              <th className="p-4 text-left"> Status</th>
+              <th className="p-4 text-left">Project Owner</th>
+              <th className="p-4 text-left">Target End Date</th>
               <th className="p-4 text-left">Health</th>
               <th className="p-4 text-left">Progress</th>
               <th className="p-4 text-left">Story Points</th>
@@ -295,8 +299,41 @@ export const ProjectTable = () => {
                     </div>
                   </td>
                   <td className="p-4">
+                    <Badge variant={project.Status === "Active" ? "success" : "default"}>
+                      {project.Status || "Unknown"}
+                    </Badge>
+                  </td>
+                 
+                  <td className="p-4">
+                    <div className="flex flex-col">
+                      <span className="font-medium">
+                        {project.ProjectOwner?.Name || "N/A"}
+                      </span>
+                      {project.ProjectOwner?.ContactInfo && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {project.ProjectOwner.ContactInfo}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+
+                  <td className="p-4">
+                    <div className="flex flex-col">
+                      <span className="font-medium">
+                        {project.TargetEndDate
+                          ? new Date(project.TargetEndDate).toLocaleDateString()
+                          : ""}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Target End Date
+                      </span>
+                    </div>
+                  </td>
+
+                   <td className="p-4">
                     {getHealthBadge(project.Health.Level)}
                   </td>
+
                   <td className="p-4">
                     <Progress
                       completed={project.Progress.CompletedTasks}
@@ -329,6 +366,7 @@ export const ProjectTable = () => {
                   </td>
                   <td className="p-4 text-right">
                     <ViewProjectButton projectKey={project.Key} />
+                    <EditProjectButton projectId={project.Id}  />
                   </td>
                 </tr>
               ))

@@ -1,5 +1,3 @@
-// src/app/user/[userId]/page.tsx (UPDATED for styling)
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -14,18 +12,16 @@ import ProjectReportTable from "@/components/usertable/ProjectReportTable";
 import UserProjectReportComponent from "@/components/usertable/UserProjectReportComponent";
 
 interface PageProps {
-  params: Promise<{ userId: string }>;
+  params: { userId: string };
 }
 
 export default function UserDetailComponent({ params }: PageProps) {
-  const { userId } = React.use(params);
+  const { userId } = params;
 
   const [project, setProject] = useState<ProjectCompletionReports | null>(null);
   const [selectedProject, setSelectedProject] =
     useState<UserProjectReport | null>(null);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    null
-  );
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [projectLoading, setProjectLoading] = useState(false);
@@ -82,9 +78,7 @@ export default function UserDetailComponent({ params }: PageProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen dark:bg-gray-800 dark:text-white">
-        <p className="text-gray-600 dark:text-gray-300">
-          Loading user details...
-        </p>
+        <p className="text-gray-600 dark:text-gray-300">Loading user details...</p>
       </div>
     );
   }
@@ -109,13 +103,8 @@ export default function UserDetailComponent({ params }: PageProps) {
   }
 
   return (
-    // Outer div now only handles centering and max-width, no background/border/shadow.
-    // The background is now the page's default background.
     <div className="mx-auto max-w-4xl w-full mt-8">
       {selectedProject && selectedProjectId ? (
-        // For the detailed project view, apply similar card styling if desired,
-        // or keep it simple based on your design. I've added a basic wrapper here
-        // to ensure it also has some visual separation if it's not full-width.
         <div className="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
           <button
             onClick={handleBackToProjects}
@@ -132,11 +121,9 @@ export default function UserDetailComponent({ params }: PageProps) {
         </div>
       ) : (
         <>
-          {/* Title now appears directly on the page background */}
-          <h2 className="text-2xl sm:text-3xl mb-5 font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
+          <h2 className="text-2xl sm:text-3xl mb-5 font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent text-center">
             Assigned Projects Overview
           </h2>
-          {/* New div wraps ONLY the table, applying the card-like styling */}
           <div className="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
             <ProjectReportTable
               data={project}
