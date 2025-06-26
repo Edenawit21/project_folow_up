@@ -260,7 +260,7 @@ const PrivilegeList = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold rounded-md bg-green-100 text-green-500 dark:bg-green-900/30 dark:text-green-300">
+                      <span className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold   text-green-500 dark:text-green-300">
                         {p.action}
                       </span>
                     </td>
@@ -277,7 +277,7 @@ const PrivilegeList = () => {
                       <div className="flex space-x-3">
                         <button
                           onClick={() => handleEdit(p.id)}
-                          className="p-2 rounded-lg bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md"
+                          className="p-2 rounded-lg  text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md"
                           aria-label="Edit"
                         >
                           <Pencil className="w-5 h-5" />
@@ -285,7 +285,7 @@ const PrivilegeList = () => {
                         <button
                           onClick={() => setDeleteId(p.id)}
                           disabled={deletingId === p.id}
-                          className="p-2 rounded-lg bg-red-50 dark:bg-gray-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="p-2 rounded-lg  text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                           aria-label="Delete"
                         >
                           {deletingId === p.id ? (
