@@ -94,9 +94,13 @@ const CreateRole: React.FC<CreateRoleProps> = ({
   };
 
   const handleReset = () => {
-    setRoleName("");
-    setDescription("");
-    setSelectedPermissions([]);
+    if (isEdit && id) {
+      loadRole(id); // Reload original values in edit mode
+    } else {
+      setRoleName("");
+      setDescription("");
+      setSelectedPermissions([]);
+    }
     setSearchTerm("");
     setDropdownOpen(false);
   };
@@ -196,7 +200,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
             <button
               type="button"
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="w-full px-4 py-3 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-left"
+              className="w-full px-4 py-3 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-left relative"
             >
               <span
                 className={
@@ -213,8 +217,8 @@ const CreateRole: React.FC<CreateRoleProps> = ({
                   : "Select permissions..."}
               </span>
               <svg
-                className={`w-5 h-5 absolute right-4 top-4 transition-transform ${
-                  dropdownOpen ? "rotate-180" : ""
+                className={`w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 transform transition-transform ${
+                  dropdownOpen ? "-rotate-180" : "rotate-0"
                 }`}
                 fill="none"
                 stroke="currentColor"
@@ -230,7 +234,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({
             </button>
 
             {dropdownOpen && (
-              <div className="absolute z-10 mt-2 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-lg max-h-64 overflow-y-auto">
+              <div className="absolute z-10 bottom-full mb-2 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-lg max-h-64 overflow-y-auto">
                 <div className="p-2 sticky top-0 bg-white dark:bg-gray-800 border-b dark:border-gray-700">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
