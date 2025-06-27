@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, use } from "react"; // ⚠️ Note: `use` is experimental and not typically used in components
 import { toast } from "react-toastify";
 import { ProjectCompletionReports } from "@/types/userProject";
 import { UserProjectReport } from "@/types/userReport";
@@ -16,7 +16,7 @@ interface PageProps {
 }
 
 export default function UserDetailComponent({ params }: PageProps) {
-  const { userId } = React.use(params); // Still assuming `params` is a Promise, but this line may need to be `await params` in `useEffect`
+  const { userId } = use(params); // ⚠️ Normally avoid using `use()` for async resolution, prefer using `await` in server components.
 
   const [project, setProject] = useState<ProjectCompletionReports | null>(null);
   const [selectedProject, setSelectedProject] =
@@ -30,7 +30,11 @@ export default function UserDetailComponent({ params }: PageProps) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (!userId) return;
+      if (!userId) {
+        setLoading(false);
+        setError("User ID is missing.");
+        return;
+      }
 
       setLoading(true);
       setError(null);
@@ -53,6 +57,11 @@ export default function UserDetailComponent({ params }: PageProps) {
     setSelectedProjectId(projectId);
     setProjectLoading(true);
     try {
+      if (!userId) {
+        toast.error("User ID not available to fetch project details.");
+        setProjectLoading(false);
+        return;
+      }
       const projectReport = await fetchUserProjectReport(userId, projectId);
       setSelectedProject(projectReport);
     } catch (err) {
@@ -98,9 +107,9 @@ export default function UserDetailComponent({ params }: PageProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow-md mt-8 border border-gray-200 dark:border-gray-700 mx-auto max-w-4xl w-full">
+    <div className="mx-auto max-w-4xl w-full mt-8">
       {selectedProject && selectedProjectId ? (
-        <div>
+        <div className="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
           <button
             onClick={handleBackToProjects}
             className="mb-4 px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors"
@@ -115,16 +124,18 @@ export default function UserDetailComponent({ params }: PageProps) {
           />
         </div>
       ) : (
-        <>
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
+        <div className="">
+          <h2 className="text-2xl sm:text-3xl mb-5 font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent text-center">
             Assigned Projects Overview
           </h2>
-          <ProjectReportTable
-            data={project}
-            currentUserId={userId}
-            onShowMore={handleShowMore}
-          />
-        </>
+          <div className="bg-white dark:bg-gray-800 dark:text-white p-6 shadow-md border border-gray-200 dark:border-gray-700 rounded-lg">
+            <ProjectReportTable
+              data={project}
+              currentUserId={userId}
+              onShowMore={handleShowMore}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

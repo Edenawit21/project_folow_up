@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { Loader2, X } from "lucide-react";
 import {
@@ -44,6 +44,7 @@ const AddMenu: React.FC<AddMenuProps> = ({
   };
 
   const [formData, setFormData] = useState<MenuFormData>(emptyFormData);
+  const [originalData, setOriginalData] = useState<MenuFormData | null>(null);
   const [loadingInitialData, setLoadingInitialData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [menuOptions, setMenuOptions] = useState<
@@ -67,16 +68,19 @@ const AddMenu: React.FC<AddMenuProps> = ({
 
         if (!isEditing) {
           setFormData(emptyFormData);
+          setOriginalData(emptyFormData);
         } else {
           const menu = await fetchMenuById(id);
-          setFormData({
+          const fetched = {
             name: menu.name || "",
             url: menu.url || "",
             icon: menu.icon || "",
             requiredPrivilege: menu.requiredPrivilege || "",
             parentId: typeof menu.parentId === "number" ? menu.parentId : null,
             order: typeof menu.order === "number" ? menu.order : null,
-          });
+          };
+          setFormData(fetched);
+          setOriginalData(fetched);
         }
       } catch (err) {
         toast.error("Failed to load data.");
@@ -123,7 +127,7 @@ const AddMenu: React.FC<AddMenuProps> = ({
   };
 
   const handleCancel = () => {
-    setFormData(emptyFormData);
+    if (originalData) setFormData(originalData);
   };
 
   return (
@@ -152,42 +156,56 @@ const AddMenu: React.FC<AddMenuProps> = ({
       ) : (
         <form id="menu-form" onSubmit={handleSubmit} className="pt-4 space-y-4">
           {[
-            { name: "name", placeholder: "Enter menu name" },
+            { name: "name", label: "Name", placeholder: "Enter menu name" },
             {
               name: "requiredPrivilege",
+              label: "Required Privilege",
               placeholder: "Enter required privilege",
             },
-            { name: "url", placeholder: "Enter URL" },
-            { name: "icon", placeholder: "Enter icon class (e.g., folder)" },
-          ].map(({ name, placeholder }) => (
-            <input
-              key={name}
-              name={name}
-              type="text"
-              value={(formData as any)[name]}
-              onChange={handleChange}
-              required={name === "name"}
-              disabled={isSubmitting}
-              placeholder={placeholder}
-              className="w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-            />
+            { name: "url", label: "URL", placeholder: "Enter URL" },
+            {
+              name: "icon",
+              label: "Icon",
+              placeholder: "Enter icon class (e.g., folder)",
+            },
+          ].map(({ name, label, placeholder }) => (
+            <div key={name}>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {label}
+              </label>
+              <input
+                name={name}
+                type="text"
+                value={(formData as any)[name]}
+                onChange={handleChange}
+                required={name === "name"}
+                disabled={isSubmitting}
+                placeholder={placeholder}
+                className="w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+              />
+            </div>
           ))}
 
-          <input
-            name="order"
-            type="number"
-            value={formData.order === null ? "" : formData.order}
-            onChange={handleChange}
-            disabled={isSubmitting}
-            min={0}
-            placeholder="Enter order"
-            className="w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Order
+            </label>
+            <input
+              name="order"
+              type="number"
+              value={formData.order === null ? "" : formData.order}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              min={0}
+              placeholder="Enter order"
+              className="w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+            />
+          </div>
 
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div className="flex flex-col-reverse">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Parent Menu
-            </span>
+            </label>
             <select
               name="parentId"
               value={formData.parentId === null ? "" : formData.parentId}
@@ -199,7 +217,7 @@ const AddMenu: React.FC<AddMenuProps> = ({
                 }))
               }
               disabled={isSubmitting}
-              className="mt-1 w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+              className="w-full px-3 py-2 border rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             >
               <option value="">No Parent</option>
               {menuOptions
@@ -210,7 +228,7 @@ const AddMenu: React.FC<AddMenuProps> = ({
                   </option>
                 ))}
             </select>
-          </label>
+          </div>
         </form>
       )}
 
