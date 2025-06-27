@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, use } from "react"; // ⬅️ import `use` from react
+import React, { useEffect, useState, use } from "react"; // ⚠️ Note: `use` is experimental and not typically used in components
 import { toast } from "react-toastify";
 import { ProjectCompletionReports } from "@/types/userProject";
 import { UserProjectReport } from "@/types/userReport";
@@ -16,7 +16,7 @@ interface PageProps {
 }
 
 export default function UserDetailComponent({ params }: PageProps) {
-  const { userId } = use(params);
+  const { userId } = use(params); // ⚠️ Normally avoid using `use()` for async resolution, prefer using `await` in server components.
 
   const [project, setProject] = useState<ProjectCompletionReports | null>(null);
   const [selectedProject, setSelectedProject] =
@@ -128,7 +128,7 @@ export default function UserDetailComponent({ params }: PageProps) {
           <h2 className="text-2xl sm:text-3xl mb-5 font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent text-center">
             Assigned Projects Overview
           </h2>
-          <div className="bg-white dark:bg-gray-800 dark:text-white p-6 shadow-md dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 dark:text-white p-6 shadow-md border border-gray-200 dark:border-gray-700 rounded-lg">
             <ProjectReportTable
               data={project}
               currentUserId={userId}
