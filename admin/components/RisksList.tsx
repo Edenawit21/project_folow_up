@@ -1,4 +1,10 @@
-import { AddOrUpdateRiskDto, AddRiskDto, RiskDto, RiskImpact, RiskLikelihood, RiskStatus } from "@/types/projectDetail";
+import {
+  AddRiskDto,
+  RiskDto,
+  RiskImpact,
+  RiskLikelihood,
+  RiskStatus,
+} from "@/types/projectDetail";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import RiskItem from "./RiskItem";
@@ -25,9 +31,9 @@ const RisksList: React.FC<{
     e.preventDefault();
     setIsAddingRisk(true);
     try {
-      const addedRisk = await addRisk(projectId, newRisk);
+      await addRisk(projectId, newRisk);
       toast.success("Risk added successfully!");
-      setNewRisk({ // Reset form
+      setNewRisk({
         description: "",
         impact: RiskImpact.Low,
         likelihood: RiskLikelihood.Low,
@@ -35,21 +41,21 @@ const RisksList: React.FC<{
         status: RiskStatus.Open,
         projectId,
       });
-      setShowAddRiskForm(false); // Hide form
-      onRiskChanged(); // Re-fetch parent data
+      setShowAddRiskForm(false);
+      onRiskChanged();
     } catch (err: any) {
       toast.error(`Error adding risk: ${err.message}`);
-      console.error("Error adding risk:", err);
     } finally {
       setIsAddingRisk(false);
     }
   };
 
   return (
-    <div className="bg-gray-50 p-4 rounded-lg mt-4 border border-gray-200">
-      <h3 className="text-xl font-semibold mb-3 text-gray-800">
+    <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mt-4 border border-gray-200 dark:border-gray-700">
+      <h3 className="text-xl font-semibold mb-3 text-gray-800 dark:text-gray-100">
         Major Risks ({safeRisks.length})
       </h3>
+
       <ul className="list-none p-0 space-y-3 mb-4">
         {safeRisks.length > 0 ? (
           safeRisks.map((r) => (
@@ -61,38 +67,41 @@ const RisksList: React.FC<{
             />
           ))
         ) : (
-          <li className="text-gray-600 italic p-3 text-center">No risks defined. Click "Add New Risk" to get started.</li>
+          <li className="text-gray-600 dark:text-gray-400 italic p-3 text-center">
+            No risks defined. Click "Add New Risk" to get started.
+          </li>
         )}
       </ul>
 
       {!showAddRiskForm ? (
         <div className="flex justify-center">
-            <button
+          <button
             onClick={() => setShowAddRiskForm(true)}
             className="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition-colors duration-200 text-base"
-            >
+          >
             Add New Risk
-            </button>
+          </button>
         </div>
       ) : (
         <form
           onSubmit={handleAddRisk}
-          className="mt-4 p-4 border border-red-200 rounded-lg bg-red-50 space-y-3"
+          className="mt-4 p-4 border border-red-200 dark:border-red-400 rounded-lg bg-red-50 dark:bg-red-900 space-y-3"
         >
-          <h4 className="text-lg font-semibold text-red-800 mb-2">
+          <h4 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">
             Add New Risk
           </h4>
+
           <div>
             <label
               htmlFor="new-risk-description"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200"
             >
               Description:
             </label>
             <textarea
               id="new-risk-description"
               rows={3}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm p-2"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 shadow-sm focus:border-red-500 focus:ring-red-500 p-2"
               value={newRisk.description}
               onChange={(e) =>
                 setNewRisk({ ...newRisk, description: e.target.value })
@@ -102,17 +111,18 @@ const RisksList: React.FC<{
               placeholder="Briefly describe the risk."
             ></textarea>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label
                 htmlFor="new-risk-impact"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-200"
               >
                 Impact:
               </label>
               <select
                 id="new-risk-impact"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm p-2"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 shadow-sm focus:border-red-500 focus:ring-red-500 p-2"
                 value={newRisk.impact}
                 onChange={(e) =>
                   setNewRisk({
@@ -123,7 +133,7 @@ const RisksList: React.FC<{
                 disabled={isAddingRisk}
               >
                 {Object.values(RiskImpact)
-                  .filter((value) => typeof value === "number")
+                  .filter((v) => typeof v === "number")
                   .map((impact) => (
                     <option key={impact} value={impact}>
                       {RiskImpact[impact]}
@@ -134,13 +144,13 @@ const RisksList: React.FC<{
             <div>
               <label
                 htmlFor="new-risk-likelihood"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-200"
               >
                 Likelihood:
               </label>
               <select
                 id="new-risk-likelihood"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm p-2"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 shadow-sm focus:border-red-500 focus:ring-red-500 p-2"
                 value={newRisk.likelihood}
                 onChange={(e) =>
                   setNewRisk({
@@ -151,7 +161,7 @@ const RisksList: React.FC<{
                 disabled={isAddingRisk}
               >
                 {Object.values(RiskLikelihood)
-                  .filter((value) => typeof value === "number")
+                  .filter((v) => typeof v === "number")
                   .map((likelihood) => (
                     <option key={likelihood} value={likelihood}>
                       {RiskLikelihood[likelihood]}
@@ -160,18 +170,19 @@ const RisksList: React.FC<{
               </select>
             </div>
           </div>
+
           <div>
             <label
               htmlFor="new-risk-mitigationPlan"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200"
             >
               Mitigation Plan (Optional):
             </label>
             <textarea
               id="new-risk-mitigationPlan"
               rows={3}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm p-2"
-              value={newRisk.mitigationPlan || ""}
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 shadow-sm focus:border-red-500 focus:ring-red-500 p-2"
+              value={newRisk.mitigationPlan}
               onChange={(e) =>
                 setNewRisk({ ...newRisk, mitigationPlan: e.target.value })
               }
@@ -179,16 +190,17 @@ const RisksList: React.FC<{
               placeholder="Outline steps to mitigate this risk."
             ></textarea>
           </div>
+
           <div>
             <label
               htmlFor="new-risk-status"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200"
             >
               Status:
             </label>
             <select
               id="new-risk-status"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm p-2"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 shadow-sm focus:border-red-500 focus:ring-red-500 p-2"
               value={newRisk.status}
               onChange={(e) =>
                 setNewRisk({
@@ -199,7 +211,7 @@ const RisksList: React.FC<{
               disabled={isAddingRisk}
             >
               {Object.values(RiskStatus)
-                .filter((value) => typeof value === "number")
+                .filter((v) => typeof v === "number")
                 .map((status) => (
                   <option key={status} value={status}>
                     {RiskStatus[status]}
@@ -207,11 +219,12 @@ const RisksList: React.FC<{
                 ))}
             </select>
           </div>
+
           <div className="flex justify-end space-x-2 mt-4">
             <button
               type="button"
               onClick={() => setShowAddRiskForm(false)}
-              className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 text-sm"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-500 rounded-lg shadow-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 text-sm"
               disabled={isAddingRisk}
             >
               Cancel
@@ -229,4 +242,5 @@ const RisksList: React.FC<{
     </div>
   );
 };
+
 export default RisksList;
