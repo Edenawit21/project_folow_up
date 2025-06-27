@@ -6,10 +6,12 @@ import {
   Search,
   Filter,
   FolderKanban,
+  CircleSlash,
+  // Pencil // <-- No need to import Pencil here, it's used in EditProjectButton
 } from "lucide-react";
 import { fetchProjects, ProjectDto } from "../../utils/Jira";
 import ViewProjectButton from "../ui/ViewProjectButton";
-import EditProjectButton from "../ui/EditProjectButton";
+import EditProjectButton from "../ui/EditProjectButton"; // This is the component that needs internal modification
 import PaginationFooter from "@/components/footer/PaginationFooter";
 import Link from "next/link";
 
@@ -201,147 +203,160 @@ export const ProjectTable = () => {
   return (
     <div className="space-y-6 p-4 sm:p-6 text-gray-800 dark:text-gray-100">
       {/* Top Section */}
-      {/* Filter and Metrics UI */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
-  <div>
-    <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
-      Project Dashboard
-    </h2>
-    <p className="mt-2 text-gray-600 dark:text-gray-400 italic text-sm">
-      Track and manage your projects effectively.
-    </p>
-  </div>
-  <div className="px-4 py-3 rounded-2xl flex items-center gap-3 w-full md:w-auto">
-    <div className="space-y-1">
-      <div className="text-sm font-medium flex items-center gap-2 opacity-90">
-        <FolderKanban className="w-4 h-4 animate-bounce-slow" />
-        <span>Total Projects</span>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+        <div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
+            Project Dashboard
+          </h2>
+          <p className="mt-2 text-gray-600 dark:text-gray-400 italic text-sm">
+            Track and manage your projects effectively.
+          </p>
+        </div>
+        <div className="px-4 py-3 rounded-2xl flex items-center gap-3 w-full md:w-auto">
+          <div className="space-y-1">
+            <div className="text-sm font-medium flex items-center gap-2 opacity-90">
+              <FolderKanban className="w-4 h-4 animate-bounce-slow" />
+              <span>Total Projects</span>
+            </div>
+            <div className="text-3xl font-extrabold text-center tracking-wide">
+              {totalItems}
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="text-3xl font-extrabold text-center tracking-wide">
-        {totalItems}
-      </div>
-    </div>
-  </div>
-</div>
 
-<div className="flex flex-col md:flex-row gap-4 items-stretch">
-  <div className="w-full md:w-64">
-    <Input
-      placeholder="Search projects..."
-      value={filters.search}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-        setFilters({ ...filters, search: e.target.value })
-      }
-    />
-  </div>
-  <div className="w-full md:w-56">
-    <Select
-      value={filters.healthLevel}
-      onValueChange={(value) =>
-        setFilters({ ...filters, healthLevel: value })
-      }
-      placeholder="Health Status"
-      options={[
-        { value: "1", label: "On Track" },
-        { value: "2", label: "Needs Attention" },
-        { value: "3", label: "Critical" },
-      ]}
-    />
-  </div>
-</div>
+      <div className="flex flex-col md:flex-row gap-4 items-stretch">
+        <div className="w-full md:w-64">
+          <Input
+            placeholder="Search projects..."
+            value={filters.search}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFilters({ ...filters, search: e.target.value })
+            }
+          />
+        </div>
+        <div className="w-full md:w-56">
+          <Select
+            value={filters.healthLevel}
+            onValueChange={(value) =>
+              setFilters({ ...filters, healthLevel: value })
+            }
+            placeholder="Health Status"
+            options={[
+              { value: "1", label: "On Track" },
+              { value: "2", label: "Needs Attention" },
+              { value: "3", label: "Critical" },
+            ]}
+          />
+        </div>
+      </div>
 
       {/* Table */}
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm bg-white dark:bg-gray-800">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 text-sm font-medium">
             <tr>
-              <th className="p-4 text-left">Project</th>
-              <th className="p-4 text-left">Lead</th>
-              <th className="p-4 text-left">Status</th>
-              <th className="p-4 text-left">Project Owner</th>
-              <th className="p-4 text-left">Target End Date</th>
-              <th className="p-4 text-left">Health</th>
-              <th className="p-4 text-left">Progress</th>
-              <th className="p-4 text-left">Story Points</th>
-              <th className="p-4 text-left">Blockers</th>
-              <th className="p-4 text-right">Actions</th>
+              <th className="p-3 text-left">Project</th>
+              <th className="p-3 text-left">Lead</th>
+              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">Project Owner</th>
+              <th className="p-3 text-left">Target End Date</th>
+              <th className="p-3 text-left">Health</th>
+              <th className="p-3 text-left">Progress</th>
+              <th className="p-3 text-left">Story Points</th>
+              <th className="p-3 text-left">Blockers</th>
+              <th className="p-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedProjects.map((project) => (
-              <tr key={project.Id} className="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
-                <td className="p-4">
-                  <Link href={`/dashboard/overview/${project.Id}`}>
-                    <div className="font-semibold text-gray-900 dark:text-white hover:underline cursor-pointer">
-                      {project.Name}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {project.Key}
-                    </div>
-                  </Link>
-                </td>
-                <td className="p-4">
-                 
-                    <div className="flex items-center gap-2 ">
+            {paginatedProjects.length > 0 ? (
+              paginatedProjects.map((project) => (
+                <tr
+                  key={project.Id}
+                  className="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150"
+                >
+                  <td className="p-3">
+                    <Link href={`/dashboard/overview/${project.Id}`}>
+                      <div className="font-semibold text-gray-900 dark:text-white hover:underline cursor-pointer">
+                        {project.Name}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {project.Key}
+                      </div>
+                    </Link>
+                  </td>
+                  <td className="p-3">
+                    <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-800 dark:text-blue-200 text-xs">
                         {project.Lead?.charAt(0) || "?"}
                       </div>
                       <span>{project.Lead}</span>
                     </div>
-                  
-                </td>
-                <td className="p-4">
-                 
+                  </td>
+                  <td className="p-3">
                     <Badge variant={project.Status === "Active" ? "success" : "default"}>{project.Status || "Unknown"}</Badge>
-               
-                </td>
-                <td className="p-4">
-                  
-                    <div className="flex flex-col ">
+                  </td>
+                  <td className="p-3">
+                    <div className="flex flex-col">
                       <span className="font-medium">{project.ProjectOwner?.Name || "N/A"}</span>
                       {project.ProjectOwner?.ContactInfo && (
                         <span className="text-xs text-gray-500 dark:text-gray-400">{project.ProjectOwner.ContactInfo}</span>
                       )}
                     </div>
-                 
-                </td>
-                <td className="p-4">
-                 
-                    <div className="flex flex-col ">
+                  </td>
+                  <td className="p-3">
+                    <div className="flex flex-col">
                       <span className="font-medium">
                         {project.TargetEndDate ? new Date(project.TargetEndDate).toLocaleDateString() : ""}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">Target End Date</span>
                     </div>
-                  
-                </td>
-                <td className="p-4">{getHealthBadge(project.Health.Level)}</td>
-                <td className="p-4">
-                  <Progress completed={project.Progress.CompletedTasks} total={project.Progress.TotalTasks} />
-                </td>
-                <td className="p-4">
-                  <div className="flex flex-col">
-                    <span className="font-medium">{project.Progress.StoryPointsCompleted}/{project.Progress.StoryPointsTotal}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Story Points</span>
+                  </td>
+                  <td className="p-3">{getHealthBadge(project.Health.Level)}</td>
+                  <td className="p-3">
+                    <Progress completed={project.Progress.CompletedTasks} total={project.Progress.TotalTasks} />
+                  </td>
+                  <td className="p-3">
+                    <div className="flex flex-col">
+                      <span className="font-medium">{project.Progress.StoryPointsCompleted}/{project.Progress.StoryPointsTotal}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Story Points</span>
+                    </div>
+                  </td>
+                  <td className="p-3">
+                    {project.Progress.ActiveBlockers > 0 ? (
+                      <Badge variant="destructive">
+                        {project.Progress.ActiveBlockers} blocker{project.Progress.ActiveBlockers !== 1 ? "s" : ""}
+                      </Badge>
+                    ) : (
+                      <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                        <CircleSlash size={16} className="text-green-500" />
+                        <span>None</span>
+                      </div>
+                    )}
+                  </td>
+                  <td className="p-3 text-right">
+                    <ViewProjectButton projectKey={project.Key} />
+                    {/* This is where EditProjectButton is used */}
+                    <EditProjectButton projectId={project.Id} />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={10} className="py-16 text-center">
+                  <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+                    <Filter size={48} className="mb-4 opacity-50" />
+                    <h3 className="text-xl font-medium mb-2">
+                      No projects found
+                    </h3>
+                    <p className="max-w-md">
+                      Try adjusting your filters or search to find what you're
+                      looking for.
+                    </p>
                   </div>
                 </td>
-                <td className="p-4">
-                  {project.Progress.ActiveBlockers > 0 ? (
-                    <Badge variant="destructive">
-                      {project.Progress.ActiveBlockers} blocker{project.Progress.ActiveBlockers !== 1 ? "s" : ""}
-                    </Badge>
-                  ) : (
-                    <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                      <span>None</span>
-                    </div>
-                  )}
-                </td>
-                <td className="p-4 text-right">
-                  <ViewProjectButton projectKey={project.Key} />
-                  <EditProjectButton projectId={project.Id} />
-                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
@@ -360,4 +375,5 @@ export const ProjectTable = () => {
     </div>
   );
 };
+
 export default ProjectTable;

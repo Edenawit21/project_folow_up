@@ -2,12 +2,10 @@ import { ProjectDetailDto } from '@/types/projectDetail';
 import { getProjectDetails } from '@/utils/projectDetailApi';
 import React, { useState, useEffect } from 'react';
 
-
 interface ProjectOverallReportProps {
-    projectId: string; // The ID of the project to display the report for
+    projectId: string; 
 }
-
-const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }) => {
+    const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }) => {
     const [report, setReport] = useState<ProjectDetailDto | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -17,7 +15,7 @@ const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }
             setLoading(true);
             setError(null);
             try {
-            
+
                 const data = await getProjectDetails(projectId);
 
                 if (data) {
@@ -33,14 +31,14 @@ const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }
             }
         };
 
-        if (projectId) { 
+        if (projectId) {
             loadReport();
         } else {
-            setLoading(false); 
+            setLoading(false);
             setReport(null);
             setError(null);
         }
-    }, [projectId]); 
+    }, [projectId]);
 
     if (loading) return <div className="text-center p-8 text-gray-600">Loading overall project report...</div>;
     if (error) return <div className="text-center p-8 text-red-500">Error: {error}</div>;
@@ -48,27 +46,26 @@ const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans p-4 sm:p-6 lg:p-8">
-           
-            <header className="mb-4 pt-2 pb-6 bg-white rounded-lg shadow-md flex flex-col items-center">
+            <header className="mb-4 py-2 bg-white rounded-lg shadow-md flex flex-col items-center"> 
                 <p className="text-lg font-semibold text-gray-800 mb-2 tracking-wide">
-                    High-level overview of the project <span className="text-blue-700 font-bold">"{report.name}"</span> (<span className="text-blue-600">{report.key}</span>) as of <span className="text-gray-700">{new Date().toLocaleDateString()}</span>.
+                    High-level overview of <span className="text-blue-700 font-bold">"{report.name}"</span> (<span className="text-blue-600">{report.key}</span>) as of <span className="text-gray-700">{new Date().toLocaleDateString()}</span>.
                 </p>
                 <div className={`mt-2 mb-2 flex items-center px-6 py-2 rounded-full text-lg font-bold border-4 shadow transition-all
                     ${
                         String(report.overallProjectStatus) === "Active"
-                            ? "bg-green-100 text-green-800 border-green-500 animate-pulse"
+                            ? "bg-green-100 text-green-800 border-green-100"
                             : String(report.overallProjectStatus) === "OnHold"
-                            ? "bg-yellow-100 text-yellow-800 border-yellow-500 animate-pulse"
+                            ? "bg-yellow-100 text-yellow-800 border-yellow-500"
                             : String(report.overallProjectStatus) === "Completed"
-                            ? "bg-blue-100 text-blue-800 border-blue-500 animate-pulse"
+                            ? "bg-blue-100 text-blue-800 border-blue-500"
                             : String(report.overallProjectStatus) === "Cancelled"
-                            ? "bg-red-100 text-red-800 border-red-500 animate-pulse"
+                            ? "bg-red-100 text-red-800 border-red-500"
                             : String(report.overallProjectStatus) === "Archived"
                             ? "bg-gray-200 text-gray-700 border-gray-400"
                             : "bg-gray-100 text-gray-800 border-gray-400"
                     }
                 `}>
-                    <span className="mr-2">Status:</span>
+                    <span className="mr-1">Status:</span>
                     <span className="uppercase tracking-wider">{report.overallProjectStatus}</span>
                 </div>
                 {report.lead && (
@@ -77,9 +74,7 @@ const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }
                     </p>
                 )}
             </header>
-
-            {/* Key Progress Indicators */}
-            <section className="flex flex-wrap justify-around items-stretch gap-8 mb-8">
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 items-stretch"> 
                 <MetricCard
                     title="Tasks Completion"
                     value={`${report.completedTasks}/${report.totalTasks}`}
@@ -109,7 +104,7 @@ const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }
 
             {/* Executive Summary */}
             {report.executiveSummary && (
-                <section className="bg-white rounded-lg shadow p-6 mb-8">
+                <section className="bg-white rounded-lg shadow-md p-6 mb-8">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">Executive Summary</h2>
                     <p className="text-gray-700">
                         {report.executiveSummary}
@@ -119,7 +114,7 @@ const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }
 
             {/* Key Milestones */}
             {report.milestones && report.milestones.length > 0 && (
-                <section className="bg-white rounded-lg shadow p-6 mb-8">
+                <section className="bg-white rounded-lg shadow-md p-6 mb-8">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">Key Milestones</h2>
                     <ul className="space-y-3">
                         {report.milestones.map((milestone, index) => (
@@ -129,14 +124,14 @@ const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }
                                     Due: {new Date(milestone.dueDate).toLocaleDateString()}
                                     <span className={`ml-3 px-3 py-1 rounded-full text-xs font-semibold
                                         ${milestone.status === 0 ? 'bg-green-200 text-green-800' :
-                                          milestone.status === 1 ? 'bg-yellow-200 text-yellow-800' :
-                                          milestone.status === 2 ? 'bg-red-200 text-red-800' :
-                                          milestone.status === 3 ? 'bg-blue-200 text-blue-800' :
-                                          milestone.status === 4 ? 'bg-orange-200 text-orange-800' :
-                                          'bg-gray-200 text-gray-800'}`}>
-                                        {typeof milestone.status === 'number'
-                                            ? ['Planned', 'OnTrack', 'AtRisk','Completed','Delay'][milestone.status] || milestone.status
-                                            : milestone.status}
+                                            milestone.status === 1 ? 'bg-yellow-200 text-yellow-800' :
+                                            milestone.status === 2 ? 'bg-red-200 text-red-800' :
+                                            milestone.status === 3 ? 'bg-blue-200 text-blue-800' :
+                                            milestone.status === 4 ? 'bg-orange-200 text-orange-800' :
+                                            'bg-gray-200 text-gray-800'}`}>
+                                            {typeof milestone.status === 'number'
+                                                ? ['Planned', 'OnTrack', 'AtRisk','Completed','Delay'][milestone.status] || milestone.status
+                                                : milestone.status}
                                     </span>
                                 </div>
                             </li>
@@ -147,7 +142,7 @@ const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }
 
             {/* Major Risks */}
             {report.risks && report.risks.length > 0 && (
-                <section className="bg-white rounded-lg shadow p-6 mb-8">
+                <section className="bg-white rounded-lg shadow-md p-6 mb-8">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 text-red-700">Major Risks</h2>
                     <ul className="space-y-3">
                         {report.risks.map(risk => (
@@ -156,9 +151,9 @@ const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }
                                 <p className="text-gray-800 flex-grow">{risk.description}</p>
                                 <span className={`ml-3 px-3 py-1 rounded-full text-xs font-semibold flex-shrink-0
                                     ${risk.impact === 2 ? 'bg-red-200 text-red-800' :
-                                      risk.impact === 1 ? 'bg-orange-200 text-orange-800' :
-                                      'bg-gray-200 text-gray-800'}`}>
-                                    Impact: {risk.impact === 2 ? 'High' : risk.impact === 1 ? 'Medium' : 'Low'}
+                                        risk.impact === 1 ? 'bg-orange-200 text-orange-800' :
+                                        'bg-gray-200 text-gray-800'}`}>
+                                        Impact: {risk.impact === 2 ? 'High' : risk.impact === 1 ? 'Medium' : 'Low'}
                                 </span>
                             </li>
                         ))}
@@ -169,13 +164,12 @@ const ProjectOverallReport: React.FC<ProjectOverallReportProps> = ({ projectId }
     );
 };
 
-// Reusable MetricCard Component (copied from previous turn, simplified slightly for clarity)
-const MetricCard = ({ title, value, percentage, color = 'gray' }: { title: string; value: string | number; percentage?: number; color?: string }) => {
+    const MetricCard = ({ title, value, percentage, color = 'gray' }: { title: string; value: string | number; percentage?: number; color?: string }) => {
     const borderColorClass = `border-${color}-500`;
     const progressBarColorClass = `bg-${color}-600`;
 
     return (
-        <div className={`bg-white rounded-lg shadow p-5 border-l-4 ${borderColorClass}`}>
+        <div className={`bg-white rounded-lg shadow-md p-5 border-l-4 ${borderColorClass}`}> 
             <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
             <p className="text-3xl font-bold text-gray-900">
                 {value}
@@ -196,4 +190,4 @@ const MetricCard = ({ title, value, percentage, color = 'gray' }: { title: strin
 };
 
 
-export default ProjectOverallReport; // Export the main App component for Canvas
+export default ProjectOverallReport;

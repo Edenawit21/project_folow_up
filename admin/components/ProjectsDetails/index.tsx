@@ -218,7 +218,7 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
   }, [sprintReport]);
 
   return (
-    <div className="min-h-screen dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 py-6 font-inter">
+    <div className="min-h-screen dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 font-inter">
       <div className="max-w-6xl mx-auto px-4 md:px-0">
         <div className="flex justify-end mb-4">
           <button
