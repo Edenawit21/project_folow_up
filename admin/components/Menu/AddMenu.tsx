@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { Loader2, X } from "lucide-react";
 import {
@@ -82,7 +82,7 @@ const AddMenu: React.FC<AddMenuProps> = ({
           setFormData(fetched);
           setOriginalData(fetched);
         }
-      } catch (err) {
+      } catch {
         toast.error("Failed to load data.");
         onClose();
       } finally {
@@ -131,20 +131,19 @@ const AddMenu: React.FC<AddMenuProps> = ({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto max-h-[90vh] overflow-y-auto p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-300 dark:border-gray-600">
-      <div className="pt-2 pb-4 border-b border-gray-200 dark:border-gray-700 relative">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-          disabled={isSubmitting}
-        >
-          <X className="h-6 w-6 hover:text-red-500" />
-        </button>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center">
-          {isEditing ? "Update Menu" : "Add New Menu"}
-        </h2>
-      </div>
+    <div className="relative w-full max-w-3xl mx-auto p-4 sm:p-6 md:p-8 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-y-auto max-h-[90vh] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute top-2 right-2 text-gray-400 hover:text-red-600 dark:text-gray-500 dark:hover:text-red-400"
+        disabled={isSubmitting}
+      >
+        <X className="h-6 w-6" />
+      </button>
+
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-4">
+        {isEditing ? "Update Menu" : "Add New Menu"}
+      </h2>
 
       {loadingInitialData ? (
         <div className="flex items-center justify-center p-6">
@@ -154,7 +153,7 @@ const AddMenu: React.FC<AddMenuProps> = ({
           </p>
         </div>
       ) : (
-        <form id="menu-form" onSubmit={handleSubmit} className="pt-4 space-y-4">
+        <form id="menu-form" onSubmit={handleSubmit} className="space-y-4">
           {[
             { name: "name", label: "Name", placeholder: "Enter menu name" },
             {

@@ -17,7 +17,8 @@ export interface LoginResponse {
 }
 export interface ChangePasswordPayload {
   userId: string;
-  currentPassword: string;
+  email?: string;
+  currentPassword?: string;
   newPassword: string;
   confirmNewPassword: string;
   isFirstLoginChange: boolean;

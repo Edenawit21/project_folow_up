@@ -51,21 +51,31 @@ const Badge = ({
   const variantClasses: Record<string, string> = {
     default: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200",
     destructive: "bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-300",
-    success: "bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300",
-    warning: "bg-yellow-100 dark:bg-yellow-900/60 text-yellow-700 dark:text-yellow-300",
+    success:
+      "bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300",
+    warning:
+      "bg-yellow-100 dark:bg-yellow-900/60 text-yellow-700 dark:text-yellow-300",
   };
 
   return (
-    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${variantClasses[variant]}`}>
+    <span
+      className={`px-2.5 py-1 rounded-full text-xs font-medium ${variantClasses[variant]}`}
+    >
       {children}
     </span>
   );
 };
 
-const Input = ({ className = "", ...props }: { className?: string; [key: string]: any }) => (
+const Input = ({
+  className = "",
+  ...props
+}: {
+  className?: string;
+  [key: string]: any;
+}) => (
   <div className="relative">
     <input
-      className={`flex h-10 w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 pl-10 pr-4 py-2 text-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+      className={`w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 ${className}`}
       {...props}
     />
     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
@@ -90,7 +100,7 @@ const Select = ({
     <select
       value={value}
       onChange={(e) => onValueChange(e.target.value)}
-      className="h-10 w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-100 pl-10 pr-10 py-2 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+      className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
       aria-label={placeholder}
       title={placeholder}
     >
@@ -101,7 +111,6 @@ const Select = ({
         </option>
       ))}
     </select>
-    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
   </div>
 );
 
@@ -294,38 +303,63 @@ export const ProjectTable = () => {
                     </div>
                   </td>
                   <td className="p-3">
-                    <Badge variant={project.Status === "Active" ? "success" : "default"}>{project.Status || "Unknown"}</Badge>
+                    <Badge
+                      variant={
+                        project.Status === "Active" ? "success" : "default"
+                      }
+                    >
+                      {project.Status || "Unknown"}
+                    </Badge>
                   </td>
                   <td className="p-3">
                     <div className="flex flex-col">
-                      <span className="font-medium">{project.ProjectOwner?.Name || "N/A"}</span>
+                      <span className="font-medium">
+                        {project.ProjectOwner?.Name || "N/A"}
+                      </span>
                       {project.ProjectOwner?.ContactInfo && (
-                        <span className="text-xs text-gray-500 dark:text-gray-400">{project.ProjectOwner.ContactInfo}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {project.ProjectOwner.ContactInfo}
+                        </span>
                       )}
                     </div>
                   </td>
                   <td className="p-3">
                     <div className="flex flex-col">
                       <span className="font-medium">
-                        {project.TargetEndDate ? new Date(project.TargetEndDate).toLocaleDateString() : ""}
+                        {project.TargetEndDate
+                          ? new Date(project.TargetEndDate).toLocaleDateString()
+                          : ""}
                       </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">Target End Date</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Target End Date
+                      </span>
                     </div>
                   </td>
-                  <td className="p-3">{getHealthBadge(project.Health.Level)}</td>
                   <td className="p-3">
-                    <Progress completed={project.Progress.CompletedTasks} total={project.Progress.TotalTasks} />
+                    {getHealthBadge(project.Health.Level)}
+                  </td>
+                  <td className="p-3">
+                    <Progress
+                      completed={project.Progress.CompletedTasks}
+                      total={project.Progress.TotalTasks}
+                    />
                   </td>
                   <td className="p-3">
                     <div className="flex flex-col">
-                      <span className="font-medium">{project.Progress.StoryPointsCompleted}/{project.Progress.StoryPointsTotal}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">Story Points</span>
+                      <span className="font-medium">
+                        {project.Progress.StoryPointsCompleted}/
+                        {project.Progress.StoryPointsTotal}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Story Points
+                      </span>
                     </div>
                   </td>
                   <td className="p-3">
                     {project.Progress.ActiveBlockers > 0 ? (
                       <Badge variant="destructive">
-                        {project.Progress.ActiveBlockers} blocker{project.Progress.ActiveBlockers !== 1 ? "s" : ""}
+                        {project.Progress.ActiveBlockers} blocker
+                        {project.Progress.ActiveBlockers !== 1 ? "s" : ""}
                       </Badge>
                     ) : (
                       <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
