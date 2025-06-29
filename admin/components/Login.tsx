@@ -137,6 +137,16 @@ const Login = () => {
                     : "border-gray-300 dark:border-gray-600"
                 } bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white`}
               />
+              <div className="text-sm text-right">
+                <button
+                  type="button"
+                  onClick={() => router.push("/forgot_password")}
+                  className="text-blue-600 hover:underline dark:text-blue-400"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
