@@ -68,17 +68,17 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 via-white to-blue-200 dark:from-gray-900 dark:via-slate-700 dark:to-gray-700 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-200 px-4">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-md backdrop-blur-md bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 shadow-2xl rounded-2xl p-10"
+        className="w-full max-w-md backdrop-blur-md bg-white/70 border border-white/40 shadow-2xl rounded-2xl p-10"
       >
-        <h2 className="text-4xl font-extrabold text-center mb-6 text-gray-800 dark:text-white">
+        <h2 className="text-4xl font-extrabold text-center mb-6 text-gray-800">
           {isReturningUser ? "Welcome back" : "Welcome"}
         </h2>
-        <p className="text-center text-sm text-gray-600 dark:text-gray-300 mb-8">
+        <p className="text-center text-sm text-gray-600 mb-8">
           {isReturningUser
             ? "Great to see you again! Please sign in"
             : "Please sign in to your account"}
@@ -93,7 +93,7 @@ const Login = () => {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
               Email
             </label>
@@ -104,11 +104,9 @@ const Login = () => {
               value={form.email}
               onChange={handleChange}
               placeholder="Enter your email"
-              className={`w-full px-4 py-2 text-base rounded-md border ${
-                errors.email
-                  ? "border-red-500"
-                  : "border-gray-300 dark:border-gray-600"
-              } bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white`}
+              className={`w-full px-4 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              } bg-gray-50 text-gray-900`}
             />
             {errors.email && (
               <p className="text-red-600 text-sm mt-1">{errors.email}</p>
@@ -119,7 +117,7 @@ const Login = () => {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
               Password
             </label>
@@ -131,17 +129,15 @@ const Login = () => {
                 value={form.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className={`w-full px-4 py-2 text-base rounded-md border ${
-                  errors.password
-                    ? "border-red-500"
-                    : "border-gray-300 dark:border-gray-600"
-                } bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white`}
+                className={`w-full px-4 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                } bg-gray-50 text-gray-900`}
               />
-              <div className="text-sm text-right">
+              <div className="text-sm text-right mt-1">
                 <button
                   type="button"
                   onClick={() => router.push("/forgot_password")}
-                  className="text-blue-600 hover:underline dark:text-blue-400"
+                  className="text-blue-600 hover:underline"
                 >
                   Forgot Password?
                 </button>
@@ -150,7 +146,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 mb-4"
               >
                 {showPassword ? (
                   <svg

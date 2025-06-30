@@ -66,9 +66,9 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-50 to-teal-100 dark:from-gray-800 dark:to-gray-800 px-4 py-8">
-      <div className="w-full max-w-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-8 rounded-2xl shadow-2xl transition-all">
-        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
+      <div className="w-full max-w-md bg-white border border-gray-200 p-8 rounded-2xl shadow-2xl transition-all">
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
           {mode === "forgot" ? "Reset Your Password" : "Change Your Password"}
         </h2>
 
@@ -77,7 +77,7 @@ const ChangePassword = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Email
               </label>
@@ -87,14 +87,14 @@ const ChangePassword = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full px-4 py-2 border rounded-lg shadow-sm dark:bg-gray-800 dark:text-white dark:border-gray-700"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition"
               />
             </div>
           ) : (
             <div>
               <label
                 htmlFor="currentPassword"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Current Password
               </label>
@@ -104,7 +104,7 @@ const ChangePassword = () => {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="Enter current password"
-                className="w-full px-4 py-2 border rounded-lg shadow-sm dark:bg-gray-800 dark:text-white dark:border-gray-700"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition"
               />
             </div>
           )}
@@ -112,7 +112,7 @@ const ChangePassword = () => {
           <div>
             <label
               htmlFor="newPassword"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
               New Password
             </label>
@@ -122,14 +122,14 @@ const ChangePassword = () => {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Enter new password"
-              className="w-full px-4 py-2 border rounded-lg shadow-sm dark:bg-gray-800 dark:text-white dark:border-gray-700"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition"
             />
           </div>
 
           <div>
             <label
               htmlFor="confirmNewPassword"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
               Confirm New Password
             </label>
@@ -139,20 +139,14 @@ const ChangePassword = () => {
               value={confirmNewPassword}
               onChange={(e) => setConfirmNewPassword(e.target.value)}
               placeholder="Confirm new password"
-              className="w-full px-4 py-2 border rounded-lg shadow-sm dark:bg-gray-800 dark:text-white dark:border-gray-700"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 transition"
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600 dark:text-red-400 font-medium">
-              {error}
-            </p>
-          )}
+          {error && <p className="text-sm text-red-600 font-medium">{error}</p>}
 
           {success && (
-            <p className="text-sm text-green-600 dark:text-green-400 font-medium">
-              {success}
-            </p>
+            <p className="text-sm text-green-600 font-medium">{success}</p>
           )}
 
           <button
