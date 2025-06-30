@@ -7,7 +7,7 @@ import {
 } from "@/types/projectDetail";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import RiskItem from "./RiskItem";
+import RiskItem from "@/components/risk/RiskItem";
 import { addRisk } from "@/utils/projectDetailApi";
 
 const RisksList: React.FC<{

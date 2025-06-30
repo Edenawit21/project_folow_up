@@ -6,7 +6,7 @@ import {
 import { addMilestone } from "@/utils/projectDetailApi";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import MilestoneItem from "./MilestoneItem";
+import MilestoneItem from "@/components/milestone/MilestoneItem";
 
 const MilestonesList: React.FC<{
   projectId: string;

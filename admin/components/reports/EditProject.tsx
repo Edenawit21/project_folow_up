@@ -5,8 +5,8 @@ import {
 } from "@/utils/projectDetailApi";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
-import RiskList from "./RisksList";
-import MilestonesList from "./MilestonesList";
+import RiskList from "@/components/risk/RisksList";
+import MilestonesList from "@/components/milestone/MilestonesList";
 
 interface ProjectStrategicEditFormProps {
   projectId: string;

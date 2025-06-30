@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, use } from "react"; // ⚠️ Note: `use` is experimental and not typically used in components
+import React, { useEffect, useState, use } from "react";
 import { toast } from "react-toastify";
 import { ProjectCompletionReports } from "@/types/userProject";
 import { UserProjectReport } from "@/types/userReport";
@@ -16,7 +16,7 @@ interface PageProps {
 }
 
 export default function UserDetailComponent({ params }: PageProps) {
-  const { userId } = use(params); // ⚠️ Normally avoid using `use()` for async resolution, prefer using `await` in server components.
+  const { userId } = use(params);
 
   const [project, setProject] = useState<ProjectCompletionReports | null>(null);
   const [selectedProject, setSelectedProject] =
@@ -107,12 +107,12 @@ export default function UserDetailComponent({ params }: PageProps) {
   }
 
   return (
-    <div className="mx-auto max-w-4xl w-full mt-8">
+    <div className="mx-auto max-w-4xl w-full mt-2">
       {selectedProject && selectedProjectId ? (
-        <div className="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+        <div className="mb-2"> 
           <button
             onClick={handleBackToProjects}
-            className="mb-4 px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors"
+            className="text-xl font-medium text-blue-600 hover:underline flex items-center pl-0 mb-2"
           >
             ← Back to Projects
           </button>
@@ -125,10 +125,10 @@ export default function UserDetailComponent({ params }: PageProps) {
         </div>
       ) : (
         <div className="">
-          <h2 className="text-2xl sm:text-3xl mb-5 font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent text-center">
+          <h2 className="text-2xl sm:text-3xl mb-5 font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent text-left mt-10">
             Assigned Projects Overview
           </h2>
-          <div className="bg-white dark:bg-gray-800 dark:text-white p-6 shadow-md border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div className="mt-4">
             <ProjectReportTable
               data={project}
               currentUserId={userId}
