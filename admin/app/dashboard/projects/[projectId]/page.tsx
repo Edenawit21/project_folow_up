@@ -1,6 +1,6 @@
 'use client';
 
-import ProjectStrategicEditForm from '@/components/EditProject';
+import ProjectStrategicEditForm from '@/components/reports/EditProject';
 import * as React from 'react';
 
 interface PageProps {

@@ -204,7 +204,6 @@ export const ProjectTable = () => {
 
   return (
     <div className="space-y-6 p-4 sm:p-6 text-gray-800 dark:text-gray-100">
-      {/* Top Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
         <div>
           <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
@@ -243,7 +242,7 @@ export const ProjectTable = () => {
             onValueChange={(value) =>
               setFilters({ ...filters, healthLevel: value })
             }
-            placeholder="Health Status"
+            placeholder="All Health Statuses"
             options={[
               { value: "1", label: "On Track" },
               { value: "2", label: "Needs Attention" },
@@ -253,7 +252,6 @@ export const ProjectTable = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm bg-white dark:bg-gray-800">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 text-sm font-medium">
@@ -261,7 +259,7 @@ export const ProjectTable = () => {
               <th className="p-3 text-left">Project</th>
               <th className="p-3 text-left">Lead</th>
               <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Project Owner</th>
+              <th className="p-3 text-left">Product Owner</th>
               <th className="p-3 text-left">Target End Date</th>
               <th className="p-3 text-left">Health</th>
               <th className="p-3 text-left">Progress</th>
@@ -363,7 +361,6 @@ export const ProjectTable = () => {
                   </td>
                   <td className="p-3 text-right">
                     <ViewProjectButton projectKey={project.Key} />
-                    {/* This is where EditProjectButton is used */}
                     <EditProjectButton projectId={project.Id} />
                   </td>
                 </tr>

@@ -3,7 +3,7 @@ import React from "react";
 interface CardProps<T> {
   title: string;
   value: number;
-  percentage: number;
+  percentage?: number;
   color: string;
 }
 

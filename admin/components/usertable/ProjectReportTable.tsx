@@ -15,7 +15,7 @@ const ProjectReportTable: React.FC<ProjectReportTableProps> = ({
   onShowMore,
 }) => {
   return (
-    <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-800">
+    <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
       <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-700">
         <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
           <tr>
@@ -95,7 +95,10 @@ const ProjectReportTable: React.FC<ProjectReportTableProps> = ({
                   {project.completedTasks}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <div className="flex items-center">
+                  <div className="flex flex-col">
+                    <span className="mb-1 text-gray-700 dark:text-gray-200 font-semibold">
+                      {project.taskCompletionPercentage.toFixed(2)}%
+                    </span>
                     <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                       <div
                         className="bg-blue-600 h-2 rounded-full"
@@ -104,9 +107,6 @@ const ProjectReportTable: React.FC<ProjectReportTableProps> = ({
                         }}
                       ></div>
                     </div>
-                    <span className="ml-2 text-gray-700 dark:text-gray-200 font-semibold">
-                      {project.taskCompletionPercentage}%
-                    </span>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
@@ -116,7 +116,10 @@ const ProjectReportTable: React.FC<ProjectReportTableProps> = ({
                   {project.completedStoryPoints}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <div className="flex items-center">
+                  <div className="flex flex-col">
+                    <span className="mb-1 text-gray-700 dark:text-gray-200 font-semibold">
+                      {project.storyPointCompletionPercentage.toFixed(2)}%
+                    </span>
                     <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                       <div
                         className="bg-green-600 h-2 rounded-full"
@@ -125,15 +128,12 @@ const ProjectReportTable: React.FC<ProjectReportTableProps> = ({
                         }}
                       ></div>
                     </div>
-                    <span className="ml-2 text-gray-700 dark:text-gray-200 font-semibold">
-                      {project.storyPointCompletionPercentage}%
-                    </span>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
                   <button
                     onClick={() => onShowMore(project.projectId)}
-                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors shadow-sm hover:shadow-md"
+                    className="px-3 py-1 bg-blue-400 hover:bg-blue-500 text-white rounded transition-colors shadow-sm hover:shadow-md"
                   >
                     Show More
                   </button>
