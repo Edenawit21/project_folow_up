@@ -485,9 +485,7 @@ const UserList = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
-            Users Management
-          </h2>
+          <h2 className="text-2xl sm:text-3xl font-bold">Users Management</h2>
           <p className="mt-1 sm:mt-2 text-gray-600 dark:text-gray-300 italic text-xs sm:text-sm">
             Manage and organize users in the system.
           </p>

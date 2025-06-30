@@ -140,9 +140,7 @@ const PrivilegeList = () => {
       {/* Header with gradient text and animated button */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
-            Privilege Management
-          </h1>
+          <h1 className="">Privilege Management</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400 italic text-sm">
             Manage application privileges and access levels
           </p>
@@ -158,7 +156,7 @@ const PrivilegeList = () => {
 
       {/* Enhanced Search Bar */}
       <div className="mb-6">
-        <div className="mb-4 max-w-md">
+        <div className="relative w-full sm:max-w-md">
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
@@ -179,7 +177,6 @@ const PrivilegeList = () => {
           )}
         </div>
       </div>
-
       {/* Enhanced Table with Card Styling */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
         <div className="overflow-x-auto">
