@@ -1,22 +1,15 @@
 export enum TaskStatus {
-  ToDo = 'To Do',
-  InProgress = 'In Progress',
+  ToDo = 'ToDo',
+  InProgress = 'InProgress',
   Done = 'Done',
   Blocked = 'Blocked',
   Unknown = 'Unknown',
-//   SelectedForDevelopment = 'Selected for Development',
-//   ReadyForReview = 'Ready For Review',
-//   InReview = 'In Review',
-//   QA = 'QA',
-//   Closed = 'Closed',
 }
 
 import { TaskInSprint } from "./sprint";
 
 // /**
-//  * Enum for broad task status categories.
-//  * Useful for grouping statuses for UI purposes (e.g., in progress, done).
-//  */
+//  * Enum for broad task status categories */
 // export enum TaskStatusCategory {
 //   ToDo = 'To Do',
 //   InProgress = 'In Progress',
@@ -25,9 +18,7 @@ import { TaskInSprint } from "./sprint";
 //   Other = 'Other',
 // }
 
-/**
- * Represents a single task assigned to a user within a project.
- */
+
 // export interface UserProjectTask {
 //   key: string;
 //   title: string;
@@ -51,18 +42,13 @@ import { TaskInSprint } from "./sprint";
 //   currentSprintState: string | null;
 // }
 
-/**
- * Represents a sprint the user is involved in.
- */
+
 export interface SprintInvolvedIn {
-  id: string; // GUID string
+  id: string; 
   name: string;
-  state: string; // e.g., "active", "closed", "future"
+  state: string; 
 }
 
-/**
- * Represents the full detailed report for a user within a specific project.
- */
 export interface UserProjectReport {
   userId: string;
   userName: string;
