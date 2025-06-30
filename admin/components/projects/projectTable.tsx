@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { ChevronDown, Search, Filter, FolderKanban,CircleSlash, } from "lucide-react";
+import { ChevronDown, Search, Filter, FolderKanban, CircleSlash } from "lucide-react";
 import { fetchProjects, ProjectDto } from "../../utils/Jira";
 import ViewProjectButton from "../ui/ViewProjectButton";
-import EditProjectButton from "../ui/EditProjectButton"; 
+import EditProjectButton from "../ui/EditProjectButton";
 import PaginationFooter from "@/components/footer/PaginationFooter";
 import Link from "next/link";
 
@@ -256,16 +256,17 @@ export const ProjectTable = () => {
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 text-sm font-medium">
             <tr>
-              <th className="p-3 text-left">Project</th>
-              <th className="p-3 text-left">Lead</th>
-              <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Product Owner</th>
-              <th className="p-3 text-left">Target End Date</th>
-              <th className="p-3 text-left">Health</th>
-              <th className="p-3 text-left">Progress</th>
-              <th className="p-3 text-left">Story Points</th>
-              <th className="p-3 text-left">Blockers</th>
-              <th className="p-3 text-right">Actions</th>
+              {/* Changed p-3 to p-2 */}
+              <th className="p-2 text-left">Project</th>
+              <th className="p-2 text-left">Lead</th>
+              <th className="p-2 text-left">Status</th>
+              <th className="p-2 text-left">Product Owner</th>
+              <th className="p-2 text-left">Target End Date</th>
+              <th className="p-2 text-left">Health</th>
+              <th className="p-2 text-left">Progress</th>
+              <th className="p-2 text-left">Story Points</th>
+              <th className="p-2 text-left">Blockers</th>
+              <th className="p-2 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -275,7 +276,8 @@ export const ProjectTable = () => {
                   key={project.Id}
                   className="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150"
                 >
-                  <td className="p-3">
+                  {/* Changed p-3 to p-2 for all td elements */}
+                  <td className="p-2">
                     <Link href={`/dashboard/overview/${project.Id}`}>
                       <div className="font-semibold text-gray-900 dark:text-white hover:underline cursor-pointer">
                         {project.Name}
@@ -285,7 +287,7 @@ export const ProjectTable = () => {
                       </div>
                     </Link>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-800 dark:text-blue-200 text-xs">
                         {project.Lead?.charAt(0) || "?"}
@@ -293,7 +295,7 @@ export const ProjectTable = () => {
                       <span>{project.Lead}</span>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2">
                     <Badge
                       variant={
                         project.Status === "Active" ? "success" : "default"
@@ -302,7 +304,7 @@ export const ProjectTable = () => {
                       {project.Status || "Unknown"}
                     </Badge>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2">
                     <div className="flex flex-col">
                       <span className="font-medium">
                         {project.ProjectOwner?.Name || "N/A"}
@@ -314,7 +316,7 @@ export const ProjectTable = () => {
                       )}
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2">
                     <div className="flex flex-col">
                       <span className="font-medium">
                         {project.TargetEndDate
@@ -326,16 +328,16 @@ export const ProjectTable = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2">
                     {getHealthBadge(project.Health.Level)}
                   </td>
-                  <td className="p-3">
+                  <td className="p-2">
                     <Progress
                       completed={project.Progress.CompletedTasks}
                       total={project.Progress.TotalTasks}
                     />
                   </td>
-                  <td className="p-3">
+                  <td className="p-2">
                     <div className="flex flex-col">
                       <span className="font-medium">
                         {project.Progress.StoryPointsCompleted}/
@@ -346,7 +348,7 @@ export const ProjectTable = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2">
                     {project.Progress.ActiveBlockers > 0 ? (
                       <Badge variant="destructive">
                         {project.Progress.ActiveBlockers} blocker
@@ -359,7 +361,7 @@ export const ProjectTable = () => {
                       </div>
                     )}
                   </td>
-                  <td className="p-3 text-right">
+                  <td className="p-2 text-right">
                     <ViewProjectButton projectKey={project.Key} />
                     <EditProjectButton projectId={project.Id} />
                   </td>
