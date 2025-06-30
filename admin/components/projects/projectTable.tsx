@@ -1,17 +1,10 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import {
-  ChevronDown,
-  Search,
-  Filter,
-  FolderKanban,
-  CircleSlash,
-  // Pencil // <-- No need to import Pencil here, it's used in EditProjectButton
-} from "lucide-react";
+import { ChevronDown, Search, Filter, FolderKanban,CircleSlash, } from "lucide-react";
 import { fetchProjects, ProjectDto } from "../../utils/Jira";
 import ViewProjectButton from "../ui/ViewProjectButton";
-import EditProjectButton from "../ui/EditProjectButton"; // This is the component that needs internal modification
+import EditProjectButton from "../ui/EditProjectButton"; 
 import PaginationFooter from "@/components/footer/PaginationFooter";
 import Link from "next/link";
 

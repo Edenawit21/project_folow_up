@@ -1,12 +1,8 @@
 import axios from "axios";
 
-/**
- * Base URL for the API
- */
 export const PROJECT_API_URL =
   process.env.NEXT_PUBLIC_BASE_API_URL ?? "https://localhost:7205/api/Project";
 
-/*  Backend contract */
 export interface ApiProject {
   id: string;
   key: string;
@@ -29,41 +25,38 @@ export interface ApiProject {
   };
   owner?: {
     name: string;
-    contactInfo?: string; // Optional field for contact info
+    contactInfo?: string; 
   };
-  targetEndDate?: string; // Optional field for target end date
-  status?: string; // Optional field for status
+  targetEndDate?: string; 
+  status?: string; 
   critical: boolean;
 }
 
-/* Response returned by GET /public — list of projects */
 export interface ApiProjectsResponse {
   success: boolean;
   data: ApiProject | ApiProject[];
 }
 
-/* Wrapped response that _may_ be returned by GET /:id */
 export interface ApiProjectByIdWrapped {
   success: boolean;
   data: ApiProject;
 }
 
-/* GET /:id can return _either_ a wrapped or a raw project object */
 export type ApiProjectByIdResponse = ApiProject | ApiProjectByIdWrapped;
 
-/* UI contract */
+
 export type ProjectDto = {
   Id: string;
   Key: string;
   Name: string;
   Description: string;
   Lead: string;
-  Status?: string; // Optional field for status
-  TargetEndDate?: string; // Optional field for target end date
+  Status?: string; 
+  TargetEndDate?: string; 
   ProjectOwner?: {
     Name?: string;
     ContactInfo ?: string;
-  }; // Optional field for project owner
+  }; 
   Health: {
     Level: number;
     Reason: string;
@@ -82,7 +75,7 @@ export type ProjectDto = {
   Critical: boolean;
 };
 
-/* Mapper */
+
 const mapApiToProjectDto = (api: ApiProject): ProjectDto => ({
   Id: api.id,
   Key: api.key,
@@ -104,16 +97,15 @@ const mapApiToProjectDto = (api: ApiProject): ProjectDto => ({
     RecentUpdates: api.progress.recentUpdates,
   },
   ProjectOwner: {
-    Name: api.owner?.name , // Assuming lead is a string, but can be an object if needed
-    ContactInfo: api.owner?.contactInfo , // Assuming contact info is optional
+    Name: api.owner?.name , 
+    ContactInfo: api.owner?.contactInfo ,
   },
   TargetEndDate: api.targetEndDate ? new Date(api.targetEndDate).toISOString() : undefined,
-  Status: api.status, // Optional field for status
+  Status: api.status, 
   Critical: api.critical,
 });
 
 
-/* Fetch **all** projects (public list) */
 export const fetchProjects = async (): Promise<ProjectDto[]> => {
   try {
     const { data, status } = await axios.get<ApiProjectsResponse>(
@@ -123,8 +115,6 @@ export const fetchProjects = async (): Promise<ProjectDto[]> => {
     if (status !== 200 || !data.success) {
       throw new Error("Failed to fetch projects");
     }
-
-    // Handle both single project and array responses
     const projects = Array.isArray(data.data) ? data.data : [data.data];
     return projects.map(mapApiToProjectDto);
   } catch (error) {
@@ -133,7 +123,6 @@ export const fetchProjects = async (): Promise<ProjectDto[]> => {
   }
 };
 
-/* Fetch **one** project by its identifier. */
 export const fetchProjectById = async (
   projectId: string
 ): Promise<ProjectDto> => {
@@ -141,7 +130,7 @@ export const fetchProjectById = async (
     const url = `${PROJECT_API_URL}/${projectId}`;
     const { data, status } = await axios.get<ApiProjectByIdResponse>(url, {
       timeout: 5000,
-      validateStatus: (status) => status < 500, // Don’t reject for 4xx errors
+      validateStatus: (status) => status < 500, 
     });
 
     if (status !== 200) {
@@ -150,7 +139,6 @@ export const fetchProjectById = async (
 
     let projectApi: ApiProject | null = null;
 
-    // Case 1: wrapped response – { success, data }
     if (typeof (data as ApiProjectByIdWrapped).success !== "undefined") {
       const wrapped = data as ApiProjectByIdWrapped;
 
@@ -160,7 +148,6 @@ export const fetchProjectById = async (
 
       projectApi = wrapped.data;
     } else {
-      // Case 2: raw project object
       projectApi = data as ApiProject;
     }
 
