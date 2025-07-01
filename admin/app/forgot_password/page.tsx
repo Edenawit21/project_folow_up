@@ -20,7 +20,6 @@ const ForgotPassword = () => {
     setError(null);
     setSubmitted(true);
 
-    // Simulate sending a reset email (replace with real API call)
     setTimeout(() => {
       const query = new URLSearchParams({
         mode: "forgot",
@@ -34,7 +33,7 @@ const ForgotPassword = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       <div className="w-full max-w-sm bg-white border border-gray-300 rounded-xl shadow-lg p-8">
-        <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-4">
+        <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-1">
           Forgot Password
         </h2>
         <p className="text-center text-gray-600 mb-8">
