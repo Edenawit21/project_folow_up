@@ -1,8 +1,7 @@
-
 "use client";
 
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { Trash2, Pencil, Plus, Search, X } from "lucide-react";
+import { Trash2, Pencil, Plus, Search, X, Filter } from "lucide-react";
 import { toast } from "react-toastify";
 import { UserData, UserFilterDto } from "@/types/user";
 import { getUsers, deleteUser } from "@/utils/userApi";
@@ -14,6 +13,26 @@ import Link from "next/link";
 import { fileURLToPath } from "url";
 
 
+ const Select = ({ value, onValueChange, options, placeholder }: { value: string; onValueChange: (value: string) => void; options: { label: string; value: string }[]; placeholder: string }) => (
+  <div className="relative">
+    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500">
+      <Filter size={16} />
+    </div>
+    <select
+      value={value}
+      onChange={(e) => onValueChange(e.target.value)}
+      className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      aria-label={placeholder}
+    >
+      <option value="">{placeholder}</option>
+      {options.map((opt) => (
+        <option key={opt.value} value={opt.value}>{opt.label}</option>
+      ))}
+    </select>
+  </div>
+);
+
+
 const UserList = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [roles, setRoles] = useState<RoleData[]>([]);
@@ -21,71 +40,55 @@ const UserList = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | undefined>();
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
+  const [role, setRole] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [source,setSource] = useState("");
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [filter, setFilter] = useState<UserFilterDto>({
-      PageNumber: 1,
-      PageSize: 15,
-      SortBy: 'Name',
-      SortDescending: false
-    });
-    const [totalCount, setTotalCount] = useState(0);
-
-   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Include search term in the filter if it exists
-        const apiFilter = {
-          ...filter,
-         
-          pageNumber: currentPage,
-          pageSize: rowsPerPage
-        };
-        
-        const [usersResult, rolesResponse] = await Promise.all([
-          getUsers(apiFilter),
-          fetchAllRoles(),
-        ]);
-        console.log("Fetched users:", usersResult);
-        console.log("Fetched roles:", rolesResponse);
-        const { items, totalCount } = usersResult;
-        setUsers(items);
-        setTotalCount(totalCount);
-        setRoles(rolesResponse);
-      } catch (error) {
-        toast.error("Failed to fetch users or roles");
-        console.error("Error fetching users or roles:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [filter, searchQuery, currentPage, rowsPerPage]);
-
-  const loadUsers = async () => {
+    PageNumber: 1,
+    PageSize: 15,
+    SortBy: "Name",
+    SortDescending: false,
+  });
+  const [totalCount, setTotalCount] = useState(0);
+  
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
+      
       const apiFilter = {
         ...filter,
-        searchTerm: searchQuery || undefined
+        SearchTerm: searchTerm || undefined,
+        Role:role||undefined,
+        Source: source || undefined,
+        pageNumber: currentPage,
+        pageSize: rowsPerPage,
       };
-      const { items, totalCount } = await getUsers(apiFilter);
+
+      const [usersResult, rolesResponse] = await Promise.all([
+        getUsers(apiFilter),
+        fetchAllRoles(),
+      ]);
+      console.log("Fetched users:", usersResult);
+      console.log("Fetched roles:", rolesResponse);
+      const { items, totalCount } = usersResult;
       setUsers(items);
       setTotalCount(totalCount);
+      setRoles(rolesResponse);
     } catch (error) {
-      toast.error("Failed to fetch users");
+      toast.error("Failed to fetch users or roles");
+      console.error("Error fetching users or roles:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter, searchTerm, currentPage, rowsPerPage, role, source]);
 
- 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleEdit = (id: string) => {
     setEditingId(id);
@@ -98,7 +101,7 @@ const UserList = () => {
   };
 
   const handleUpdate = () => {
-    loadUsers();
+    fetchData();
   };
 
   const confirmDelete = async () => {
@@ -106,7 +109,7 @@ const UserList = () => {
     try {
       await deleteUser(deleteId);
       toast.success("User deleted successfully");
-      loadUsers();
+      fetchData();
     } catch (error) {
       toast.error("Failed to delete user");
     } finally {
@@ -114,21 +117,63 @@ const UserList = () => {
     }
   };
 
- 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
+    const term = e.target.value;
+    setSearchTerm(term);
+    setCurrentPage(1);
+
+    // Apply the same search term to all searchable fields
+    setFilter((prev) => ({
+      ...prev,
+      // Email: term || undefined,
+      DisplayName: term || undefined,
+      // FirstName: term || undefined,
+      // LastName: term || undefined,
+      PageNumber: 1,
+    }));
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
+    setFilter((prev) => ({
+      ...prev,
+      Email: undefined,
+      DisplayName: undefined,
+      FirstName: undefined,
+      LastName: undefined,
+      PageNumber: 1,
+    }));
   };
 
   // Handle page change
   const handlePageChange = useCallback((page: number) => {
-     setFilter(prev => ({ ...prev, pageNumber: page }));
-   }, []);
- 
-   // Handle rows per page change
-   const handleRowsPerPageChange = useCallback((pageSize: number) => {
-     setFilter(prev => ({ ...prev, pageSize, pageNumber: 1 }));
-   }, []);
+    setFilter((prev) => ({ ...prev, PageNumber: page }));
+  }, []);
+
+  // Handle rows per page change
+  const handleRowsPerPageChange = useCallback((pageSize: number) => {
+    setFilter((prev) => ({ ...prev, pageSize, PageNumber: 1 }));
+  }, []);
+
+  function handleRoleFilter(value: string): void {
+    setFilter((prev) => ({
+      ...prev,
+      role: value || undefined,
+      PageNumber: 1,
+    }));
+    setRole(value);
+    setCurrentPage(1);
+  }
+
+  function handleSourceFilter(value: string): void {
+    setFilter((prev: UserFilterDto) => ({
+      ...prev,
+      Source: value || undefined,
+      PageNumber: 1,
+    }));
+    setSource(value);
+    setCurrentPage(1);
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -157,20 +202,49 @@ const UserList = () => {
           </div>
           <input
             type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchTerm}
+            onChange={handleSearchChange}
             placeholder="Search..."
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
           />
-          {searchQuery && (
+          {searchTerm && (
             <button
-              onClick={() => setSearchQuery("")}
+              onClick={clearSearch}
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
               aria-label="Clear search"
             >
               <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100" />
             </button>
           )}
+
+          <div className="w-full md:w-56">
+        
+        </div>
+
+        <div className="w-full md:w-56">
+          <Select
+            value={filter.Source || ''}
+            onValueChange={handleSourceFilter}
+            placeholder="Source"
+            options={[
+              { value: "Jira", label: "Jira" }, 
+              { value: "Local", label: "Local" }
+             
+            ]}
+          />
+        </div>
+
+              <div className="w-full md:w-56">
+          <Select
+            value={filter.Role || ''}
+            onValueChange={handleRoleFilter}
+            placeholder="Role"
+            options={roles.map((role) => ({
+              value: role.name,
+              label: role.name,
+            }))}
+          />
+        </div>
         </div>
       </div>
 
@@ -212,146 +286,148 @@ const UserList = () => {
                     </div>
                   </td>
                 </tr>
-) : users.length === 0 ? (
-  <tr>
-    <td
-      colSpan={6}
-      className="px-4 py-12 sm:py-16 text-center text-gray-500 dark:text-gray-400"
-    >
-      <div className="flex flex-col items-center justify-center">
-        <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-12 h-12 sm:w-16 sm:h-16" />
-        <h3 className="mt-3 text-base sm:text-lg font-medium text-gray-900 dark:text-white">
-          {searchQuery
-            ? "No matching users found"
-            : "No users found"}
-        </h3>
-        <p className="mt-1 text-gray-500 dark:text-gray-400 text-sm sm:text-base">
-          {searchQuery
-            ? "Try adjusting your search query"
-            : "Get started by creating a new user"}
-        </p>
-      </div>
-    </td>
-  </tr>
-) : (
-  users.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  ).map((user) => (
-    <tr
-      key={user.id}
-      className="transition hover:bg-gray-50 dark:hover:bg-gray-800/50"
-    >
-      <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-        <Link
-          href={`/dashboard/users/${user.id}`}
-          className="block w-full py-2 -my-2 text-sm sm:text-base font-medium text-gray-900 dark:text-white"
-        >
-          {user.displayName ||
-            `${user.firstName} ${user.lastName}`}
-        </Link>
-      </td>
-      <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-        <Link
-          href={`/dashboard/users/${user.id}`}
-          className="block w-full py-2 -my-2 text-sm sm:text-base"
-        >
-          {user.email}
-        </Link>
-      </td>
-      <td className="px-3 py-3 sm:px-6 sm:py-4">
-        <Link
-          href={`/dashboard/users/${user.id}`}
-          className="block w-full py-2 -my-2"
-        >
-          <div className="flex flex-wrap gap-1">
-            {user.roles?.map((role, index) => (
-              <span
-                key={index}
-                className="px-2 py-0.5 text-green-500 dark:text-green-500 text-base "
-              >
-                {role}
-              </span>
-            ))}
-          </div>
-        </Link>
-      </td>
-      <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-indigo-500 dark:text-indigo-400 hidden sm:table-cell">
-        <Link
-          href={`/dashboard/users/${user.id}`}
-          className="block w-full py-2 -my-2"
-        >
-          {user.source}
-        </Link>
-      </td>
-      <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-        <Link
-          href={`/dashboard/users/${user.id}`}
-          className="block w-full py-2 -my-2"
-        >
-          <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              user.isActive
-                ? "text-green-800  dark:text-green-300"
-                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-            }`}
-          >
-            {user.isActive ? "Yes" : "No"}
-          </span>
-        </Link>
-      </td>
-      <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-        <div className="flex justify-center space-x-2 sm:space-x-3">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleEdit(user.id);
-            }}
-            disabled={user.source === "Jira"}
-            className={`p-1.5 sm:p-2 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md ${
-              user.source === "Jira"
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-            title={
-              user.source === "Jira"
-                ? "Edit disabled for Jira users"
-                : "Edit User"
-            }
-          >
-            <Pencil size={16} className="sm:w-4 sm:h-4" />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setDeleteId(user.id);
-            }}
-            disabled={user.source === "Jira"}
-            className={`p-1.5 sm:p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed ${
-              user.source === "Jira"
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-            title={
-              user.source === "Jira"
-                ? "Delete disabled for Jira users"
-                : "Delete User"
-            }
-          >
-            <Trash2 size={16} className="sm:w-4 sm:h-4" />
-          </button>
-        </div>
-      </td>
-    </tr>
-  ))
-)}
+              ) : users.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-4 py-12 sm:py-16 text-center text-gray-500 dark:text-gray-400"
+                  >
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-12 h-12 sm:w-16 sm:h-16" />
+                      <h3 className="mt-3 text-base sm:text-lg font-medium text-gray-900 dark:text-white">
+                        {searchTerm
+                          ? "No matching users found"
+                          : "No users found"}
+                      </h3>
+                      <p className="mt-1 text-gray-500 dark:text-gray-400 text-sm sm:text-base">
+                        {searchTerm
+                          ? "Try adjusting your search query"
+                          : "Get started by creating a new user"}
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                users
+                  .slice(
+                    (currentPage - 1) * rowsPerPage,
+                    currentPage * rowsPerPage
+                  )
+                  .map((user) => (
+                    <tr
+                      key={user.id}
+                      className="transition hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    >
+                      <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                        <Link
+                          href={`/dashboard/users/${user.id}`}
+                          className="block w-full py-2 -my-2 text-sm sm:text-base font-medium text-gray-900 dark:text-white"
+                        >
+                          {user.displayName ||
+                            `${user.firstName} ${user.lastName}`}
+                        </Link>
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                        <Link
+                          href={`/dashboard/users/${user.id}`}
+                          className="block w-full py-2 -my-2 text-sm sm:text-base"
+                        >
+                          {user.email}
+                        </Link>
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">
+                        <Link
+                          href={`/dashboard/users/${user.id}`}
+                          className="block w-full py-2 -my-2"
+                        >
+                          <div className="flex flex-wrap gap-1">
+                            {user.roles?.map((role, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-0.5 text-green-500 dark:text-green-500 text-base "
+                              >
+                                {role}
+                              </span>
+                            ))}
+                          </div>
+                        </Link>
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-indigo-500 dark:text-indigo-400 hidden sm:table-cell">
+                        <Link
+                          href={`/dashboard/users/${user.id}`}
+                          className="block w-full py-2 -my-2"
+                        >
+                          {user.source}
+                        </Link>
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                        <Link
+                          href={`/dashboard/users/${user.id}`}
+                          className="block w-full py-2 -my-2"
+                        >
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              user.isActive
+                                ? "text-green-800  dark:text-green-300"
+                                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                            }`}
+                          >
+                            {user.isActive ? "Yes" : "No"}
+                          </span>
+                        </Link>
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                        <div className="flex justify-center space-x-2 sm:space-x-3">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(user.id);
+                            }}
+                            disabled={user.source === "Jira"}
+                            className={`p-1.5 sm:p-2 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md ${
+                              user.source === "Jira"
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                            title={
+                              user.source === "Jira"
+                                ? "Edit disabled for Jira users"
+                                : "Edit User"
+                            }
+                          >
+                            <Pencil size={16} className="sm:w-4 sm:h-4" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteId(user.id);
+                            }}
+                            disabled={user.source === "Jira"}
+                            className={`p-1.5 sm:p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed ${
+                              user.source === "Jira"
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                            title={
+                              user.source === "Jira"
+                                ? "Delete disabled for Jira users"
+                                : "Delete User"
+                            }
+                          >
+                            <Trash2 size={16} className="sm:w-4 sm:h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
       {/* Pagination */}
-       <PaginationFooter
+      <PaginationFooter
         currentPage={filter.PageNumber ?? 1}
         rowsPerPage={filter.PageSize ?? 15}
         totalItems={totalCount}
@@ -409,5 +485,5 @@ const UserList = () => {
   );
 };
 
-export default UserList;
 
+export default UserList;
