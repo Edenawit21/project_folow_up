@@ -4,7 +4,7 @@ export const PROJECT_API_URL =
   process.env.NEXT_PUBLIC_BASE_API_URL ?? "https://localhost:7205/api/Project";
 
 
-export interface PagedList<T> {
+  export interface PagedList<T> {
   items: T[];
   totalCount: number;
   pageNumber: number;
@@ -19,18 +19,14 @@ export interface ProjectFilterDto {
   pageSize?: number;
   SortBy?: string;
   SortDescending?: boolean
-  // --- FIX IS HERE ---
-  SearchTerm?: string; // <--- ADDED THIS LINE for general search
-  // Keep these if your backend also allows specific field searches
   Name ?: string;
   Description ?: string;
   Lead ?: string;
-  // --- END FIX ---
   HealthLevel ?: number;
   IsCritical ?: boolean;
   Status ?: string;
-}
 
+}
 export interface ApiProject {
   id: string;
   key: string;
@@ -53,10 +49,10 @@ export interface ApiProject {
   };
   owner?: {
     name: string;
-    contactInfo?: string;
+    contactInfo?: string; 
   };
-  targetEndDate?: string;
-  status?: string;
+  targetEndDate?: string; 
+  status?: string; 
   critical: boolean;
 }
 
@@ -79,12 +75,12 @@ export type ProjectDto = {
   Name: string;
   Description: string;
   Lead: string;
-  Status?: string;
-  TargetEndDate?: string;
+  Status?: string; 
+  TargetEndDate?: string; 
   ProjectOwner?: {
     Name?: string;
     ContactInfo ?: string;
-  };
+  }; 
   Health: {
     Level: number;
     Reason: string;
@@ -125,19 +121,17 @@ const mapApiToProjectDto = (api: ApiProject): ProjectDto => ({
     RecentUpdates: api.progress.recentUpdates,
   },
   ProjectOwner: {
-    Name: api.owner?.name ,
+    Name: api.owner?.name , 
     ContactInfo: api.owner?.contactInfo ,
   },
   TargetEndDate: api.targetEndDate ? new Date(api.targetEndDate).toISOString() : undefined,
-  Status: api.status,
+  Status: api.status, 
   Critical: api.critical,
 });
 
 
 export const fetchProjects = async (filter: ProjectFilterDto): Promise<PagedList<ProjectDto>> => {
   try {
-    // Axios will automatically convert the 'filter' object into query parameters
-    // e.g., ?pageNumber=1&pageSize=15&SearchTerm=HR%20report
     const response = await axios.get<{
       success: boolean;
       data: PagedList<ApiProject>;
@@ -150,7 +144,7 @@ export const fetchProjects = async (filter: ProjectFilterDto): Promise<PagedList
     }
 
     const pagedData = response.data.data;
-
+    
     return {
       items: pagedData.items.map(mapApiToProjectDto),
       totalCount: pagedData.totalCount,
@@ -173,7 +167,7 @@ export const fetchProjectById = async (
     const url = `${PROJECT_API_URL}/${projectId}`;
     const { data, status } = await axios.get<ApiProjectByIdResponse>(url, {
       timeout: 5000,
-      validateStatus: (status) => status < 500,
+      validateStatus: (status) => status < 500, 
     });
 
     if (status !== 200) {
