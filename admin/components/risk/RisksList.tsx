@@ -77,7 +77,7 @@ const RisksList: React.FC<{
         <div className="flex justify-center">
           <button
             onClick={() => setShowAddRiskForm(true)}
-            className="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition-colors duration-200 text-base"
+            className="px-6 py-2 bg-red-400 text-white font-semibold rounded-lg shadow-md hover:bg-red-500 transition-colors duration-200 text-base"
           >
             Add New Risk
           </button>
@@ -231,7 +231,7 @@ const RisksList: React.FC<{
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition-colors duration-200 text-sm"
+              className="px-4 py-2 bg-red-400 text-white font-semibold rounded-lg shadow-md hover:bg-red-500 transition-colors duration-200 text-sm"
               disabled={isAddingRisk}
             >
               {isAddingRisk ? "Adding..." : "Save Risk"}

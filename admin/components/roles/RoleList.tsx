@@ -27,19 +27,17 @@ const PermissionsDisplay = ({ permissions }: { permissions: string[] }) => {
 
   return (
     <div className="flex flex-wrap items-start gap-2 text-green-600 dark:text-green-400 font-medium">
-      {/* Role list - vertical */}
       <div className="flex flex-col gap-1">
         {displayedPermissions.map((perm, idx) => (
           <span
             key={idx}
-            className="inline-block px-2 py-0.5 rounded-md text-green-700 dark:text-green-300 text-xs sm:text-sm"
+            className="inline-block px-2 py-0.5 rounded-md text-green-700 dark:text-green-300 text-xs sm:text-sm font-semibold"
           >
             {perm}
           </span>
         ))}
       </div>
 
-      {/* Show more / Show less buttons */}
       <div className="flex flex-col gap-1">
         {remainingCount > 0 && !showAll && (
           <button
@@ -113,8 +111,6 @@ const RoleList = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [targetId, setTargetId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalMenus, setTotalMenus] = useState(0);
@@ -136,7 +132,6 @@ const RoleList = () => {
     loadRoles();
   }, []);
 
-  // Filter roles based on search query
   const filteredRoles = useCallback(() => {
     if (!searchQuery) return roles;
 
@@ -187,7 +182,6 @@ const RoleList = () => {
     }
   };
 
-  // Calculate roles to display based on pagination
   const filtered = filteredRoles();
   const startIndex = (currentPage - 1) * rowsPerPage;
   const paginatedRoles = filtered.slice(startIndex, startIndex + rowsPerPage);
@@ -209,8 +203,6 @@ const RoleList = () => {
           <span>Create Role</span>
         </button>
       </div>
-
-      {/* Search Bar */}
       <div className="mb-5 sm:mb-6">
         <div className="relative w-full sm:max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

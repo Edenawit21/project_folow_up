@@ -88,7 +88,7 @@ const EmptyState = () => (
   <tr>
     <td colSpan={10} className="py-16 text-center">
       <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-        <Filter size={48} className="mb-4 opacity-50" />
+<Filter size={48} className="mb-4 opacity-50" />
         <h3 className="text-xl font-medium mb-2">No projects found</h3>
         <p className="max-w-md">Try adjusting your filters or search to find what you're looking for.</p>
       </div>
@@ -178,7 +178,8 @@ export const ProjectTable = () => {
   const [totalCount, setTotalCount] = useState(0);
 
   // Memoized function to fetch projects
-  const loadProjects = useCallback(async () => {
+  const loadProjects = useCallback(
+  async () => {
     try {
       setLoading(true);
       // Create a copy of filter with the effective search term applied
@@ -288,7 +289,8 @@ export const ProjectTable = () => {
             onValueChange={handleHealthFilter}
             placeholder="Health Status"
             options={[
-              { value: "0", label: "On Track" },
+
+{ value: "0", label: "On Track" },
               { value: "1", label: "Needs Attention" },
               { value: "2", label: "Critical" },
             ]}

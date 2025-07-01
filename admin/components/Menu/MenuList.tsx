@@ -96,6 +96,7 @@ const MenuList: React.FC = () => {
       const updated = menus.filter((m) => m.id !== menuIdToDelete);
       setMenus(updated);
       setFilteredMenus(updated);
+      // Adjust current page if the last item on a page was deleted
       if (paginatedMenus.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
@@ -169,19 +170,19 @@ const MenuList: React.FC = () => {
         <table className="min-w-full">
           <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-3 py-3 sm:px-4 sm:py-4 text-left text-xs sm:text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Name
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-3 py-3 sm:px-4 sm:py-4 text-left text-xs sm:text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Permission
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-3 py-3 sm:px-4 sm:py-4 text-left text-xs sm:text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Order
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-3 py-3 sm:px-4 sm:py-4 text-left text-xs sm:text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Parent
               </th>
-              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-3 py-3 sm:px-4 sm:py-4 text-center text-xs sm:text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -198,7 +199,7 @@ const MenuList: React.FC = () => {
               paginatedMenus.map((menu) => (
                 <tr key={menu.id}>
                   <td className="px-4 py-3">{menu.name}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-green-700 dark:text-green-300 font-semibold"> {/* Added font-semibold here */}
                     {menu.requiredPermission || "None"}
                   </td>
                   <td className="px-4 py-3">{menu.order ?? "-"}</td>
@@ -208,19 +209,19 @@ const MenuList: React.FC = () => {
                       <button
                         onClick={() => handleEdit(menu.id)}
                         disabled={deletingId === menu.id}
-                        className="p-2 text-indigo-600 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-md"
+                        className="p-1.5 sm:p-2 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => confirmDelete(menu.id)}
                         disabled={deletingId === menu.id}
-                        className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-md"
+                        className="p-1.5 sm:p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {deletingId === menu.id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                         )}
                       </button>
                     </div>

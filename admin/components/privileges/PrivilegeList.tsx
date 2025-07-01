@@ -19,13 +19,10 @@ const PrivilegeList = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Fetch all privileges on mount
   useEffect(() => {
     const loadPrivileges = async () => {
       setLoading(true);
@@ -44,7 +41,6 @@ const PrivilegeList = () => {
     loadPrivileges();
   }, []);
 
-  // Filter privileges whenever search term changes
   useEffect(() => {
     if (searchTerm) {
       const lowerSearch = searchTerm.toLowerCase();
@@ -76,26 +72,22 @@ const PrivilegeList = () => {
     }
   }, [searchTerm, privileges]);
 
-  // Client-side pagination slice
   const startIndex = (currentPage - 1) * rowsPerPage;
   const paginatedPrivileges = filteredPrivileges.slice(
     startIndex,
     startIndex + rowsPerPage
   );
 
-  // Open modal to create new privilege
   const handleCreate = () => {
     setEditingId(undefined);
     setModalOpen(true);
   };
 
-  // Open modal to edit privilege
   const handleEdit = (id: string) => {
     setEditingId(id);
     setModalOpen(true);
   };
 
-  // After add or update, reload privileges and close modal
   const handleUpdate = async () => {
     setModalOpen(false);
     setEditingId(undefined);
@@ -114,7 +106,6 @@ const PrivilegeList = () => {
     }
   };
 
-  // Delete confirmation
   const confirmDelete = async () => {
     if (!deleteId) return;
     setDeletingId(deleteId);
@@ -137,11 +128,10 @@ const PrivilegeList = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header with gradient text and animated button */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="">Privilege Management</h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400 italic text-sm">
+          <h1 className="text-2xl sm:text-3xl font-bold">Privilege Management</h1>
+          <p className="mt-1 sm:mt-2 text-gray-600 dark:text-gray-400 italic text-xs sm:text-sm">
             Manage application privileges and access levels
           </p>
         </div>
@@ -153,8 +143,6 @@ const PrivilegeList = () => {
           <span>Add Privilege</span>
         </button>
       </div>
-
-      {/* Enhanced Search Bar */}
       <div className="mb-6">
         <div className="relative w-full sm:max-w-md">
           <div className="relative">
@@ -177,7 +165,6 @@ const PrivilegeList = () => {
           )}
         </div>
       </div>
-      {/* Enhanced Table with Card Styling */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
         <div className="overflow-x-auto">
           <table className="min-w-full">
@@ -257,7 +244,7 @@ const PrivilegeList = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold   text-green-500 dark:text-green-300">
+                      <span className="px-2.5 py-0.5 inline-flex text-base leading-5 font-semibold text-green-700 dark:text-green-300">
                         {p.action}
                       </span>
                     </td>
@@ -301,7 +288,6 @@ const PrivilegeList = () => {
         </div>
       </div>
 
-      {/* Pagination */}
       <PaginationFooter
         currentPage={currentPage}
         rowsPerPage={rowsPerPage}
@@ -313,7 +299,6 @@ const PrivilegeList = () => {
         }}
       />
 
-      {/* Enhanced Modals */}
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
           <AddPrivilege
