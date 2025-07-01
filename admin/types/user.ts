@@ -28,10 +28,8 @@ export interface PagedList<T> {
 export interface UserFilterDto {
   PageNumber?: number;
   PageSize?: number;
-  Email?: string;
-  DisplayName?: string;
-  FirstName?: string;
-  LastName?: string;
+  SearchTerm?: string;
+  Source ?: string; 
   IsActive?: boolean;
   Role?: string;
   SortBy?: string;

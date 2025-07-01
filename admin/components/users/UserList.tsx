@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { Trash2, Pencil, Plus, Search, X } from "lucide-react";
+import { Trash2, Pencil, Plus, Search, X, Filter } from "lucide-react";
 import { toast } from "react-toastify";
 import { UserData, UserFilterDto } from "@/types/user";
 import { getUsers, deleteUser } from "@/utils/userApi";
@@ -12,6 +12,27 @@ import PaginationFooter from "@/components/footer/PaginationFooter";
 import Link from "next/link";
 import { fileURLToPath } from "url";
 
+
+ const Select = ({ value, onValueChange, options, placeholder }: { value: string; onValueChange: (value: string) => void; options: { label: string; value: string }[]; placeholder: string }) => (
+  <div className="relative">
+    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500">
+      <Filter size={16} />
+    </div>
+    <select
+      value={value}
+      onChange={(e) => onValueChange(e.target.value)}
+      className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      aria-label={placeholder}
+    >
+      <option value="">{placeholder}</option>
+      {options.map((opt) => (
+        <option key={opt.value} value={opt.value}>{opt.label}</option>
+      ))}
+    </select>
+  </div>
+);
+
+
 const UserList = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [roles, setRoles] = useState<RoleData[]>([]);
@@ -19,8 +40,9 @@ const UserList = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | undefined>();
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [role, setRole] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [source,setSource] = useState("");
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -32,18 +54,16 @@ const UserList = () => {
     SortDescending: false,
   });
   const [totalCount, setTotalCount] = useState(0);
-  //const debouncedSearchTerm = useDebounce(searchTerm, 9000);
-  // Move fetchData to component scope so it can be called elsewhere
+  
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      // Include search term in the filter if it exists
+      
       const apiFilter = {
         ...filter,
-        // Email: debouncedSearchTerm || undefined,
-        DisplayName: searchTerm || undefined,
-        //FirstName: debouncedSearchTerm || undefined,
-        // LastName: debouncedSearchTerm || undefined,
+        SearchTerm: searchTerm || undefined,
+        Role:role||undefined,
+        Source: source || undefined,
         pageNumber: currentPage,
         pageSize: rowsPerPage,
       };
@@ -64,7 +84,7 @@ const UserList = () => {
     } finally {
       setLoading(false);
     }
-  }, [filter, searchTerm, currentPage, rowsPerPage]);
+  }, [filter, searchTerm, currentPage, rowsPerPage, role, source]);
 
   useEffect(() => {
     fetchData();
@@ -135,6 +155,26 @@ const UserList = () => {
     setFilter((prev) => ({ ...prev, pageSize, PageNumber: 1 }));
   }, []);
 
+  function handleRoleFilter(value: string): void {
+    setFilter((prev) => ({
+      ...prev,
+      role: value || undefined,
+      PageNumber: 1,
+    }));
+    setRole(value);
+    setCurrentPage(1);
+  }
+
+  function handleSourceFilter(value: string): void {
+    setFilter((prev: UserFilterDto) => ({
+      ...prev,
+      Source: value || undefined,
+      PageNumber: 1,
+    }));
+    setSource(value);
+    setCurrentPage(1);
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
@@ -176,6 +216,35 @@ const UserList = () => {
               <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100" />
             </button>
           )}
+
+          <div className="w-full md:w-56">
+        
+        </div>
+
+        <div className="w-full md:w-56">
+          <Select
+            value={filter.Source || ''}
+            onValueChange={handleSourceFilter}
+            placeholder="Source"
+            options={[
+              { value: "Jira", label: "Jira" }, 
+              { value: "Local", label: "Local" }
+             
+            ]}
+          />
+        </div>
+
+              <div className="w-full md:w-56">
+          <Select
+            value={filter.Role || ''}
+            onValueChange={handleRoleFilter}
+            placeholder="Role"
+            options={roles.map((role) => ({
+              value: role.name,
+              label: role.name,
+            }))}
+          />
+        </div>
         </div>
       </div>
 
@@ -226,12 +295,12 @@ const UserList = () => {
                     <div className="flex flex-col items-center justify-center">
                       <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-12 h-12 sm:w-16 sm:h-16" />
                       <h3 className="mt-3 text-base sm:text-lg font-medium text-gray-900 dark:text-white">
-                        {searchQuery
+                        {searchTerm
                           ? "No matching users found"
                           : "No users found"}
                       </h3>
                       <p className="mt-1 text-gray-500 dark:text-gray-400 text-sm sm:text-base">
-                        {searchQuery
+                        {searchTerm
                           ? "Try adjusting your search query"
                           : "Get started by creating a new user"}
                       </p>
@@ -416,20 +485,5 @@ const UserList = () => {
   );
 };
 
-export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
 
 export default UserList;
