@@ -15,6 +15,29 @@ export interface UserData {
   roles: string[];
 }
 
+export interface PagedList<T> {
+  items: T[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+export interface UserFilterDto {
+  PageNumber?: number;
+  PageSize?: number;
+  Email?: string;
+  DisplayName?: string;
+  FirstName?: string;
+  LastName?: string;
+  IsActive?: boolean;
+  Role?: string;
+  SortBy?: string;
+  SortDescending?: boolean;
+}
+
 export interface UserResponse {
   success: boolean;
   data: UserData;

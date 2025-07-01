@@ -3,6 +3,30 @@ import axios from "axios";
 export const PROJECT_API_URL =
   process.env.NEXT_PUBLIC_BASE_API_URL ?? "https://localhost:7205/api/Project";
 
+
+  export interface PagedList<T> {
+  items: T[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+export interface ProjectFilterDto {
+  pageNumber?: number;
+  pageSize?: number;
+  SortBy?: string;
+  SortDescending?: boolean
+  Name ?: string;
+  Description ?: string;
+  Lead ?: string;
+  HealthLevel ?: number;
+  IsCritical ?: boolean;
+  Status ?: string;
+
+}
 export interface ApiProject {
   id: string;
   key: string;
@@ -106,17 +130,30 @@ const mapApiToProjectDto = (api: ApiProject): ProjectDto => ({
 });
 
 
-export const fetchProjects = async (): Promise<ProjectDto[]> => {
+export const fetchProjects = async (filter: ProjectFilterDto): Promise<PagedList<ProjectDto>> => {
   try {
-    const { data, status } = await axios.get<ApiProjectsResponse>(
-      `${PROJECT_API_URL}/api/Project/public`
-    );
+    const response = await axios.get<{
+      success: boolean;
+      data: PagedList<ApiProject>;
+    }>(`${PROJECT_API_URL}/api/Project/public`, {
+      params: filter
+    });
 
-    if (status !== 200 || !data.success) {
+    if (!response.data.success) {
       throw new Error("Failed to fetch projects");
     }
-    const projects = Array.isArray(data.data) ? data.data : [data.data];
-    return projects.map(mapApiToProjectDto);
+
+    const pagedData = response.data.data;
+    
+    return {
+      items: pagedData.items.map(mapApiToProjectDto),
+      totalCount: pagedData.totalCount,
+      pageNumber: pagedData.pageNumber,
+      pageSize: pagedData.pageSize,
+      totalPages: pagedData.totalPages,
+      hasPreviousPage: pagedData.hasPreviousPage,
+      hasNextPage: pagedData.hasNextPage
+    };
   } catch (error) {
     console.error("Error fetching projects:", error);
     throw error;
