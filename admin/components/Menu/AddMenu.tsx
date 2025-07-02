@@ -11,7 +11,7 @@ import {
 } from "@/utils/menuApi";
 
 interface AddMenuProps {
-  id: number; // menu id to edit; 0 = create new
+  id: number; 
   onClose: () => void;
   onCreate: () => void;
   onUpdate: () => void;

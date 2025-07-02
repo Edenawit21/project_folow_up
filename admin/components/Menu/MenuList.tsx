@@ -14,7 +14,7 @@ const MenuList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<number | undefined>(undefined);
+  const [editingId, setEditingId] = useState<number | undefined>();
   const [searchTerm, setSearchTerm] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,25 +36,19 @@ const MenuList: React.FC = () => {
         setLoading(false);
       }
     };
-
     loadMenus();
   }, []);
 
   useEffect(() => {
     if (searchTerm) {
-      const lowerSearch = searchTerm.toLowerCase();
-      const filtered = menus.filter((menu) => {
-        const nameMatch = menu.name.toLowerCase().includes(lowerSearch);
-        const permissionMatch = (menu.requiredPermission || "")
-          .toLowerCase()
-          .includes(lowerSearch);
-        const orderMatch = menu.order?.toString().includes(lowerSearch);
-        const parentMatch = getParentName(menu.parentId)
-          .toLowerCase()
-          .includes(lowerSearch);
-        return nameMatch || permissionMatch || orderMatch || parentMatch;
-      });
-      setFilteredMenus(filtered);
+      const lower = searchTerm.toLowerCase();
+      setFilteredMenus(
+        menus.filter((menu) =>
+          [menu.name, menu.requiredPermission, menu.order?.toString(), getParentName(menu.parentId)]
+            .filter(Boolean)
+            .some((val) => val?.toLowerCase().includes(lower))
+        )
+      );
       setCurrentPage(1);
     } else {
       setFilteredMenus(menus);
@@ -71,13 +65,12 @@ const MenuList: React.FC = () => {
     setModalOpen(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const updated = await fetchAllMenus();
+    setMenus(updated);
+    setFilteredMenus(updated);
     setModalOpen(false);
     setEditingId(undefined);
-    fetchAllMenus().then((data) => {
-      setMenus(data);
-      setFilteredMenus(data);
-    });
   };
 
   const confirmDelete = (id: number) => {
@@ -96,7 +89,7 @@ const MenuList: React.FC = () => {
       const updated = menus.filter((m) => m.id !== menuIdToDelete);
       setMenus(updated);
       setFilteredMenus(updated);
-      if (paginatedMenus.length === 1 && currentPage > 1) {
+      if ((filteredMenus.length - 1) % rowsPerPage === 0 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
     } catch (error) {
@@ -116,27 +109,22 @@ const MenuList: React.FC = () => {
   const getParentName = (parentId: number | null | undefined) => {
     if (!parentId) return "None";
     const parent = menus.find((m) => m.id === parentId);
-    return parent ? parent.name : "Unknown";
+    return parent?.name || "Unknown";
   };
 
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedMenus = filteredMenus.slice(
-    startIndex,
-    startIndex + rowsPerPage
-  );
+  const paginatedMenus = filteredMenus.slice(startIndex, startIndex + rowsPerPage);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Menu Management</h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400 italic text-sm">
-            Manage application menus
-          </p>
+          <p className="mt-2 text-gray-600 dark:text-gray-400 italic text-sm">Manage application menus</p>
         </div>
         <button
           onClick={handleCreateClick}
-          className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 group w-full md:w-auto justify-center"
+          className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 group"
         >
           <Plus className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:rotate-90" />
           Add Menu
@@ -159,31 +147,21 @@ const MenuList: React.FC = () => {
               className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
               aria-label="Clear search"
             >
-              <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100" />
+              <X className="h-5 w-5" />
             </button>
           )}
         </div>
       </div>
 
       <div className="overflow-x-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow">
-        <table className="min-w-full">
+        <table className="min-w-full text-sm text-left">
           <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
             <tr>
-              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
-                Permission
-              </th>
-              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
-                Order
-              </th>
-              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
-                Parent
-              </th>
-              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
-                Actions
-              </th>
+              <th className="px-4 py-4 text-indigo-600 dark:text-indigo-200 font-medium uppercase tracking-wide">Name</th>
+              <th className="px-4 py-4 text-indigo-600 dark:text-indigo-200 font-medium uppercase tracking-wide">Permission</th>
+              <th className="px-4 py-4 text-indigo-600 dark:text-indigo-200 font-medium uppercase tracking-wide">Order</th>
+              <th className="px-4 py-4 text-indigo-600 dark:text-indigo-200 font-medium uppercase tracking-wide">Parent</th>
+              <th className="px-4 py-4 text-center text-indigo-600 dark:text-indigo-200 font-medium uppercase tracking-wide">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -198,9 +176,7 @@ const MenuList: React.FC = () => {
               paginatedMenus.map((menu) => (
                 <tr key={menu.id}>
                   <td className="px-4 py-3">{menu.name}</td>
-                  <td className="px-4 py-3">
-                    {menu.requiredPermission || "None"}
-                  </td>
+                  <td className="px-4 py-3 text-green-700 dark:text-green-300 font-semibold">{menu.requiredPermission || "None"}</td>
                   <td className="px-4 py-3">{menu.order ?? "-"}</td>
                   <td className="px-4 py-3">{getParentName(menu.parentId)}</td>
                   <td className="px-4 py-3 text-center">
@@ -208,17 +184,17 @@ const MenuList: React.FC = () => {
                       <button
                         onClick={() => handleEdit(menu.id)}
                         disabled={deletingId === menu.id}
-                        className="p-2 rounded-lg  text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md"
+                        className="p-2 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => confirmDelete(menu.id)}
                         disabled={deletingId === menu.id}
-                        className="p-2 rounded-lg  text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 disabled:opacity-50"
                       >
                         {deletingId === menu.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin" />
                         ) : (
                           <Trash2 className="w-4 h-4" />
                         )}
@@ -229,10 +205,7 @@ const MenuList: React.FC = () => {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan={5}
-                  className="text-center py-10 text-gray-500 dark:text-gray-400"
-                >
+                <td colSpan={5} className="text-center py-10 text-gray-500 dark:text-gray-400">
                   No menus found.
                 </td>
               </tr>
@@ -252,45 +225,37 @@ const MenuList: React.FC = () => {
         }}
       />
 
+      {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <AddMenu
-              id={editingId ?? 0}
-              onClose={() => setModalOpen(false)}
-              onCreate={handleSubmit}
-              onUpdate={handleSubmit}
-            />
+            <AddMenu id={editingId ?? 0} onClose={() => setModalOpen(false)} onCreate={handleSubmit} onUpdate={handleSubmit} />
           </div>
         </div>
       )}
 
+      {/* Delete Confirm Dialog */}
       {confirmDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full mx-4 border dark:border-gray-700">
             <div className="text-center">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
                 <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Confirm Deletion
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Are you sure you want to delete this privilege? This action
-                cannot be undone.
-              </p>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Confirm Deletion</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to delete this menu item? This action cannot be undone.</p>
               <div className="flex justify-center gap-3">
                 <button
                   onClick={cancelDelete}
-                  className="px-5 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg transition-colors duration-200"
+                  className="px-5 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteConfirmed}
-                  className="px-5 py-2.5 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white rounded-lg shadow-md transition-all duration-200 transform hover:scale-[1.03]"
+                  className="px-5 py-2.5 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white rounded-lg shadow-md transition-transform duration-200 hover:scale-[1.03]"
                 >
-                  Delete Privilege
+                  Delete Menu
                 </button>
               </div>
             </div>

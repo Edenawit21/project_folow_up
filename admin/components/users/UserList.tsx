@@ -1,82 +1,133 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
-import { Trash2, Pencil, Plus, Search, X } from "lucide-react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { Trash2, Pencil, Plus, Search, X, Filter } from "lucide-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
 
-import { UserData } from "@/types/user";
+import { UserData, UserFilterDto } from "@/types/user";
 import { RoleData } from "@/types/role";
 import { getUsers, deleteUser } from "@/utils/userApi";
 import { fetchAllRoles } from "@/utils/roleApi";
 import AddUser from "./AddUser";
 import PaginationFooter from "@/components/footer/PaginationFooter";
 
+const Select = ({
+  value,
+  onValueChange,
+  options,
+  placeholder,
+}: {
+  value: string;
+  onValueChange: (value: string) => void;
+  options: { label: string; value: string }[];
+  placeholder: string;
+}) => (
+  <div className="relative">
+    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500">
+      <Filter size={16} />
+    </div>
+    <select
+      value={value}
+      onChange={(e) => onValueChange(e.target.value)}
+      className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      aria-label={placeholder}
+    >
+      <option value="">{placeholder}</option>
+      {options.map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
+  </div>
+);
+
 const UserList = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [roles, setRoles] = useState<RoleData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | undefined>();
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [sourceFilter, setSourceFilter] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [usersRes, rolesRes] = await Promise.all([
-          getUsers(),
-          fetchAllRoles(),
-        ]);
-        setUsers(usersRes);
-        setRoles(rolesRes);
-      } catch {
-        toast.error("Failed to load data");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  const [filter, setFilter] = useState<UserFilterDto>({
+    PageNumber: 1,
+    PageSize: 10,
+    SortBy: "Name",
+    SortDescending: false,
+  });
+  const [totalCount, setTotalCount] = useState(0);
 
-  const loadUsers = async () => {
+  // Fetch users and roles according to current filters
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getUsers();
-      setUsers(res);
-    } catch {
-      toast.error("Failed to load users");
+      const apiFilter = {
+        ...filter,
+        SearchTerm: searchTerm || undefined,
+        Role: roleFilter || undefined,
+        Source: sourceFilter || undefined,
+      };
+
+      const [usersResult, rolesResponse] = await Promise.all([
+        getUsers(apiFilter),
+        fetchAllRoles(),
+      ]);
+
+      const { items, totalCount } = usersResult;
+      setUsers(items);
+      setTotalCount(totalCount);
+      setRoles(rolesResponse);
+    } catch (error) {
+      toast.error("Failed to fetch users or roles");
+      console.error(error);
     } finally {
       setLoading(false);
     }
+  }, [filter, searchTerm, roleFilter, sourceFilter]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Handlers for search & filters
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    setFilter((prev) => ({ ...prev, PageNumber: 1 }));
   };
 
-  const filteredUsers = useMemo(() => {
-    const query = searchQuery.toLowerCase();
-    return users.filter((user) => {
-      const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-      const rolesMatch = user.roles?.some((r) =>
-        r.toLowerCase().includes(query)
-      );
-      return (
-        (user.displayName || fullName).includes(query) ||
-        user.email.toLowerCase().includes(query) ||
-        user.source.toLowerCase().includes(query) ||
-        (user.isActive ? "yes" : "no").includes(query) ||
-        rolesMatch
-      );
-    });
-  }, [searchQuery, users]);
+  const clearSearch = () => {
+    setSearchTerm("");
+    setFilter((prev) => ({ ...prev, SearchTerm: undefined, PageNumber: 1 }));
+  };
 
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedUsers = filteredUsers.slice(
-    startIndex,
-    startIndex + rowsPerPage
-  );
+  const handleRoleFilterChange = (value: string) => {
+    setRoleFilter(value);
+    setFilter((prev) => ({ ...prev, Role: value || undefined, PageNumber: 1 }));
+  };
+
+  const handleSourceFilterChange = (value: string) => {
+    setSourceFilter(value);
+    setFilter((prev) => ({
+      ...prev,
+      Source: value || undefined,
+      PageNumber: 1,
+    }));
+  };
+
+  const handlePageChange = (page: number) => {
+    setFilter((prev) => ({ ...prev, PageNumber: page }));
+  };
+
+  const handleRowsPerPageChange = (pageSize: number) => {
+    setFilter((prev) => ({ ...prev, PageSize: pageSize, PageNumber: 1 }));
+  };
 
   const handleCreate = () => {
     setEditingId(undefined);
@@ -88,27 +139,35 @@ const UserList = () => {
     setModalOpen(true);
   };
 
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setEditingId(undefined);
+  };
+
+  const handleModalUpdate = () => {
+    // Refresh user list after add/update
+    fetchData();
+    handleModalClose();
+  };
+
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
       await deleteUser(deleteId);
-      toast.success("User deleted");
-      await loadUsers();
-    } catch {
-      toast.error("Delete failed");
+      toast.success("User deleted successfully");
+      fetchData();
+    } catch (error) {
+      toast.error("Failed to delete user");
+      console.error(error);
     } finally {
       setDeleteId(null);
     }
   };
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
-
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
             Users Management
@@ -126,29 +185,58 @@ const UserList = () => {
         </button>
       </div>
 
-      {/* Search */}
-      <div className="mb-6">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+      {/* Search & Filters */}
+      <div className="mb-6 flex flex-col md:flex-row md:items-end gap-4 md:justify-between">
+        <div className="relative w-full sm:max-w-md md:flex-grow-0">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500" />
+          </div>
           <input
             type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder="Search users..."
+            className="w-full pl-10 pr-10 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
           />
-          {searchQuery && (
+          {searchTerm && (
             <button
-              onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              onClick={clearSearch}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              aria-label="Clear search"
             >
               <X size={18} />
             </button>
           )}
         </div>
+
+        <div className="flex flex-col md:flex-row gap-3 md:gap-4 w-full md:w-auto">
+          <div className="w-full md:w-56">
+            <Select
+              value={sourceFilter}
+              onValueChange={handleSourceFilterChange}
+              placeholder="Source"
+              options={[
+                { value: "Jira", label: "Jira" },
+                { value: "Local", label: "Local" },
+              ]}
+            />
+          </div>
+
+          <div className="w-full md:w-56">
+            <Select
+              value={roleFilter}
+              onValueChange={handleRoleFilterChange}
+              placeholder="Role"
+              options={roles.map((role) => ({
+                value: role.name,
+                label: role.name,
+              }))}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Table */}
+      {/* User Table */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm text-left">
@@ -169,7 +257,7 @@ const UserList = () => {
                 <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                   Active
                 </th>
-                <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-widerr">
+                <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -184,74 +272,130 @@ const UserList = () => {
                     </p>
                   </td>
                 </tr>
-              ) : paginatedUsers.length === 0 ? (
+              ) : users.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
                     className="text-center py-10 text-gray-500 dark:text-gray-400"
                   >
-                    No users found.
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-12 h-12 sm:w-16 sm:h-16" />
+                      <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">
+                        {searchTerm
+                          ? "No matching users found"
+                          : "No users found"}
+                      </h3>
+                      <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
+                        {searchTerm
+                          ? "Try adjusting your search query"
+                          : "Get started by creating a new user"}
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (
-                paginatedUsers.map((user) => (
+                users.map((user) => (
                   <tr
                     key={user.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                    className="transition hover:bg-gray-50 dark:hover:bg-gray-800/50"
                   >
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                       <Link
                         href={`/dashboard/users/${user.id}`}
-                        className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                        className="block w-full py-2 -my-2 text-sm sm:text-base font-medium text-gray-900 dark:text-white"
                       >
                         {user.displayName ||
                           `${user.firstName} ${user.lastName}`}
                       </Link>
                     </td>
-                    <td className="px-4 py-3">{user.email}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {user.roles?.map((role, idx) => (
-                          <span
-                            key={idx}
-                            className="text-green-600 dark:text-green-400 text-xl dark:bg-green-900/40 px-2 py-0.5 rounded-full"
-                          >
-                            {role}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
-                      {user.source}
-                    </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          user.isActive
-                            ? "bg-green-100 text-green-700 dark:bg-green-800/30 dark:text-green-300"
-                            : "bg-red-100 text-red-700 dark:bg-red-800/30 dark:text-red-300"
-                        }`}
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                      <Link
+                        href={`/dashboard/users/${user.id}`}
+                        className="block w-full py-2 -my-2 text-sm sm:text-base"
                       >
-                        {user.isActive ? "Yes" : "No"}
-                      </span>
+                        {user.email}
+                      </Link>
                     </td>
-                    <td className="px-4 py-3 text-center">
-                      <div className="flex justify-center gap-2">
-                        <button
-                          onClick={() => handleEdit(user.id)}
-                          disabled={user.source === "Jira"}
-                          title="Edit"
-                          className="p-2 rounded-md text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-800 disabled:opacity-40"
+                    <td className="px-3 py-3 sm:px-6 sm:py-4">
+                      <Link
+                        href={`/dashboard/users/${user.id}`}
+                        className="block w-full py-2 -my-2"
+                      >
+                        <div className="flex flex-wrap gap-1">
+                          {user.roles?.map((role, index) => (
+                            <span
+                              key={index}
+                              className="px-2 py-0.5 text-green-500 dark:text-green-500 text-base "
+                            >
+                              {role}
+                            </span>
+                          ))}
+                        </div>
+                      </Link>
+                    </td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-indigo-500 dark:text-indigo-400 hidden sm:table-cell">
+                      <Link
+                        href={`/dashboard/users/${user.id}`}
+                        className="block w-full py-2 -my-2"
+                      >
+                        {user.source}
+                      </Link>
+                    </td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                      <Link
+                        href={`/dashboard/users/${user.id}`}
+                        className="block w-full py-2 -my-2"
+                      >
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            user.isActive
+                              ? "text-green-800  dark:text-green-300"
+                              : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                          }`}
                         >
-                          <Pencil size={16} />
+                          {user.isActive ? "Yes" : "No"}
+                        </span>
+                      </Link>
+                    </td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                      <div className="flex justify-center space-x-2 sm:space-x-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(user.id);
+                          }}
+                          disabled={user.source === "Jira"}
+                          className={`p-1.5 sm:p-2 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md ${
+                            user.source === "Jira"
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                          title={
+                            user.source === "Jira"
+                              ? "Edit disabled for Jira users"
+                              : "Edit User"
+                          }
+                        >
+                          <Pencil size={16} className="sm:w-4 sm:h-4" />
                         </button>
                         <button
-                          onClick={() => setDeleteId(user.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteId(user.id);
+                          }}
                           disabled={user.source === "Jira"}
-                          title="Delete"
-                          className="p-2 rounded-md text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800 disabled:opacity-40"
+                          className={`p-1.5 sm:p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed ${
+                            user.source === "Jira"
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                          title={
+                            user.source === "Jira"
+                              ? "Delete disabled for Jira users"
+                              : "Delete User"
+                          }
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={16} className="sm:w-4 sm:h-4" />
                         </button>
                       </div>
                     </td>
@@ -265,34 +409,29 @@ const UserList = () => {
 
       {/* Pagination */}
       <PaginationFooter
-        currentPage={currentPage}
-        rowsPerPage={rowsPerPage}
-        totalItems={filteredUsers.length}
-        onPageChange={setCurrentPage}
-        onRowsPerPageChange={(rows) => {
-          setRowsPerPage(rows);
-          setCurrentPage(1);
-        }}
+        currentPage={filter.PageNumber ?? 1}
+        rowsPerPage={filter.PageSize ?? 10}
+        totalItems={totalCount}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
       />
 
-      {/* Modals */}
+      {/* Add/Edit Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
           <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-4 max-w-2xl w-full mx-4">
             <AddUser
               id={editingId}
-              onClose={() => {
-                setModalOpen(false);
-                setEditingId(undefined);
-              }}
-              onCreate={loadUsers}
-              onUpdate={loadUsers}
+              onClose={handleModalClose}
+              onCreate={handleModalUpdate}
+              onUpdate={handleModalUpdate}
               roles={roles}
             />
           </div>
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
       {deleteId && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-sm w-full mx-4 text-center">

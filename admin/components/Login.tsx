@@ -75,10 +75,10 @@ const Login = () => {
         transition={{ duration: 0.6 }}
         className="w-full max-w-md backdrop-blur-md bg-white/70 border border-white/40 shadow-2xl rounded-2xl p-10"
       >
-        <h2 className="text-4xl font-extrabold text-center mb-6 text-gray-800">
+        <h2 className="text-4xl font-extrabold text-center mb-1 text-gray-800"> 
           {isReturningUser ? "Welcome back" : "Welcome"}
         </h2>
-        <p className="text-center text-sm text-gray-600 mb-8">
+        <p className="text-center text-sm text-gray-600 mb-8"> 
           {isReturningUser
             ? "Great to see you again! Please sign in"
             : "Please sign in to your account"}
@@ -88,8 +88,6 @@ const Login = () => {
           {errors.general && (
             <p className="text-red-600 text-sm text-center">{errors.general}</p>
           )}
-
-          {/* Email Field */}
           <div>
             <label
               htmlFor="email"
@@ -112,8 +110,6 @@ const Login = () => {
               <p className="text-red-600 text-sm mt-1">{errors.email}</p>
             )}
           </div>
-
-          {/* Password Field */}
           <div>
             <label
               htmlFor="password"

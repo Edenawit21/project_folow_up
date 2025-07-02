@@ -1,8 +1,5 @@
 import { OverallProjectStatus, ProjectDetailDto } from "@/types/projectDetail";
-import {
-  getProjectDetails,
-  updateProjectStrategicDetails,
-} from "@/utils/projectDetailApi";
+import { getProjectDetails, updateProjectStrategicDetails, } from "@/utils/projectDetailApi";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import RiskList from "@/components/risk/RisksList";
@@ -136,13 +133,13 @@ const ProjectStrategicEditForm: React.FC<ProjectStrategicEditFormProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-800 font-sans p-4 sm:p-6 lg:p-8 text-gray-800 dark:text-gray-100 ">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800 font-sans pt-0 px-4 sm:px-6 lg:px-8 text-gray-800 dark:text-gray-100">
       <ToastContainer position="bottom-right" autoClose={5000} />
-      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 border border-gray-200 dark:border-slate-700">
-        <h1 className="text-3xl font-bold mb-6 text-center">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg p-6 sm:p-8 border border-gray-200 dark:border-slate-700">
+        <h1 className="text-3xl font-bold mb-4 text-center">
           Edit Strategic Project Details: {projectData.name} ({projectData.key})
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 text-center mb-8">
+        <p className="text-gray-600 dark:text-gray-400 text-center mb-6"> 
           Manage high-level project status, owner, summary, dates, milestones,
           and risks.
         </p>
@@ -215,7 +212,7 @@ const ProjectStrategicEditForm: React.FC<ProjectStrategicEditFormProps> = ({
             </div>
             <div>
               <label className="block mb-2 font-medium">
-                Project Owner Name:
+                Product Owner Name:
               </label>
               <input
                 type="text"
@@ -227,7 +224,7 @@ const ProjectStrategicEditForm: React.FC<ProjectStrategicEditFormProps> = ({
             </div>
             <div>
               <label className="block mb-2 font-medium">
-                Project Owner Contact Info:
+                Product Owner Contact Info:
               </label>
               <input
                 type="text"
@@ -277,7 +274,7 @@ const ProjectStrategicEditForm: React.FC<ProjectStrategicEditFormProps> = ({
           <div className="flex justify-end">
             <button
               type="submit"
-              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50"
+              className="px-2 py-3 bg-blue-400 text-white font-semibold rounded-lg shadow hover:bg-blue-500 disabled:opacity-50"
               disabled={isSaving}
             >
               {isSaving ? "Saving..." : "Save Strategic Details"}
@@ -286,7 +283,6 @@ const ProjectStrategicEditForm: React.FC<ProjectStrategicEditFormProps> = ({
         </form>
 
         <hr className="my-8 border-gray-200 dark:border-slate-600" />
-
         <MilestonesList
           projectId={projectId}
           milestones={projectData.milestones}
@@ -294,9 +290,7 @@ const ProjectStrategicEditForm: React.FC<ProjectStrategicEditFormProps> = ({
             getProjectDetails(projectId).then(setProjectData)
           }
         />
-
         <hr className="my-8 border-gray-200 dark:border-slate-600" />
-
         <RiskList
           projectId={projectId}
           risks={projectData.risks}

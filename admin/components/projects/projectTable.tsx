@@ -8,7 +8,7 @@ import {
   FolderKanban,
   CircleSlash,
 } from "lucide-react";
-import { fetchProjects, ProjectDto } from "../../utils/Jira";
+import { fetchProjects, ProjectDto, ProjectFilterDto } from "../../utils/Jira";
 import ViewProjectButton from "../ui/ViewProjectButton";
 import EditProjectButton from "../ui/EditProjectButton";
 import PaginationFooter from "@/components/footer/PaginationFooter";
@@ -40,18 +40,20 @@ const Badge = ({ variant = "default", children }: { variant?: "default" | "destr
   );
 };
 
-const Input = ({ value, onChange, onClear, ...props }: { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; onClear?: () => void; [key: string]: any }) => (
-  <div className="relative w-full sm:max-w-md">
+// Modified Input component to handle form submission
+const Input = ({ value, onChange, onClear, onSearchSubmit, ...props }: { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; onClear?: () => void; onSearchSubmit?: (e: React.FormEvent) => void; [key: string]: any }) => (
+  // Wrap the input in a form to enable submission on Enter key
+  <form onSubmit={onSearchSubmit} className="relative w-full sm:max-w-md">
     <input
       value={value}
       onChange={onChange}
-      className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      className="w-full pl-10 pr-8 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
       {...props}
     />
     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
     {value && (
       <button
-        type="button"
+        type="button" // Important: Use type="button" to prevent it from submitting the form
         onClick={onClear}
         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         aria-label="Clear search"
@@ -59,7 +61,8 @@ const Input = ({ value, onChange, onClear, ...props }: { value: string; onChange
         ✕
       </button>
     )}
-  </div>
+    {/* No explicit search button needed here, form submission (Enter key) triggers it */}
+  </form>
 );
 
 const Select = ({ value, onValueChange, options, placeholder }: { value: string; onValueChange: (value: string) => void; options: { label: string; value: string }[]; placeholder: string }) => (
@@ -85,7 +88,7 @@ const EmptyState = () => (
   <tr>
     <td colSpan={10} className="py-16 text-center">
       <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-        <Filter size={48} className="mb-4 opacity-50" />
+<Filter size={48} className="mb-4 opacity-50" />
         <h3 className="text-xl font-medium mb-2">No projects found</h3>
         <p className="max-w-md">Try adjusting your filters or search to find what you're looking for.</p>
       </div>
@@ -163,65 +166,92 @@ const ProjectRow = ({ project }: { project: ProjectDto }) => {
 export const ProjectTable = () => {
   const [projects, setProjects] = useState<ProjectDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [effectiveSearchTerm, setEffectiveSearchTerm] = useState(""); 
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState({ healthLevel: "", search: "" });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [filter, setFilter] = useState<ProjectFilterDto>({
+    pageNumber: 1,
+    pageSize: 15,
+    SortBy: 'Name',
+    SortDescending: false,
+  });
+  const [totalCount, setTotalCount] = useState(0);
 
+  // Memoized function to fetch projects
+  const loadProjects = useCallback(
+  async () => {
+    try {
+      setLoading(true);
+      // Create a copy of filter with the effective search term applied
+      const apiFilter = {
+        ...filter,
+        SearchTerm: searchTerm || undefined // Use effectiveSearchTerm for API call
+      };
+      const { items, totalCount } = await fetchProjects(apiFilter);
+      setProjects(items);
+      setTotalCount(totalCount);
+    } catch (err) {
+      setError("Failed to load projects. Please try again later.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [filter, searchTerm]); // Dependencies for loadProjects
+
+  // Trigger project fetch whenever filter or effectiveSearchTerm changes
   useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchProjects();
-        setProjects(data);
-      } catch (err) {
-        setError("Failed to load projects. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
     loadProjects();
+  }, [loadProjects]); // Dependency is the memoized loadProjects function
+
+  // Handle search input change (updates searchTerm, but not effectiveSearchTerm)
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   }, []);
 
-  const getHealthLevel = useCallback((level: number) => {
-    if (level === 0) return 1;
-    if (level === 1) return 2;
-    if (level === 2) return 3;
-    return 0;
+  
+  const handleSearchSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault(); 
+    const term = (e.target as HTMLInputElement).value;
+    setSearchTerm(term)
+  }, [searchTerm]); // searchTerm is a dependency here
+
+  // Handle clear search
+  const handleClearSearch = useCallback(() => {
+    setSearchTerm(""); 
+    setEffectiveSearchTerm("");
+    setFilter(prev => ({
+      ...prev,
+      pageNumber: 1
+    }));
   }, []);
 
-  const filteredProjects = useMemo(() => {
-    return projects.filter((project) => {
-      const healthLevel = getHealthLevel(project.Health.Level);
-      return (
-        (filters.healthLevel === "" || healthLevel.toString() === filters.healthLevel) &&
-        (filters.search === "" ||
-          project.Name.toLowerCase().includes(filters.search.toLowerCase()) ||
-          project.Key.toLowerCase().includes(filters.search.toLowerCase()) ||
-          (project.Lead && project.Lead.toLowerCase().includes(filters.search.toLowerCase())))
-      );
-    });
-  }, [projects, filters, getHealthLevel]);
+  // Handle health level filter
+  const handleHealthFilter = useCallback((value: string) => {
+    setFilter(prev => ({
+      ...prev,
+      HealthLevel: value ? Number(value) : undefined,
+      pageNumber: 1
+    }));
+  }, []);
 
-  const paginatedProjects = useMemo(() => {
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    return filteredProjects.slice(startIndex, startIndex + rowsPerPage);
-  }, [filteredProjects, currentPage, rowsPerPage]);
+  // Handle status filter
+  const handleStatusFilter = useCallback((value: string) => {
+    setFilter(prev => ({
+      ...prev,
+      Status: value || undefined,
+      pageNumber: 1
+    }));
+  }, []);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilters((prev) => ({ ...prev, search: e.target.value }));
-    setCurrentPage(1);
-  };
+  // Handle pagination
+  const handlePageChange = useCallback((page: number) => {
+    setFilter(prev => ({ ...prev, pageNumber: page }));
+  }, []);
 
-  const handleClearSearch = () => {
-    setFilters((prev) => ({ ...prev, search: "" }));
-    setCurrentPage(1);
-  };
-
-  const handleHealthFilter = (value: string) => {
-    setFilters((prev) => ({ ...prev, healthLevel: value }));
-    setCurrentPage(1);
-  };
+  // Handle rows per page change
+  const handleRowsPerPageChange = useCallback((pageSize: number) => {
+    setFilter(prev => ({ ...prev, pageSize, pageNumber: 1 }));
+  }, []);
 
   if (loading) return <div className="text-center py-20">Loading projects...</div>;
   if (error) return <div className="text-center text-red-500 py-20">{error}</div>;
@@ -238,24 +268,46 @@ export const ProjectTable = () => {
             <div className="text-sm font-medium flex items-center gap-2 opacity-90">
               <FolderKanban className="w-4 h-4 animate-bounce-slow" /><span>Total Projects</span>
             </div>
-            <div className="text-3xl font-extrabold text-center tracking-wide">{filteredProjects.length}</div>
+            <div className="text-3xl font-extrabold text-center tracking-wide">{totalCount}</div>
           </div>
         </div>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
-          <Input placeholder="Search projects..." value={filters.search} onChange={handleSearchChange} onClear={handleClearSearch} />
+          <Input
+            placeholder="Search projects..."
+            value={searchTerm} 
+            onChange={handleSearchChange} 
+            onClear={handleClearSearch}
+            onSearchSubmit={handleSearchSubmit} 
+          />
         </div>
         <div className="w-full md:w-56">
           <Select
-            value={filters.healthLevel}
+            value={filter.HealthLevel?.toString() || ''}
             onValueChange={handleHealthFilter}
             placeholder="Health Status"
             options={[
-              { value: "1", label: "On Track" },
-              { value: "2", label: "Needs Attention" },
-              { value: "3", label: "Critical" },
+
+{ value: "0", label: "On Track" },
+              { value: "1", label: "Needs Attention" },
+              { value: "2", label: "Critical" },
+            ]}
+          />
+        </div>
+        <div className="w-full md:w-56">
+          <Select
+            value={filter.Status || ''}
+            onValueChange={handleStatusFilter}
+            placeholder="Project Status"
+            options={[
+              { value: "NotStarted", label: "Active" }, 
+              { value: "Active", label: "In Progress" }, 
+              { value: "OnHold", label: "On Hold" },
+              { value: "Completed", label: "Completed" },
+              { value: "Cancelled", label: "Cancelled" },
+              { value: "Archived", label: "Archived" },
             ]}
           />
         </div>
@@ -265,7 +317,17 @@ export const ProjectTable = () => {
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 text-sm font-medium">
             <tr>
-              <th className="p-2 text-left">Project</th>
+              <th
+                className="p-2 text-left cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                onClick={() => setFilter(prev => ({
+                  ...prev,
+                  SortBy: 'Name',
+                  SortDescending: prev.SortBy === 'Name' ? !prev.SortDescending : false,
+                  pageNumber: 1
+                }))}
+              >
+                Project {filter.SortBy === 'Name' && (filter.SortDescending ? '↓' : '↑')}
+              </th>
               <th className="p-2 text-left">Lead</th>
               <th className="p-2 text-left">Status</th>
               <th className="p-2 text-left">Product Owner</th>
@@ -278,8 +340,8 @@ export const ProjectTable = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedProjects.length > 0 ? (
-              paginatedProjects.map((project) => <ProjectRow key={project.Id} project={project} />)
+            {projects.length > 0 ? (
+              projects.map((project) => <ProjectRow key={project.Id} project={project} />)
             ) : (
               <EmptyState />
             )}
@@ -288,11 +350,11 @@ export const ProjectTable = () => {
       </div>
 
       <PaginationFooter
-        currentPage={currentPage}
-        rowsPerPage={rowsPerPage}
-        totalItems={filteredProjects.length}
-        onPageChange={setCurrentPage}
-        onRowsPerPageChange={setRowsPerPage}
+        currentPage={filter.pageNumber ?? 1}
+        rowsPerPage={filter.pageSize ?? 15}
+        totalItems={totalCount}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
       />
     </div>
   );
