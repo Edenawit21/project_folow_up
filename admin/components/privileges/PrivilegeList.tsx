@@ -140,7 +140,9 @@ const PrivilegeList = () => {
       {/* Header with gradient text and animated button */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="">Privilege Management</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">
+            Privilege Management
+          </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400 italic text-sm">
             Manage application privileges and access levels
           </p>

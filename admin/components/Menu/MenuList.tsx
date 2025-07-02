@@ -165,23 +165,23 @@ const MenuList: React.FC = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow">
+      <div className="overflow-x-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow">
         <table className="min-w-full">
-          <thead className="bg-gray-100 dark:bg-gray-700">
+          <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Name
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Permission
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Order
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Parent
               </th>
-              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-4 text-left text-sm font-normal text-indigo-600 dark:text-indigo-200 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -208,14 +208,14 @@ const MenuList: React.FC = () => {
                       <button
                         onClick={() => handleEdit(menu.id)}
                         disabled={deletingId === menu.id}
-                        className="p-2 text-indigo-600 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-md"
+                        className="p-2 rounded-lg  text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 shadow-sm hover:shadow-md"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => confirmDelete(menu.id)}
                         disabled={deletingId === menu.id}
-                        className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-md"
+                        className="p-2 rounded-lg  text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {deletingId === menu.id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -266,26 +266,33 @@ const MenuList: React.FC = () => {
       )}
 
       {confirmDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm">
-            <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
-            <p className="text-sm mb-6">
-              Are you sure you want to delete this menu? This action cannot be
-              undone.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={cancelDelete}
-                className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteConfirmed}
-                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-              >
-                Delete
-              </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-gray-100 dark:border-gray-700">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
+                <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                Confirm Deletion
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                Are you sure you want to delete this privilege? This action
+                cannot be undone.
+              </p>
+              <div className="flex justify-center gap-3">
+                <button
+                  onClick={cancelDelete}
+                  className="px-5 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteConfirmed}
+                  className="px-5 py-2.5 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white rounded-lg shadow-md transition-all duration-200 transform hover:scale-[1.03]"
+                >
+                  Delete Privilege
+                </button>
+              </div>
             </div>
           </div>
         </div>

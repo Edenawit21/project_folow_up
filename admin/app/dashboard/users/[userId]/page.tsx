@@ -112,7 +112,7 @@ export default function UserDetailComponent({ params }: PageProps) {
         <div className="mb-2"> 
           <button
             onClick={handleBackToProjects}
-            className="text-xl font-medium text-blue-600 hover:underline flex items-center pl-0 mb-2"
+            className="text-xl font-medium text-blue-600 hover:underline flex items-center mt-[-5px] ml-[-30px]"
           >
             ← Back to Projects
           </button>
@@ -125,7 +125,7 @@ export default function UserDetailComponent({ params }: PageProps) {
         </div>
       ) : (
         <div className="">
-          <h2 className="text-2xl sm:text-3xl mb-5 font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent text-left mt-10">
+          <h2 className="text-2xl sm:text-3xl mb-5 font-bold text-left mt-10">
             Assigned Projects Overview
           </h2>
           <div className="mt-4">
