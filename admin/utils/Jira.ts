@@ -19,9 +19,7 @@ export interface ProjectFilterDto {
   pageSize?: number;
   SortBy?: string;
   SortDescending?: boolean
-  Name ?: string;
-  Description ?: string;
-  Lead ?: string;
+  SearchTerm?: string;
   HealthLevel ?: number;
   IsCritical ?: boolean;
   Status ?: string;
