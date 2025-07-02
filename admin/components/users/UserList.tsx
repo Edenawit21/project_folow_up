@@ -10,7 +10,6 @@ import AddUser from "./AddUser";
 import { RoleData } from "@/types/role";
 import PaginationFooter from "@/components/footer/PaginationFooter";
 import Link from "next/link";
-import { fileURLToPath } from "url";
 
 
 const Select = ({ value, onValueChange, options, placeholder }: { value: string; onValueChange: (value: string) => void; options: { label: string; value: string }[]; placeholder: string }) => (
@@ -53,11 +52,11 @@ const UserList = () => {
     SortDescending: false,
   });
   const [totalCount, setTotalCount] = useState(0);
-  
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      
+
       const apiFilter = {
         ...filter,
         SearchTerm: searchTerm || undefined,
@@ -190,8 +189,8 @@ const UserList = () => {
       </div>
 
       {/* Search Bar and Filters */}
-      <div className="mb-5 sm:mb-6 flex flex-col md:flex-row md:items-end gap-3"> 
-        <div className="relative w-full sm:max-w-md md:flex-grow"> 
+      <div className="mb-5 sm:mb-6 flex flex-col md:flex-row md:items-end gap-3 md:justify-between"> 
+        <div className="relative w-full sm:max-w-md md:flex-grow-0">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500" />
           </div>
@@ -212,29 +211,30 @@ const UserList = () => {
             </button>
           )}
         </div>
+        <div className="flex flex-col md:flex-row gap-3"> 
+            <div className="w-full md:w-56">
+                <Select
+                    value={filter.Source || ''}
+                    onValueChange={handleSourceFilter}
+                    placeholder="Source"
+                    options={[
+                    { value: "Jira", label: "Jira" },
+                    { value: "Local", label: "Local" }
+                    ]}
+                />
+            </div>
 
-        <div className="w-full md:w-56"> 
-          <Select
-            value={filter.Source || ''}
-            onValueChange={handleSourceFilter}
-            placeholder="Source"
-            options={[
-              { value: "Jira", label: "Jira" }, 
-              { value: "Local", label: "Local" }
-            ]}
-          />
-        </div>
-
-        <div className="w-full md:w-56"> 
-          <Select
-            value={filter.Role || ''}
-            onValueChange={handleRoleFilter}
-            placeholder="Role"
-            options={roles.map((role) => ({
-              value: role.name,
-              label: role.name,
-            }))}
-          />
+            <div className="w-full md:w-56">
+                <Select
+                    value={filter.Role || ''}
+                    onValueChange={handleRoleFilter}
+                    placeholder="Role"
+                    options={roles.map((role) => ({
+                    value: role.name,
+                    label: role.name,
+                    }))}
+                />
+            </div>
         </div>
       </div>
 
@@ -474,6 +474,5 @@ const UserList = () => {
     </div>
   );
 };
-
 
 export default UserList;
