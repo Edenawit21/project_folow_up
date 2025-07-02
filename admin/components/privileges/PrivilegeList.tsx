@@ -130,11 +130,10 @@ const PrivilegeList = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
- className="mt-2 text-gray-600 dark:text-gray-400 italic text-sm">
-
-          <h1 className="text-2xl sm:text-3xl font-bold">Privilege Management</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">
+            Privilege Management
+          </h1>
           <p className="mt-1 sm:mt-2 text-gray-600 dark:text-gray-400 italic text-xs sm:text-sm">
-
             Manage application privileges and access levels
           </p>
         </div>
