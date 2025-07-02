@@ -166,14 +166,14 @@ const ProjectRow = ({ project }: { project: ProjectDto }) => {
 export const ProjectTable = () => {
   const [projects, setProjects] = useState<ProjectDto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState(""); // State for the input field's value
-  const [effectiveSearchTerm, setEffectiveSearchTerm] = useState(""); // State that triggers the actual search API call
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [effectiveSearchTerm, setEffectiveSearchTerm] = useState(""); 
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<ProjectFilterDto>({
     pageNumber: 1,
     pageSize: 15,
     SortBy: 'Name',
-    SortDescending: false
+    SortDescending: false,
   });
   const [totalCount, setTotalCount] = useState(0);
 
@@ -185,7 +185,7 @@ export const ProjectTable = () => {
       // Create a copy of filter with the effective search term applied
       const apiFilter = {
         ...filter,
-        SearchTerm: effectiveSearchTerm || undefined // Use effectiveSearchTerm for API call
+        SearchTerm: searchTerm || undefined // Use effectiveSearchTerm for API call
       };
       const { items, totalCount } = await fetchProjects(apiFilter);
       setProjects(items);
@@ -196,7 +196,7 @@ export const ProjectTable = () => {
     } finally {
       setLoading(false);
     }
-  }, [filter, effectiveSearchTerm]); // Dependencies for loadProjects
+  }, [filter, searchTerm]); // Dependencies for loadProjects
 
   // Trigger project fetch whenever filter or effectiveSearchTerm changes
   useEffect(() => {
@@ -208,11 +208,11 @@ export const ProjectTable = () => {
     setSearchTerm(e.target.value);
   }, []);
 
-  // Handle search submission (e.g., on Enter key press or explicit search button click)
+  
   const handleSearchSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission behavior (page reload)
-    setEffectiveSearchTerm(searchTerm); // Update effectiveSearchTerm to trigger API call
-    setFilter(prev => ({ ...prev, pageNumber: 1 })); // Reset to first page on new search
+    e.preventDefault(); 
+    const term = (e.target as HTMLInputElement).value;
+    setSearchTerm(term)
   }, [searchTerm]); // searchTerm is a dependency here
 
   // Handle clear search
