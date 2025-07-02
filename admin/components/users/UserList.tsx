@@ -13,7 +13,7 @@ import Link from "next/link";
 import { fileURLToPath } from "url";
 
 
- const Select = ({ value, onValueChange, options, placeholder }: { value: string; onValueChange: (value: string) => void; options: { label: string; value: string }[]; placeholder: string }) => (
+const Select = ({ value, onValueChange, options, placeholder }: { value: string; onValueChange: (value: string) => void; options: { label: string; value: string }[]; placeholder: string }) => (
   <div className="relative">
     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500">
       <Filter size={16} />
@@ -43,7 +43,6 @@ const UserList = () => {
   const [role, setRole] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [source,setSource] = useState("");
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -125,10 +124,7 @@ const UserList = () => {
     // Apply the same search term to all searchable fields
     setFilter((prev) => ({
       ...prev,
-      // Email: term || undefined,
       DisplayName: term || undefined,
-      // FirstName: term || undefined,
-      // LastName: term || undefined,
       PageNumber: 1,
     }));
   };
@@ -177,7 +173,6 @@ const UserList = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold">Users Management</h2>
@@ -194,9 +189,9 @@ const UserList = () => {
         </button>
       </div>
 
-      {/* Search Bar */}
-      <div className="mb-5 sm:mb-6">
-        <div className="relative w-full sm:max-w-md">
+      {/* Search Bar and Filters */}
+      <div className="mb-5 sm:mb-6 flex flex-col md:flex-row md:items-end gap-3"> 
+        <div className="relative w-full sm:max-w-md md:flex-grow"> 
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500" />
           </div>
@@ -216,12 +211,9 @@ const UserList = () => {
               <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100" />
             </button>
           )}
-
-          <div className="w-full md:w-56">
-        
         </div>
 
-        <div className="w-full md:w-56">
+        <div className="w-full md:w-56"> 
           <Select
             value={filter.Source || ''}
             onValueChange={handleSourceFilter}
@@ -229,12 +221,11 @@ const UserList = () => {
             options={[
               { value: "Jira", label: "Jira" }, 
               { value: "Local", label: "Local" }
-             
             ]}
           />
         </div>
 
-              <div className="w-full md:w-56">
+        <div className="w-full md:w-56"> 
           <Select
             value={filter.Role || ''}
             onValueChange={handleRoleFilter}
@@ -244,7 +235,6 @@ const UserList = () => {
               label: role.name,
             }))}
           />
-        </div>
         </div>
       </div>
 
