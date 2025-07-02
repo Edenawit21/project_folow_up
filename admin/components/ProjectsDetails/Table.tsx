@@ -14,7 +14,7 @@ const Table = <T extends object>({
   emptyMessage = "No data available.",
 }: TableProps<T>) => {
   return (
-    <div className="w-full overflow-x-auto rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+    <div>
       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead className="bg-gray-100 dark:bg-gray-800">
           <tr>

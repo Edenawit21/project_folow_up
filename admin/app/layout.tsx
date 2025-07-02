@@ -1,20 +1,14 @@
-
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
-import { Geist } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Load Inter font and apply it using className
+const inter = Inter({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -32,9 +26,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      {/* Apply Inter font here */}
+      <body className={`${inter.className} antialiased`}>
         {children}
         <ToastContainer position="top-right" autoClose={3000} />
       </body>

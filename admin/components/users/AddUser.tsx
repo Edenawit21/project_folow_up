@@ -193,7 +193,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
 
   return (
     <>
-      <div className="relative w-full max-w-3xl mx-auto p-4 sm:p-6 md:p-8 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-y-auto max-h-[90vh]">
+      <div className="relative w-full max-w-3xl mx-auto p-4 sm:p-6 md:p-8 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-y-auto max-h-[90vh]">
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl"
