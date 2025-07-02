@@ -130,19 +130,19 @@ const Login = () => {
                 } bg-gray-50 text-gray-900`}
               />
               <div className="text-sm text-right mt-1">
-                <button
+                {/* <button
                   type="button"
                   onClick={() => router.push("/forgot_password")}
                   className="text-blue-600 hover:underline"
                 >
                   Forgot Password?
-                </button>
+                </button> */}
               </div>
 
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 mb-4"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 mb-4 top-1/2 -translate-y-1/2"
               >
                 {showPassword ? (
                   <svg
