@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export const PROJECT_API_URL =
   process.env.NEXT_PUBLIC_BASE_API_URL ?? "https://localhost:7205/api/Project";
@@ -128,15 +129,18 @@ const mapApiToProjectDto = (api: ApiProject): ProjectDto => ({
 });
 
 
-export const fetchProjects = async (filter: ProjectFilterDto): Promise<PagedList<ProjectDto>> => {
+export const fetchProjects = async (filter: ProjectFilterDto,token:string): Promise<PagedList<ProjectDto>> => {
   try {
     const response = await axios.get<{
       success: boolean;
       data: PagedList<ApiProject>;
     }>(`${PROJECT_API_URL}/api/Project/public`, {
-      params: filter
+      params: filter,
+       headers: {
+        'Authorization': `Bearer ${token}` // Add authorization header
+      }
     });
-
+      
     if (!response.data.success) {
       throw new Error("Failed to fetch projects");
     }
@@ -153,6 +157,14 @@ export const fetchProjects = async (filter: ProjectFilterDto): Promise<PagedList
       hasNextPage: pagedData.hasNextPage
     };
   } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      const status = error.response.status;
+
+      if (status === 401 || status === 403) {
+        throw new Error("You are not authorized to view these projects.");
+      }
+    }
+
     console.error("Error fetching projects:", error);
     throw error;
   }

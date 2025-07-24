@@ -19,17 +19,22 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
     roles: [],
   });
 
-  const [existingUserData, setExistingUserData] =
-    useState<UpdateUserDto | null>(null);
+  const [existingUserData, setExistingUserData] = useState<UpdateUserDto | null>(null);
   const [roles, setRoles] = useState<RoleData[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [generatedPassword, setGeneratedPassword] = useState<string | null>(
-    null
-  );
+  const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  const getToken = () => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("jwt_token");
+    }
+    return null;
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -63,13 +68,20 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
   useEffect(() => {
     let isMounted = true;
     const loadData = async () => {
+      const token = getToken();
+      if (!token) {
+        toast.error("Authentication token not found. Please log in again.");
+        setLoading(false);
+        return;
+      }
+
       try {
-        const allRoles = await fetchAllRoles();
+        const allRoles = await fetchAllRoles(token);
         if (!isMounted) return;
         setRoles(allRoles);
 
         if (id) {
-          const user = await fetchUserById(id);
+          const user = await fetchUserById(id, token);
           if (!isMounted) return;
           setFormData({
             firstName: user.firstName,
@@ -124,6 +136,13 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
     e.preventDefault();
     setSubmitting(true);
 
+    const token = getToken();
+    if (!token) {
+      toast.error("Authentication token not found. Please log in again.");
+      setSubmitting(false);
+      return;
+    }
+
     const { firstName, lastName, email, roles } = formData;
 
     if (!firstName.trim()) return toastError("First name is required.");
@@ -147,21 +166,18 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
           location: existingUserData.location || "",
         };
 
-        await updateUser(id, updatePayload);
+        await updateUser(id, updatePayload, token);
         toast.success("User updated successfully!");
         onUpdate?.();
         onClose();
       } else {
-        const createdUser = await registerUser(formData);
-        setGeneratedPassword(createdUser.generatedPassword);
-        onCreate?.({
-          username: `${firstName} ${lastName}`,
-          email,
-          role: roles.join(", "),
-        });
-
-        setFormData({ firstName: "", lastName: "", email: "", roles: [] });
-        setDropdownOpen(false);
+        const response = await registerUser(formData);
+        if (response && response.generatedPassword) {
+          setGeneratedPassword(response.generatedPassword);
+          setShowPasswordModal(true);
+        } else {
+          throw new Error("No password generated in response");
+        }
       }
     } catch (err: any) {
       const errorMsg =
@@ -170,6 +186,18 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleClosePasswordModal = () => {
+    setShowPasswordModal(false);
+    setGeneratedPassword(null);
+    setFormData({ firstName: "", lastName: "", email: "", roles: [] });
+    onCreate?.({
+      username: `${formData.firstName} ${formData.lastName}`,
+      email: formData.email,
+      role: formData.roles.join(", "),
+    });
+    onClose();
   };
 
   const handleReset = () => {
@@ -193,7 +221,7 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
 
   return (
     <>
-      <div className="relative w-full max-w-3xl mx-auto p-4 sm:p-6 md:p-8 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-y-auto max-h-[90vh]">
+      <div className="relative w-full max-w-3xl mx-auto p-4 sm:p-6 md:p-8 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-y-auto max-h-[90vh]">
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl"
@@ -306,33 +334,30 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
         </form>
       </div>
 
-      {generatedPassword && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl text-center w-full max-w-sm mx-auto">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+      {showPasswordModal && generatedPassword && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl text-center w-full max-w-sm mx-4">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
               Generated Password
             </h3>
-            <div className="flex items-center justify-center mb-4">
+            <div className="flex items-center mb-4">
               <input
                 type="text"
                 readOnly
                 value={generatedPassword}
-                className="w-full px-3 py-2 border rounded text-center text-gray-800 dark:text-white dark:bg-gray-700"
+                className="flex-1 px-3 py-2 border rounded text-center text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-700"
               />
               <button
                 onClick={() => copyToClipboard(generatedPassword)}
                 className="ml-2 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 aria-label="Copy password"
               >
-                {copied ? "Copied" : "Copy"}
+                {copied ? "Copied!" : "Copy"}
               </button>
             </div>
             <button
-              onClick={() => {
-                setGeneratedPassword(null);
-                onClose();
-              }}
-              className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded hover:bg-gray-400"
+              onClick={handleClosePasswordModal}
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded hover:bg-gray-300 dark:hover:bg-gray-600"
             >
               Close
             </button>

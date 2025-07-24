@@ -247,7 +247,7 @@ const UserProjectReportComponent: React.FC<UserProjectReportProps> = ({
         </h2>
         <div className="">
           {displayedTasks.length > 0 ? (
-            <div className="min-w-full">
+            <div >
               <TasksTable tasks={displayedTasks} />
             </div>
           ) : (

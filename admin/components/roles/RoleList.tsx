@@ -115,10 +115,17 @@ const RoleList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalMenus, setTotalMenus] = useState(0);
 
+  const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
+        if (!token) {
+          setError("Authentication token not found. Please log in again.");
+          setLoading(false);
+          return;
+        }
+        
   const loadRoles = async () => {
     setLoading(true);
     try {
-      const data = await fetchAllRoles();
+      const data = await fetchAllRoles(token);
       setRoles(data);
       setTotalMenus(data.length);
     } catch (error) {
@@ -171,11 +178,15 @@ const RoleList = () => {
     if (!targetId) return;
 
     try {
-      await deleteRole(targetId);
+      await deleteRole(targetId , token);
       toast.success("Role deleted successfully.");
       loadRoles();
     } catch (error) {
-      toast.error("Failed to delete role.");
+      const errorMessage =
+        (error as any)?.response?.data?.message ||
+        (error as any)?.message ||
+        "Failed to delete role.";
+      toast.error(errorMessage);
     } finally {
       setTargetId(null);
       setConfirmOpen(false);
@@ -378,3 +389,7 @@ const RoleList = () => {
 };
 
 export default RoleList;
+function setError(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+

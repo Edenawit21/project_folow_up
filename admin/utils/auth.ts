@@ -12,6 +12,10 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
       `${API_URL}/api/Account/login`,
       data
     );
+    // Store JWT token in localStorage if present in response
+    if (response.data && (response.data as any).token) {
+      localStorage.setItem("jwt_token", (response.data as any).token);
+    }
     return response.data;
   } catch (error: unknown) {
     const err = error as AxiosError<{ message: string }>;

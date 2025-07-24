@@ -17,10 +17,14 @@ if (!API_BASE_URL) {
 }
 
 /* Fetch all menu items */
-export const fetchAllMenus = async (): Promise<MenuItemSummary[]> => {
+export const fetchAllMenus = async ( token:string): Promise<MenuItemSummary[]> => {
   try {
     const response = await axios.get<AllMenusResponse>(
-      `${API_BASE_URL}/api/Menu/all`
+      `${API_BASE_URL}/api/Menu/all`,{
+        headers: {
+          Authorization: `Bearer ${token}`, // Add authorization header
+      }
+    }
     );
     const data = response.data.data;
 
@@ -32,10 +36,14 @@ export const fetchAllMenus = async (): Promise<MenuItemSummary[]> => {
 };
 
 /* Fetch a single menu item by ID */
-export const fetchMenuById = async (id: number): Promise<MenuItem> => {
+export const fetchMenuById = async (id: number , token:string): Promise<MenuItem> => {
   try {
     const response = await axios.get<MenuByIdResponse>(
-      `${API_BASE_URL}/api/Menu/${id}`
+      `${API_BASE_URL}/api/Menu/${id}` , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Add authorization header
+        }
+      }
     );
     const raw = response.data.data;
 
@@ -57,7 +65,7 @@ export const fetchMenuById = async (id: number): Promise<MenuItem> => {
 };
 
 /* Create a new menu item */
-export const createMenuItem = async (menu: CreateMenuItem): Promise<void> => {
+export const createMenuItem = async (menu: CreateMenuItem , token:string): Promise<void> => {
   try {
     const payload = {
       Name: menu.name,
@@ -68,7 +76,11 @@ export const createMenuItem = async (menu: CreateMenuItem): Promise<void> => {
       Order: menu.order ?? 0,
     };
 
-    await axios.post(`${API_BASE_URL}/api/Menu`, payload);
+    await axios.post(`${API_BASE_URL}/api/Menu`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add authorization header
+      }
+    });
   } catch (error) {
     handleApiError(error, "create menu");
   }
@@ -77,7 +89,8 @@ export const createMenuItem = async (menu: CreateMenuItem): Promise<void> => {
 /* Update an existing menu item */
 export const updateMenuItem = async (
   id: number,
-  menu: UpdateMenuItemPayload
+  menu: UpdateMenuItemPayload,
+  token: string
 ): Promise<void> => {
   try {
     const payload = {
@@ -90,16 +103,24 @@ export const updateMenuItem = async (
       Order: menu.order ?? null,
     };
 
-    await axios.put(`${API_BASE_URL}/api/Menu/${id}`, payload);
+    await axios.put(`${API_BASE_URL}/api/Menu/${id}`, payload , {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add authorization header
+      }
+    });
   } catch (error) {
     handleApiError(error, `update menu ${id}`);
   }
 };
 
 /* Delete a menu item */
-export const deleteMenuItem = async (id: number): Promise<void> => {
+export const deleteMenuItem = async (id: number , token:string): Promise<void> => {
   try {
-    await axios.delete(`${API_BASE_URL}/api/Menu/${id}`);
+    await axios.delete(`${API_BASE_URL}/api/Menu/${id}` ,{
+      headers: {
+        Authorization: `Bearer ${token}`, // Add authorization header
+      }
+    });
   } catch (error) {
     handleApiError(error, `delete menu ${id}`);
   }

@@ -37,11 +37,12 @@ const RiskItem: React.FC<RiskItemProps> = ({
     try {
       const updateData: UpdateRiskDto = {
         description: editedRisk.description,
-        impact: Number(editedRisk.impact),
-        likelihood: Number(editedRisk.likelihood),
+        impact: editedRisk.impact,
+        likelihood: editedRisk.likelihood,
         mitigationPlan: editedRisk.mitigationPlan,
-        status: Number(editedRisk.status),
+        status: editedRisk.status,
       };
+      console.log("Sending updateData:", updateData); // Add this line
       await updateRisk(projectId, risk.id, updateData);
       toast.success("Risk updated successfully!");
       setIsEditing(false);

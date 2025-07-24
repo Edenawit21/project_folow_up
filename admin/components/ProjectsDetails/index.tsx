@@ -34,6 +34,7 @@ import TeamWorkloadTable from "@/components/sprint/TeamWorkloadTable";
 import RecentActivityTable from "@/components/sprint/RecentActivityTable";
 import { TasksTable } from "../sprint/TaskTable";
 import PriorityBreakdownCard from "@/components/sprint/PriorityBreakdownChart";
+import { toast } from "react-toastify";
 
 interface ProjectDetailProps {
   projectKey: string;
@@ -97,7 +98,13 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
       setLoading(true);
       setError(null);
       try {
-        const projectOverviewData: ProjectSprintOverviewResponse = await fetchApi(projectKey);
+        const token = localStorage.getItem("jwt_token");
+        if (!token) {
+          setError("Authentication token not found. Please log in again.");
+          setLoading(false);
+          return;
+        }
+        const projectOverviewData: ProjectSprintOverviewResponse = await fetchApi(projectKey,token);
         setProjectName(projectOverviewData.projectName);
         if (projectOverviewData.sprints?.length > 0) {
           setAvailableSprints(projectOverviewData.sprints);
@@ -111,12 +118,13 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
         } else {
           setError(`No sprints found for project with key: ${projectKey}`);
         }
-      } catch (err: any) {
-        console.error("Error fetching project overview:", err);
-        setError(err.message || "Failed to fetch data.");
-      } finally {
-        setLoading(false);
-      }
+      } catch (error) {
+        const errorMessage =
+      (error as Error)?.message || "Failed to fetch projects.";
+    toast.error(errorMessage); // will now display "You are not authorized..." if that was the cause
+  } finally {
+    setLoading(false);
+  }
     };
     fetchData();
   }, [projectKey]);
@@ -127,7 +135,14 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
       setLoading(true);
       setError(null);
       try {
-        const sprintDetail = await fetchSprint(selectedSprintId);
+        // Retrieve the token from localStorage
+        const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
+        if (!token) {
+          setError("Authentication token not found. Please log in again.");
+          setLoading(false);
+          return;
+        }
+        const sprintDetail = await fetchSprint(selectedSprintId, token);
         setSprintReport({
           ...sprintDetail,
           taskStatusCounts: sprintDetail.taskStatusCounts || {},
@@ -136,13 +151,13 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
           recentActivities: sprintDetail.recentActivities || [],
         });
         setSelectedDeveloper("");
-      } catch (err: any) {
-        console.error(`Error fetching sprint details:`, err);
-        setError(err.message || "Failed to fetch sprint details.");
-        setSprintReport(null);
-      } finally {
-        setLoading(false);
-      }
+      }catch (error) {
+        const errorMessage =
+      (error as Error)?.message || "Failed to fetch projects.";
+    toast.error(errorMessage); // will now display "You are not authorized..." if that was the cause
+  } finally {
+    setLoading(false);
+  }
     };
     fetchSelectedSprintDetails();
   }, [selectedSprintId]);

@@ -10,37 +10,50 @@ if (process.env.NODE_ENV === 'production' && !GLOBAL_BASE_API_URL) {
 }
 
 /* Fetches project sprint overview data from the API.*/
-export const fetchApi = async (projectKey: string): Promise<ProjectSprintOverviewResponse> => {
+export const fetchApi = async (projectKey: string, token: string): Promise<ProjectSprintOverviewResponse> => {
   if (!GLOBAL_BASE_API_URL) {
-    throw new Error("API base URL is not configured. Please set NEXT_PUBLIC_BASE_API_URL in your .env.local file.");
+    throw new Error("API base URL not configured");
   }
+
   const url = `${GLOBAL_BASE_API_URL}${REPORTS_API_PATH}/${projectKey}/sprint-overview`;
+  console.debug('API Request:', { url, token: token ? 'exists' : 'missing' });
 
   try {
-    const response = await fetch(url);
+    const startTime = Date.now();
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      credentials: 'include' // Only if using cookies
+    });
+    console.debug(`Request took ${Date.now() - startTime}ms`);
+
     const responseBody = await response.text();
+    console.debug('API Response:', {
+      status: response.status,
+      headers: Object.fromEntries(response.headers.entries()),
+      body: responseBody
+    });
 
     if (!response.ok) {
-      let errorDetail = `Status: ${response.status}`;
-      try {
-        const parsedError = JSON.parse(responseBody);
-        errorDetail += ` - ${parsedError.message || JSON.stringify(parsedError)}`;
-      } catch {
-        errorDetail += ` - ${responseBody.substring(0, 100)}${responseBody.length > 100 ? '...' : ''}`;
-      }
-      throw new Error(`Failed to fetch sprint overview: ${errorDetail}`);
+      throw new Error(`HTTP ${response.status}: ${responseBody.substring(0, 100)}`);
     }
 
-    try {
-      return JSON.parse(responseBody) as ProjectSprintOverviewResponse;
-    } catch (jsonError) {
-      console.error(`Failed to parse successful response as JSON from ${url}:`, responseBody, jsonError);
-      throw new Error(`Invalid JSON response from API: ${jsonError instanceof Error ? jsonError.message : String(jsonError)}`);
-    }
-
+    return JSON.parse(responseBody) as ProjectSprintOverviewResponse;
+    
   } catch (error) {
-    console.error(`Network or unexpected error in fetchApi for project ${projectKey} at ${url}:`, error);
-    throw error; 
+    console.error('API Call Failed:', {
+      error,
+      url,
+      time: new Date().toISOString()
+    });
+    
+    if (error instanceof TypeError) {
+      throw new Error("Network error - check console for details");
+    }
+    throw error;
   }
 };
 
@@ -93,36 +106,37 @@ export const getProgressColor = (percentage: number): string => {
   return 'bg-red-500';
 };
 
-export const fetchSprint = async  (sprintId : string) : Promise<SprintReportDetail> => {
-      if (!GLOBAL_BASE_API_URL) {
-    throw new Error("API base URL is not configured. Please set NEXT_PUBLIC_BASE_API_URL in your .env.local file.");
+export const fetchSprint = async (sprintId: string, token: string): Promise<SprintReportDetail> => {
+  if (!GLOBAL_BASE_API_URL) {
+    throw new Error("API base URL is not configured.");
   }
+
   const url = `${GLOBAL_BASE_API_URL}/api/Reports/sprints/${sprintId}`;
+  console.debug('Fetching from:', url); // Debug log
 
   try {
-    const response = await fetch(url);
-    const responseBody = await response.text();
+    const response = await fetch(url, {
+      method: 'GET', // or headers as needed
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
+      }
+    });
 
     if (!response.ok) {
-      let errorDetail = `Status: ${response.status}`;
-      try {
-        const parsedError = JSON.parse(responseBody);
-        errorDetail += ` - ${parsedError.message || JSON.stringify(parsedError)}`;
-      } catch {
-        errorDetail += ` - ${responseBody.substring(0, 100)}${responseBody.length > 100 ? '...' : ''}`;
-      }
-      throw new Error(`Failed to fetch sprint overview: ${errorDetail}`);
+      const errorData = await response.json().catch(() => null);
+      throw new Error(
+        errorData?.message || 
+        `HTTP error! status: ${response.status}`
+      );
     }
 
-    try {
-      return JSON.parse(responseBody) as SprintReportDetail;
-    } catch (jsonError) {
-      console.error(`Failed to parse successful response as JSON from ${url}:`, responseBody, jsonError);
-      throw new Error(`Invalid JSON response from API: ${jsonError instanceof Error ? jsonError.message : String(jsonError)}`);
-    }
-
+    return await response.json() as SprintReportDetail;
+    
   } catch (error) {
-    console.error(`Network or unexpected error in fetchApi for project ${sprintId} at ${url}:`, error);
-    throw error; 
+    console.error('Fetch error:', error);
+    throw new Error(
+      error instanceof Error ? error.message : 'Failed to fetch sprint'
+    );
   }
 }

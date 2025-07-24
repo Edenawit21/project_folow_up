@@ -21,12 +21,17 @@ const MenuList: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [menuIdToDelete, setMenuIdToDelete] = useState<number | null>(null);
-
+const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
+        if (!token) {
+          setError("Authentication token not found. Please log in again.");
+          setLoading(false);
+          return;
+        }
   useEffect(() => {
     const loadMenus = async () => {
       setLoading(true);
       try {
-        const data = await fetchAllMenus();
+        const data = await fetchAllMenus(token);
         setMenus(data);
         setFilteredMenus(data);
       } catch (error) {
@@ -66,7 +71,7 @@ const MenuList: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    const updated = await fetchAllMenus();
+    const updated = await fetchAllMenus(token);
     setMenus(updated);
     setFilteredMenus(updated);
     setModalOpen(false);
@@ -84,7 +89,7 @@ const MenuList: React.FC = () => {
     setDeletingId(menuIdToDelete);
 
     try {
-      await deleteMenuItem(menuIdToDelete);
+      await deleteMenuItem(menuIdToDelete , token);
       toast.success("Menu deleted successfully.");
       const updated = menus.filter((m) => m.id !== menuIdToDelete);
       setMenus(updated);
@@ -267,3 +272,7 @@ const MenuList: React.FC = () => {
 };
 
 export default MenuList;
+function setError(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+

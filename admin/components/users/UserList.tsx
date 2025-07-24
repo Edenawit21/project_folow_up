@@ -63,6 +63,12 @@ const UserList = () => {
   });
   const [totalCount, setTotalCount] = useState(0);
 
+  const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
+        if (!token) {
+          setError("Authentication token not found. Please log in again.");
+          
+          return;
+        }
   // Fetch users and roles according to current filters
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -73,10 +79,15 @@ const UserList = () => {
         Role: roleFilter || undefined,
         Source: sourceFilter || undefined,
       };
-
+      const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
+        if (!token) {
+          setError("Authentication token not found. Please log in again.");
+          setLoading(false);
+          return;
+        }
       const [usersResult, rolesResponse] = await Promise.all([
-        getUsers(apiFilter),
-        fetchAllRoles(),
+        getUsers(apiFilter , token),
+        fetchAllRoles(token),
       ]);
 
       const { items, totalCount } = usersResult;
@@ -153,7 +164,7 @@ const UserList = () => {
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
-      await deleteUser(deleteId);
+      await deleteUser(deleteId,token);
       toast.success("User deleted successfully");
       fetchData();
     } catch (error) {
@@ -464,3 +475,7 @@ const UserList = () => {
 };
 
 export default UserList;
+function setError(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+

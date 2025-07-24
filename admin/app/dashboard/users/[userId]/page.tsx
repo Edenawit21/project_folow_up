@@ -27,7 +27,12 @@ export default function UserDetailComponent({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [projectLoading, setProjectLoading] = useState(false);
-
+const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
+        if (!token) {
+          setError("Authentication token not found. Please log in again.");
+          setLoading(false);
+          return;
+        }
   useEffect(() => {
     const fetchUser = async () => {
       if (!userId) {
@@ -39,7 +44,7 @@ export default function UserDetailComponent({ params }: PageProps) {
       setLoading(true);
       setError(null);
       try {
-        const userData = await FetchProjectById(userId);
+        const userData = await FetchProjectById(userId, token);
         setProject(userData);
       } catch (err) {
         console.error("Failed to fetch user details:", err);
@@ -62,7 +67,8 @@ export default function UserDetailComponent({ params }: PageProps) {
         setProjectLoading(false);
         return;
       }
-      const projectReport = await fetchUserProjectReport(userId, projectId);
+     
+      const projectReport = await fetchUserProjectReport(userId, projectId ); 
       setSelectedProject(projectReport);
     } catch (err) {
       console.error("Failed to fetch project details:", err);

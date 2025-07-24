@@ -18,11 +18,7 @@ export const getProjectDetails = async (projectId: string): Promise<ProjectDetai
     }
 };
 
-/**
- * Updates the strategic details of a project via the backend API.
- * @param projectId The ID of the project to update.
- * @param data The partial data containing the updated details.
- */
+
 export const updateProjectStrategicDetails = async (
   projectId: string,
   data: UpdateProjectStrategicDetailsDto

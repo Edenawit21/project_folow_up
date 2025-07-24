@@ -13,6 +13,7 @@ import ViewProjectButton from "../ui/ViewProjectButton";
 import EditProjectButton from "../ui/EditProjectButton";
 import PaginationFooter from "@/components/footer/PaginationFooter";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 const Progress = ({ completed, total }: { completed: number; total: number }) => {
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
@@ -187,15 +188,22 @@ export const ProjectTable = () => {
         ...filter,
         SearchTerm: searchTerm || undefined // Use effectiveSearchTerm for API call
       };
-      const { items, totalCount } = await fetchProjects(apiFilter);
+      const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
+        if (!token) {
+          setError("Authentication token not found. Please log in again.");
+          setLoading(false);
+          return;
+        }
+      const { items, totalCount } = await fetchProjects(apiFilter,token);
       setProjects(items);
       setTotalCount(totalCount);
-    } catch (err) {
-      setError("Failed to load projects. Please try again later.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) {
+      const errorMessage =
+      (error as Error)?.message || "Failed to fetch projects.";
+    toast.error(errorMessage); // will now display "You are not authorized..." if that was the cause
+  } finally {
+    setLoading(false);
+  }
   }, [filter, searchTerm]); // Dependencies for loadProjects
 
   // Trigger project fetch whenever filter or effectiveSearchTerm changes
