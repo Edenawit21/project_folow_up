@@ -59,7 +59,7 @@ const HealthCard = ({ health, isLoading }: HealthCardProps) => {
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border border-gray-200 dark:border-gray-700 transition-all">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800 dark:text-white">
-          <Gauge size={20} /> Project Health
+          <Gauge size={20} /> Project Condition
         </h3>
         <Badge variant={getHealthVariant(health.Level)}>
           {getHealthStatusText(health.Level)}

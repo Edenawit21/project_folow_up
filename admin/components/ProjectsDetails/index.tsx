@@ -218,9 +218,9 @@ const ProjectDetail: NextPage<ProjectDetailProps> = ({ projectKey }) => {
   }, [sprintReport]);
 
   return (
-    <div className="min-h-screen dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 font-inter">
+    <div className="min-h-screen dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 font-inter min-w-full">
       <div className="max-w-6xl mx-auto px-4 md:px-0">
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-start mb-4">
           <button
             onClick={() => router.push("/dashboard/projects")}
             className="text-xl font-medium text-blue-600 hover:underline flex items-center"

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const PROJECT_API_URL =
-  process.env.NEXT_PUBLIC_BASE_API_URL ?? "https://localhost:7205/api/Project";
+  process.env.NEXT_PUBLIC_BASE_API_URL ?? "https://localhost:5106/api/Project";
 
 
   export interface PagedList<T> {
@@ -128,35 +128,67 @@ const mapApiToProjectDto = (api: ApiProject): ProjectDto => ({
 });
 
 
-export const fetchProjects = async (filter: ProjectFilterDto): Promise<PagedList<ProjectDto>> => {
+export const fetchProjects = async (
+  filter: ProjectFilterDto
+): Promise<PagedList<ProjectDto>> => {
   try {
-    const response = await axios.get<{
-      success: boolean;
-      data: PagedList<ApiProject>;
-    }>(`${PROJECT_API_URL}/api/Project/public`, {
-      params: filter
+    const response = await axios.get(`${PROJECT_API_URL}/api/Project/public`, {
+      params: filter,
     });
 
-    if (!response.data.success) {
-      throw new Error("Failed to fetch projects");
+    const data = response.data.data;
+
+    // Determine if data is a paged object or a plain array
+    let itemsArray: ApiProject[] = [];
+    let pagedInfo = {
+      totalCount: 0,
+      pageNumber: 1,
+      pageSize: 0,
+      totalPages: 1,
+      hasPreviousPage: false,
+      hasNextPage: false,
+    };
+
+    if (Array.isArray(data)) {
+      // Plain array response
+      itemsArray = data;
+      pagedInfo.totalCount = data.length;
+      pagedInfo.pageSize = data.length;
+    } else if (data && Array.isArray(data.items)) {
+      // Paged response
+      itemsArray = data.items;
+      pagedInfo = {
+        totalCount: data.totalCount,
+        pageNumber: data.pageNumber,
+        pageSize: data.pageSize,
+        totalPages: data.totalPages,
+        hasPreviousPage: data.hasPreviousPage,
+        hasNextPage: data.hasNextPage,
+      };
+    } else {
+      // fallback if data is undefined or unexpected
+      itemsArray = [];
     }
 
-    const pagedData = response.data.data;
-    
     return {
-      items: pagedData.items.map(mapApiToProjectDto),
-      totalCount: pagedData.totalCount,
-      pageNumber: pagedData.pageNumber,
-      pageSize: pagedData.pageSize,
-      totalPages: pagedData.totalPages,
-      hasPreviousPage: pagedData.hasPreviousPage,
-      hasNextPage: pagedData.hasNextPage
+      items: itemsArray.map(mapApiToProjectDto),
+      ...pagedInfo,
     };
   } catch (error) {
     console.error("Error fetching projects:", error);
-    throw error;
+    return {
+      items: [],
+      totalCount: 0,
+      pageNumber: 1,
+      pageSize: 0,
+      totalPages: 1,
+      hasPreviousPage: false,
+      hasNextPage: false,
+    };
   }
 };
+
+
 
 export const fetchProjectById = async (
   projectId: string

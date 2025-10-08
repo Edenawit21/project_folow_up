@@ -10,6 +10,7 @@ export interface MenuItem {
   isActive: boolean;
   parent: MenuItem | null;
   children: MenuItem[];
+  content?: 'list' | 'form' | 'default';
 }
 
 export interface MenuByIdResponse {

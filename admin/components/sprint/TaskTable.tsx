@@ -32,9 +32,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ tasks }) => {
   }, [tasks, currentPage, rowsPerPage]);
 
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
   const handleRowsPerPageChange = (rows: number) => {
@@ -92,7 +90,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ tasks }) => {
           {task.key}
         </a>
       </td>
-      <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 max-w-sm whitespace-normal break-words">
+      <td className="px-6 py-4 whitespace-normal text-sm text-gray-700 dark:text-gray-300 max-w-xs">
         {task.title}
       </td>
 
@@ -146,12 +144,15 @@ const TasksTable: React.FC<TasksTableProps> = ({ tasks }) => {
         Tasks in Sprint
       </div>
 
-      <Table
-        headers={headers}
-        data={paginatedTasks}
-        renderRow={renderRow}
-        emptyMessage="No tasks found for this sprint."
-      />
+      {/* Horizontal scroll safe wrapper */}
+      <div className="overflow-x-auto">
+        <Table
+          headers={headers}
+          data={paginatedTasks}
+          renderRow={renderRow}
+          emptyMessage="No tasks found for this sprint."
+        />
+      </div>
 
       <PaginationFooter
         currentPage={currentPage}

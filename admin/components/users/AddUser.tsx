@@ -153,13 +153,21 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
         onClose();
       } else {
         const createdUser = await registerUser(formData);
-        setGeneratedPassword(createdUser.generatedPassword);
-        onCreate?.({
-          username: `${firstName} ${lastName}`,
-          email,
-          role: roles.join(", "),
-        });
 
+        // Show password modal before closing
+        if (createdUser.generatedPassword) {
+          setGeneratedPassword(createdUser.generatedPassword);
+        } else {
+          toast.success("User registered successfully!");
+          onCreate?.({
+            username: `${firstName} ${lastName}`,
+            email,
+            role: roles.join(", "),
+          });
+          onClose();
+        }
+
+        // Reset form data but keep modal open if showing password
         setFormData({ firstName: "", lastName: "", email: "", roles: [] });
         setDropdownOpen(false);
       }
@@ -271,8 +279,6 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
                         onChange={() => handleRoleChange(role.name)}
                         className="mr-2"
                         disabled={loading || submitting}
-                        aria-checked={formData.roles.includes(role.name)}
-                        role="checkbox"
                       />
                       {role.name}
                     </label>
@@ -322,7 +328,6 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
               <button
                 onClick={() => copyToClipboard(generatedPassword)}
                 className="ml-2 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                aria-label="Copy password"
               >
                 {copied ? "Copied" : "Copy"}
               </button>
@@ -330,6 +335,12 @@ const AddUser = ({ id, onClose, onCreate, onUpdate }: AddUserProps) => {
             <button
               onClick={() => {
                 setGeneratedPassword(null);
+                toast.success("User registered successfully!");
+                onCreate?.({
+                  username: `${formData.firstName} ${formData.lastName}`,
+                  email: formData.email,
+                  role: formData.roles.join(", "),
+                });
                 onClose();
               }}
               className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded hover:bg-gray-400"

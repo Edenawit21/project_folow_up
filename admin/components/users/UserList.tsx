@@ -64,32 +64,32 @@ const UserList = () => {
   const [totalCount, setTotalCount] = useState(0);
 
   // Fetch users and roles according to current filters
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const apiFilter = {
-        ...filter,
-        SearchTerm: searchTerm || undefined,
-        Role: roleFilter || undefined,
-        Source: sourceFilter || undefined,
-      };
+ const fetchData = useCallback(async () => {
+   setLoading(true);
+   try {
+     const apiFilter = {
+       ...filter,
+       SearchTerm: searchTerm || undefined,
+       Role: roleFilter || undefined,
+       Source: sourceFilter || undefined,
+     };
 
-      const [usersResult, rolesResponse] = await Promise.all([
-        getUsers(apiFilter),
-        fetchAllRoles(),
-      ]);
+     const [usersResult, rolesResponse] = await Promise.all([
+       getUsers(apiFilter),
+       fetchAllRoles(),
+     ]);
 
-      const { items, totalCount } = usersResult;
-      setUsers(items);
-      setTotalCount(totalCount);
-      setRoles(rolesResponse);
-    } catch (error) {
-      toast.error("Failed to fetch users or roles");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }, [filter, searchTerm, roleFilter, sourceFilter]);
+     const { items = [], totalCount = 0 } = usersResult || {};
+     setUsers(items);
+     setTotalCount(totalCount);
+     setRoles(rolesResponse || []);
+   } catch (error) {
+     toast.error("Failed to fetch users or roles");
+     console.error(error);
+   } finally {
+     setLoading(false);
+   }
+ }, [filter, searchTerm, roleFilter, sourceFilter]);
 
   useEffect(() => {
     fetchData();
@@ -322,10 +322,13 @@ const UserList = () => {
                         className="block w-full py-2 -my-2"
                       >
                         <div className="flex flex-wrap gap-1">
-                          {user.roles?.map((role, index) => (
+                          {(user.roles && user.roles.length > 0
+                            ? user.roles
+                            : ["—"]
+                          ).map((role, index) => (
                             <span
                               key={index}
-                              className="px-2 py-0.5 text-green-500 dark:text-green-500 text-base "
+                              className="px-2 py-0.5 text-gray-400 dark:text-gray-500 text-base"
                             >
                               {role}
                             </span>
